@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef functional_vector_h
-#define functional_vector_h
+#ifndef FUNCTIONAL_VECTOR_H
+#define FUNCTIONAL_VECTOR_H
 #include <vector>
 #include <functional>
 #include <algorithm>
@@ -34,8 +34,8 @@ public:
     : backing_vector_()
     {
     }
-    
-    functional_vector(const std::vector<T> &vector)
+
+    explicit functional_vector(const std::vector<T> &vector)
     : backing_vector_(std::move(vector))
     {
     }
@@ -50,8 +50,8 @@ public:
         backing_vector_.push_back(value);
         return *this;
     }
-    
-    functional_vector adding(T value) const
+
+    [[nodiscard]] functional_vector adding(T value) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.push_back(value);
@@ -65,8 +65,8 @@ public:
                                vector.end());
         return *this;
     }
-    
-    functional_vector adding_range(const std::vector<T>& vector) const
+
+    [[nodiscard]] functional_vector adding_range(const std::vector<T>& vector) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.reserve(augmented_vector.size() + vector.size());
@@ -83,8 +83,8 @@ public:
                                list.end());
         return *this;
     }
-    
-    functional_vector adding_range(const std::initializer_list<T>& list) const
+
+    [[nodiscard]] functional_vector adding_range(const std::initializer_list<T>& list) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.reserve(augmented_vector.size() + list.size());
@@ -131,8 +131,8 @@ public:
         std::reverse(backing_vector_.begin(), backing_vector_.end());
         return *this;
     }
-    
-    functional_vector reversed() const
+
+    [[nodiscard]] functional_vector reversed() const
     {
         std::vector<T> reversed_vector(backing_vector_);
         std::reverse(reversed_vector.begin(), reversed_vector.end());
@@ -196,18 +196,18 @@ public:
                   comparison_predicate);
         return functional_vector(sorted_vector);
     }
-    
-    functional_vector sorted_ascending() const
+
+    [[nodiscard]] functional_vector sorted_ascending() const
     {
         return sorted(std::less_equal<T>());
     }
-    
-    functional_vector sorted_descending() const
+
+    [[nodiscard]] functional_vector sorted_descending() const
     {
         return sorted(std::greater_equal<T>());
     }
-    
-    size_t size() const
+
+    [[nodiscard]] size_t size() const
     {
         return backing_vector_.size();
     }
@@ -228,8 +228,8 @@ public:
     {
         return backing_vector_.begin();
     }
-    
-    typename std::vector<T>::const_iterator begin() const
+
+    [[nodiscard]] typename std::vector<T>::const_iterator begin() const
     {
         return backing_vector_.begin();
     }
@@ -238,8 +238,8 @@ public:
     {
         return backing_vector_.end();
     }
-    
-    typename std::vector<T>::const_iterator end() const
+
+    [[nodiscard]] typename std::vector<T>::const_iterator end() const
     {
         return backing_vector_.end();
     }
@@ -251,8 +251,8 @@ public:
                       operation);
         return *this;
     }
-    
-    std::optional<size_t> first_index_of(const T& element) const
+
+    [[nodiscard]] std::optional<size_t> first_index_of(const T& element) const
     {
         auto it = std::find(backing_vector_.begin(),
                             backing_vector_.end(),
@@ -262,8 +262,8 @@ public:
         }
         return std::nullopt;
     }
-    
-    std::optional<size_t> last_index_of(const T& element) const
+
+    [[nodiscard]] std::optional<size_t> last_index_of(const T& element) const
     {
         auto it = std::find(backing_vector_.rbegin(),
                             backing_vector_.rend(),
@@ -273,8 +273,8 @@ public:
         }
         return std::nullopt;
     }
-    
-    std::vector<size_t> all_indices_of(const T& element) const
+
+    [[nodiscard]] std::vector<size_t> all_indices_of(const T& element) const
     {
         std::vector<size_t> indices;
         auto it = std::find(backing_vector_.begin(),
@@ -294,8 +294,8 @@ public:
         backing_vector_.erase(begin() + index);
         return *this;
     }
-    
-    functional_vector removing_at(size_t index) const
+
+    [[nodiscard]] functional_vector removing_at(size_t index) const
     {
         assert(index < size());
         auto copy(backing_vector_);
@@ -310,8 +310,8 @@ public:
         }
         return remove_at(size() - 1);
     }
-    
-    functional_vector removing_last() const
+
+    [[nodiscard]] functional_vector removing_last() const
     {
         if (size() == 0) {
             return *this;
@@ -326,8 +326,8 @@ public:
         }
         return remove_at(0);
     }
-    
-    functional_vector removing_first() const
+
+    [[nodiscard]] functional_vector removing_first() const
     {
         if (size() == 0) {
             return *this;
@@ -341,8 +341,8 @@ public:
         backing_vector_.insert(begin() + index, element);
         return *this;
     }
-    
-    functional_vector inserting_at(size_t index, const T& element) const
+
+    [[nodiscard]] functional_vector inserting_at(size_t index, const T& element) const
     {
         assert(index < size());
         auto copy(backing_vector_);
@@ -354,4 +354,4 @@ private:
     std::vector<T> backing_vector_;
 };
 
-#endif /* functional_vector_h */
+#endif /* FUNCTIONAL_VECTOR_H */
