@@ -2,17 +2,17 @@
 #include <string>
 #include "functional_vector.h"
 
-struct Child {
-    Child(int age)
+struct child {
+    child(int age)
     : age(age)
     {
     }
     int age;
 };
 
-struct Person {
-    Person(int age, std::string name)
-    : age(age), name(name)
+struct person {
+    person(int age, std::string name)
+    : age(age), name(std::move(name))
     {
     }
     int age;
@@ -87,8 +87,8 @@ TEST(FunctionalVectorTest, AddingRangeFromInitializerListTest) {
 
 TEST(FunctionalVectorTest, MapTest) {
     const auto vector_under_test = functional_vector({1, 3, 4});
-    const auto mapped_vector = vector_under_test.map<Child>([](const auto& age) {
-        return Child(age);
+    const auto mapped_vector = vector_under_test.map<child>([](const auto& age) {
+        return child(age);
     });
     EXPECT_EQ(3, mapped_vector.size());
     EXPECT_EQ(1, mapped_vector[0].age);
@@ -97,7 +97,7 @@ TEST(FunctionalVectorTest, MapTest) {
 }
 
 TEST(FunctionalVectorTest, FilterTest) {
-    auto vector_under_test = functional_vector({Child(1), Child(3), Child(4)});
+    auto vector_under_test = functional_vector({child(1), child(3), child(4)});
     vector_under_test.filter([](const auto& child) {
         return child.age < 2;
     });
@@ -110,7 +110,7 @@ TEST(FunctionalVectorTest, FilterTest) {
 }
 
 TEST(FunctionalVectorTest, FilteredTest) {
-    const auto vector_under_test = functional_vector({Child(1), Child(3), Child(4)});
+    const auto vector_under_test = functional_vector({child(1), child(3), child(4)});
     const auto filtered_vector = vector_under_test.filtered([](const auto& child) {
         return child.age < 2;
     });
@@ -120,7 +120,7 @@ TEST(FunctionalVectorTest, FilteredTest) {
 }
 
 TEST(FunctionalVectorTest, ReverseTest) {
-    auto vector_under_test = functional_vector({Child(6), Child(2), Child(9)});
+    auto vector_under_test = functional_vector({child(6), child(2), child(9)});
     vector_under_test.reverse();
     EXPECT_EQ(3, vector_under_test.size());
     EXPECT_EQ(9, vector_under_test[0].age);
@@ -129,7 +129,7 @@ TEST(FunctionalVectorTest, ReverseTest) {
 }
 
 TEST(FunctionalVectorTest, ReversedTest) {
-    const auto vector_under_test = functional_vector({Child(6), Child(2), Child(9)});
+    const auto vector_under_test = functional_vector({child(6), child(2), child(9)});
     const auto reversed_vector = vector_under_test.reversed();
     EXPECT_EQ(3, reversed_vector.size());
     EXPECT_EQ(9, reversed_vector[0].age);
@@ -155,7 +155,7 @@ TEST(FunctionalVectorTest, ZipWithFunctionalVectorUnequalSizesThrowsTest) {
 
 TEST(FunctionalVectorTest, ZipWithStdVectorTest) {
     const auto ages_vector = functional_vector({32, 25, 53});
-    const auto zipped_vector = ages_vector.zip(std::vector{"Jake", "Mary", "John"});
+    const auto zipped_vector = ages_vector.zip(std::vector<std::string>{"Jake", "Mary", "John"});
     EXPECT_EQ(3, zipped_vector.size());
     
     EXPECT_EQ(32, zipped_vector[0].first);
@@ -171,7 +171,7 @@ TEST(FunctionalVectorTest, ZipWithStdVectorTest) {
 TEST(FunctionalVectorTest, ZipWithFunctionalVectorTest) {
     const auto ages_vector = functional_vector({32, 25, 53});
     const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
-    const auto zipped_vector = ages_vector.zip(std::vector{"Jake", "Mary", "John"});
+    const auto zipped_vector = ages_vector.zip(names_vector);
     EXPECT_EQ(3, zipped_vector.size());
     
     EXPECT_EQ(32, zipped_vector[0].first);
@@ -185,7 +185,7 @@ TEST(FunctionalVectorTest, ZipWithFunctionalVectorTest) {
 }
 
 TEST(FunctionalVectorTest, SortTest) {
-    auto vector_under_test = functional_vector({Person(45, "Jake"), Person(34, "Bob"), Person(52, "Manfred"), Person(8, "Alice")});
+    auto vector_under_test = functional_vector({person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")});
     vector_under_test.sort([](const auto& person1, const auto& person2) {
         return person1.name < person2.name;
     });
@@ -205,7 +205,7 @@ TEST(FunctionalVectorTest, SortTest) {
 }
 
 TEST(FunctionalVectorTest, SortedTest) {
-    const auto vector_under_test = functional_vector({Person(45, "Jake"), Person(34, "Bob"), Person(52, "Manfred"), Person(8, "Alice")});
+    const auto vector_under_test = functional_vector({person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")});
     const auto sorted_vector = vector_under_test.sorted([](const auto& person1, const auto& person2) {
         return person1.name < person2.name;
     });
