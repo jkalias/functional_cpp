@@ -19,6 +19,13 @@ struct Person {
     std::string name;
 };
 
+template<typename T>
+void debug_vector(const functional_vector<T>& vec) {
+    vec.for_each([](const auto& element) {
+        std::cout << element << std::endl;
+    });
+}
+
 TEST(FunctionalVectorTest, AddTest) {
 	auto vector_under_test = functional_vector<int>();
 	EXPECT_EQ(0, vector_under_test.size());
@@ -175,4 +182,143 @@ TEST(FunctionalVectorTest, ZipWithFunctionalVectorTest) {
     
     EXPECT_EQ(53, zipped_vector[2].first);
     EXPECT_EQ("John", zipped_vector[2].second);
+}
+
+TEST(FunctionalVectorTest, SortTest) {
+    auto vector_under_test = functional_vector({Person(45, "Jake"), Person(34, "Bob"), Person(52, "Manfred"), Person(8, "Alice")});
+    vector_under_test.sort([](const auto& person1, const auto& person2) {
+        return person1.name < person2.name;
+    });
+    EXPECT_EQ(4, vector_under_test.size());
+    
+    EXPECT_EQ("Alice", vector_under_test[0].name);
+    EXPECT_EQ(8, vector_under_test[0].age);
+    
+    EXPECT_EQ("Bob", vector_under_test[1].name);
+    EXPECT_EQ(34, vector_under_test[1].age);
+    
+    EXPECT_EQ("Jake", vector_under_test[2].name);
+    EXPECT_EQ(45, vector_under_test[2].age);
+    
+    EXPECT_EQ("Manfred", vector_under_test[3].name);
+    EXPECT_EQ(52, vector_under_test[3].age);
+}
+
+TEST(FunctionalVectorTest, SortedTest) {
+    const auto vector_under_test = functional_vector({Person(45, "Jake"), Person(34, "Bob"), Person(52, "Manfred"), Person(8, "Alice")});
+    const auto sorted_vector = vector_under_test.sorted([](const auto& person1, const auto& person2) {
+        return person1.name < person2.name;
+    });
+    
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ("Jake", vector_under_test[0].name);
+    EXPECT_EQ(45, vector_under_test[0].age);
+    EXPECT_EQ("Bob", vector_under_test[1].name);
+    EXPECT_EQ(34, vector_under_test[1].age);
+    EXPECT_EQ("Manfred", vector_under_test[2].name);
+    EXPECT_EQ(52, vector_under_test[2].age);
+    EXPECT_EQ("Alice", vector_under_test[3].name);
+    EXPECT_EQ(8, vector_under_test[3].age);
+    
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ("Alice", sorted_vector[0].name);
+    EXPECT_EQ(8, sorted_vector[0].age);
+    EXPECT_EQ("Bob", sorted_vector[1].name);
+    EXPECT_EQ(34, sorted_vector[1].age);
+    EXPECT_EQ("Jake", sorted_vector[2].name);
+    EXPECT_EQ(45, sorted_vector[2].age);
+    EXPECT_EQ("Manfred", sorted_vector[3].name);
+    EXPECT_EQ(52, sorted_vector[3].age);
+}
+
+TEST(FunctionalVectorTest, SortAscendingTest) {
+    auto vector_under_test = functional_vector({3, 1, 9, -4});
+    vector_under_test.sort_ascending();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(-4, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(3, vector_under_test[2]);
+    EXPECT_EQ(9, vector_under_test[3]);
+}
+
+TEST(FunctionalVectorTest, SortedAscendingTest) {
+    const auto vector_under_test = functional_vector({3, 1, 9, -4});
+    const auto sorted_vector = vector_under_test.sorted_ascending();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(3, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(9, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
+    
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ(-4, sorted_vector[0]);
+    EXPECT_EQ(1, sorted_vector[1]);
+    EXPECT_EQ(3, sorted_vector[2]);
+    EXPECT_EQ(9, sorted_vector[3]);
+}
+
+TEST(FunctionalVectorTest, SortDescendingTest) {
+    auto vector_under_test = functional_vector({3, 1, 9, -4});
+    vector_under_test.sort_descending();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(9, vector_under_test[0]);
+    EXPECT_EQ(3, vector_under_test[1]);
+    EXPECT_EQ(1, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
+}
+
+TEST(FunctionalVectorTest, SortedDescendingTest) {
+    const auto vector_under_test = functional_vector({3, 1, 9, -4});
+    const auto sorted_vector = vector_under_test.sorted_descending();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(3, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(9, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
+    
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ(9, sorted_vector[0]);
+    EXPECT_EQ(3, sorted_vector[1]);
+    EXPECT_EQ(1, sorted_vector[2]);
+    EXPECT_EQ(-4, sorted_vector[3]);
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorNegativeDeathTest) {
+    const auto vector_under_test = functional_vector({3, 1, 9, -4});
+    EXPECT_DEATH(vector_under_test[-1], "");
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorIndexEqualToSizeDeathTest) {
+    const auto vector_under_test = functional_vector({3, 1, 9, -4});
+    EXPECT_DEATH(vector_under_test[4], "");
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorIndexLargerThanSizeDeathTest) {
+    const auto vector_under_test = functional_vector({3, 1, 9, -4});
+    EXPECT_DEATH(vector_under_test[5], "");
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorAssignNegativeDeathTest) {
+    auto vector_under_test = functional_vector({3, 1, 9, -4});
+    EXPECT_DEATH(vector_under_test[-1] = 5, "");
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorAssignIndexEqualSizeDeathTest) {
+    auto vector_under_test = functional_vector({3, 1, 9, -4});
+    EXPECT_DEATH(vector_under_test[4] = 5, "");
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorAssignIndexLargerThanSizeDeathTest) {
+    auto vector_under_test = functional_vector({3, 1, 9, -4});
+    EXPECT_DEATH(vector_under_test[5] = -3, "");
+}
+
+TEST(FunctionalVectorTest, SubscriptOperatorAssignTest) {
+    auto vector_under_test = functional_vector({3, 1, 9, -4});
+    vector_under_test[2] = 7;
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(3, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(7, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
 }
