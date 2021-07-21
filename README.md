@@ -1,6 +1,55 @@
-# functional_vector
-A wrapper for C++ std::vector geared towards a more fluent API, with functional programming in mind.
+# Say hello to functional C++ vectors
+A wrapper for C++ std::vector geared towards functional programming and fluent APIs.
+The primary focus is readability at the call site (not performance) and eliminating manual management of vector indices.
+This is heavily influenced and inspired by C# and Swift.
 
-The primary focus is readability at the call site and not performance.
+## Examples
+### zip, map, filter, sort
+```c++
+#include "functional_vector.h" // instead of <vector>
 
-Heavily influenced and inspired from C# and Swift.
+struct person {
+    person(int age, std::string name)
+    : age(age), name(std::move(name))
+    {}
+    int age;
+    std::string name;
+};
+
+// ...
+
+// the employees' ages
+const auto ages = functional_vector<int>({32, 45, 37, 23});
+
+// the employees' names
+const auto names = functional_vector<std::string>({"Jake", "Anna", "Kate", "Bob"});
+
+const auto employees_below_40 = ages
+    // zip two vectors for simultaneous processing
+    .zip(names)
+
+    // apply the functional map algorithm (transform from one type to another)
+    .map<person>([](const auto& pair) {                     
+        return person(pair.first, pair.second);
+    })
+    
+    // filter the elements using a local function (lambda)
+    .filter([](const auto& person) {
+        return person.age < 40;
+    })
+    
+    // sort according to custom predicate
+    .sort([](const auto& person1, const auto& person2) {
+        return person1.age < person2.age;
+    });
+
+/*
+ prints the following:
+ Bob is 23 years old.
+ Jake is 32 years old.
+ Kate is 37 years old.
+ */
+employees_sorted_by_age.for_each([](const auto& person) {
+    std::cout << person.name << " is " << person.age << " years old." << std::endl;
+});
+```
