@@ -147,24 +147,24 @@ public:
     };
     
     template <typename U>
-    functional_vector<functional_vector_tuple<U>> zip(const std::vector<U>& vector) const
+    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const std::vector<U>& vector) const
     {
         assert(backing_vector_.size() == vector.size());
         std::vector<functional_vector_tuple<U>> combined_vector;
         combined_vector.reserve(vector.size());
-        for (auto i = 0; i < backing_vector_.size(); i++) {
+        for (size_t i = 0; i < backing_vector_.size(); i++) {
             combined_vector.push_back({ backing_vector_[i], vector[i] });
         }
         return functional_vector<functional_vector_tuple<U>>(combined_vector);
     }
     
     template <typename U>
-    functional_vector<functional_vector_tuple<U>> zip(const functional_vector<U>& vector) const
+    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const functional_vector<U>& vector) const
     {
         assert(backing_vector_.size() == vector.size());
         std::vector<functional_vector_tuple<U>> combined_vector;
         combined_vector.reserve(vector.size());
-        for (auto i = 0; i < backing_vector_.size(); i++) {
+        for (size_t i = 0; i < backing_vector_.size(); i++) {
             combined_vector.push_back({ backing_vector_[i], vector[i] });
         }
         return functional_vector<functional_vector_tuple<U>>(combined_vector);
@@ -254,10 +254,9 @@ public:
 
     [[nodiscard]] std::optional<size_t> first_index_of(const T& element) const
     {
-        auto it = std::find(backing_vector_.begin(),
-                            backing_vector_.end(),
-                            element);
-        if (it != backing_vector_.end()) {
+	    if (auto it = std::find(backing_vector_.begin(),
+	                            backing_vector_.end(),
+	                            element); it != backing_vector_.end()) {
             return std::distance(backing_vector_.begin(), it);
         }
         return std::nullopt;
@@ -265,10 +264,9 @@ public:
 
     [[nodiscard]] std::optional<size_t> last_index_of(const T& element) const
     {
-        auto it = std::find(backing_vector_.rbegin(),
-                            backing_vector_.rend(),
-                            element);
-        if (it != backing_vector_.rend()) {
+	    if (auto it = std::find(backing_vector_.rbegin(),
+	                            backing_vector_.rend(),
+	                            element); it != backing_vector_.rend()) {
             return std::distance(it, backing_vector_.rend()) - 1;
         }
         return std::nullopt;
