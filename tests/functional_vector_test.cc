@@ -5,16 +5,14 @@
 struct child {
     child(int age)
     : age(age)
-    {
-    }
+    {}
     int age;
 };
 
 struct person {
     person(int age, std::string name)
     : age(age), name(std::move(name))
-    {
-    }
+    {}
     int age;
     std::string name;
 };
