@@ -93,7 +93,7 @@ public:
                                 list.end());
         return functional_vector(augmented_vector);
     }
-    
+        
     template <typename U>
     functional_vector<U> map(const std::function<U(T)>& transform) const
     {
@@ -335,17 +335,30 @@ public:
     
     functional_vector& insert_at(size_t index, const T& element)
     {
-        assert(index < size());
+        assert(index <= size());
         backing_vector_.insert(begin() + index, element);
         return *this;
     }
 
     [[nodiscard]] functional_vector inserting_at(size_t index, const T& element) const
     {
-        assert(index < size());
+        assert(index <= size());
         auto copy(backing_vector_);
         copy.insert(copy.begin() + index, element);
         return functional_vector(copy);
+    }
+    
+    bool operator == (const functional_vector<T>& rhs) const
+    {
+        return std::equal(backing_vector_.begin(),
+                          backing_vector_.end(),
+                          rhs.begin(),
+                          rhs.end());
+    }
+    
+    bool operator != (const functional_vector<T>& rhs) const
+    {
+        return !((*this) == rhs);
     }
     
 private:
