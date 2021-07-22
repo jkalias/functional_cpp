@@ -223,20 +223,10 @@ public:
         assert(index < size());
         return backing_vector_[index];
     }
-    
-    typename std::vector<T>::iterator begin()
-    {
-        return backing_vector_.begin();
-    }
 
     [[nodiscard]] typename std::vector<T>::const_iterator begin() const
     {
         return backing_vector_.begin();
-    }
-    
-    typename std::vector<T>::iterator end()
-    {
-        return backing_vector_.end();
     }
 
     [[nodiscard]] typename std::vector<T>::const_iterator end() const
