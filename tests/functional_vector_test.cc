@@ -560,3 +560,16 @@ TEST(RangeTest, InvalidFromStartAndEndTest) {
     EXPECT_EQ(-1, range.start);
     EXPECT_EQ(-1, range.count);
 }
+
+TEST(RangeTest, EqualityTest) {
+    EXPECT_FALSE(index_range::invalid == index_range::from_start_and_end(9, 10));
+    EXPECT_TRUE(index_range::invalid == index_range::from_start_and_end(10, 9));
+    EXPECT_TRUE(index_range::invalid == index_range::invalid);
+    EXPECT_FALSE(index_range::invalid != index_range::invalid);
+    
+    EXPECT_TRUE(index_range::from_start_and_end(9, 10) == index_range::from_start_and_end(9, 10));
+    EXPECT_FALSE(index_range::from_start_and_end(9, 10) != index_range::from_start_and_end(9, 10));
+    
+    EXPECT_FALSE(index_range::from_start_and_end(9, 10) == index_range::from_start_and_end(8, 10));
+    EXPECT_TRUE(index_range::from_start_and_end(9, 10) != index_range::from_start_and_end(8, 10));
+}

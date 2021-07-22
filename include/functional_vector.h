@@ -30,6 +30,8 @@
 struct index_range
 {
 public:
+    static index_range invalid;
+    
     static index_range from_start_and_count(size_t start, size_t count)
     {
         return index_range(start, count);
@@ -53,6 +55,7 @@ public:
     size_t start;
     size_t count;
     bool is_valid;
+    
 private:
     index_range(size_t start, size_t count)
     : start(-1), count(-1)
@@ -64,6 +67,8 @@ private:
         }
     }
 };
+
+index_range index_range::invalid = index_range::from_start_and_count(-1, -1);
 
 template <typename T>
 class functional_vector {
