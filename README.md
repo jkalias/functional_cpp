@@ -1,3 +1,4 @@
+[![GitHub license](https://img.shields.io/github/license/jkalias/functional_vector)](https://github.com/jkalias/functional_vector/blob/main/LICENSE)
 # Say hello to functional C++ vectors
 A wrapper for C++ std::vector geared towards functional programming and fluent APIs.
 The primary focus is readability at the call site (not performance) and eliminating manual management of vector indices.
