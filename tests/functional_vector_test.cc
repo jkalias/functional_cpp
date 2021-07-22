@@ -507,3 +507,56 @@ TEST(FunctionalVectorTest, InsertingAtFilledVectorTest) {
     EXPECT_EQ(functional_vector<int>({1, 4, 2, 18, 5, 8, 3, 1, 7, 1}), augmented_vector);
     EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
+
+TEST(RangeTest, InvalidTest) {
+    auto range = index_range::from_start_and_count(0, 0);
+    EXPECT_FALSE(range.is_valid);
+    EXPECT_EQ(-1, range.start);
+    EXPECT_EQ(-1, range.count);
+    
+    range = index_range::from_start_and_count(0, -1);
+    EXPECT_FALSE(range.is_valid);
+    EXPECT_EQ(-1, range.start);
+    EXPECT_EQ(-1, range.count);
+    
+    range = index_range::from_start_and_count(-1, 10);
+    EXPECT_FALSE(range.is_valid);
+    EXPECT_EQ(-1, range.start);
+    EXPECT_EQ(-1, range.count);
+}
+
+TEST(RangeTest, ValidFromStartAndCountTest) {
+    auto range = index_range::from_start_and_count(0, 1);
+    EXPECT_TRUE(range.is_valid);
+    EXPECT_EQ(0, range.start);
+    EXPECT_EQ(1, range.count);
+    
+    range = index_range::from_start_and_count(13, 3);
+    EXPECT_TRUE(range.is_valid);
+    EXPECT_EQ(13, range.start);
+    EXPECT_EQ(3, range.count);
+}
+
+TEST(RangeTest, ValidFromStartAndEndTest) {
+    auto range = index_range::from_start_and_end(0, 1);
+    EXPECT_TRUE(range.is_valid);
+    EXPECT_EQ(0, range.start);
+    EXPECT_EQ(2, range.count);
+    
+    range = index_range::from_start_and_end(13, 15);
+    EXPECT_TRUE(range.is_valid);
+    EXPECT_EQ(13, range.start);
+    EXPECT_EQ(3, range.count);
+    
+    range = index_range::from_start_and_end(13, 13);
+    EXPECT_TRUE(range.is_valid);
+    EXPECT_EQ(13, range.start);
+    EXPECT_EQ(1, range.count);
+}
+
+TEST(RangeTest, InvalidFromStartAndEndTest) {
+    auto range = index_range::from_start_and_end(10, 9);
+    EXPECT_FALSE(range.is_valid);
+    EXPECT_EQ(-1, range.start);
+    EXPECT_EQ(-1, range.count);
+}

@@ -27,6 +27,44 @@
 #include <algorithm>
 #include <optional>
 
+struct index_range
+{
+public:
+    static index_range from_start_and_count(size_t start, size_t count)
+    {
+        return index_range(start, count);
+    }
+    
+    static index_range from_start_and_end(size_t start, size_t end)
+    {
+        return index_range(start, end - start + 1);
+    }
+    
+    bool operator == (const index_range& rhs) const
+    {
+        return start == rhs.start && count == rhs.count;
+    }
+    
+    bool operator != (const index_range& rhs) const
+    {
+        return !(*this == rhs);
+    }
+    
+    size_t start;
+    size_t count;
+    bool is_valid;
+private:
+    index_range(size_t start, size_t count)
+    : start(-1), count(-1)
+    {
+        is_valid = start >= 0 && start != -1 && count > 0 && count != -1;
+        if (is_valid) {
+            this->start = start;
+            this->count = count;
+        }
+    }
+};
+
 template <typename T>
 class functional_vector {
 public:
