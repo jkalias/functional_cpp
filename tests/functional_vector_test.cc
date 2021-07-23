@@ -349,55 +349,55 @@ TEST(FunctionalVectorTest, SubscriptOperatorAssignTest) {
     EXPECT_EQ(-4, vector_under_test[3]);
 }
 
-TEST(FunctionalVectorTest, FirstIndexOfEmptyVectorTest) {
+TEST(FunctionalVectorTest, FindFirstIndexEmptyVectorTest) {
     const auto vector_under_test = functional_vector<int>();
-    EXPECT_FALSE(vector_under_test.first_index_of(-3).has_value());
+    EXPECT_FALSE(vector_under_test.find_first_index(-3).has_value());
 }
 
-TEST(FunctionalVectorTest, FirstIndexOfFilledVectorWithoutMatchTest) {
+TEST(FunctionalVectorTest, FindFirstIndexFilledVectorWithoutMatchTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    EXPECT_FALSE(vector_under_test.first_index_of(9).has_value());
+    EXPECT_FALSE(vector_under_test.find_first_index(9).has_value());
 }
 
-TEST(FunctionalVectorTest, FirstIndexOfFilledVectorTest) {
+TEST(FunctionalVectorTest, FindFirstIndexFilledVectorTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    EXPECT_EQ(0, vector_under_test.first_index_of(1).value());
-    EXPECT_EQ(7, vector_under_test.first_index_of(7).value());
-    EXPECT_EQ(3, vector_under_test.first_index_of(5).value());
+    EXPECT_EQ(0, vector_under_test.find_first_index(1).value());
+    EXPECT_EQ(7, vector_under_test.find_first_index(7).value());
+    EXPECT_EQ(3, vector_under_test.find_first_index(5).value());
 }
 
-TEST(FunctionalVectorTest, LastIndexOfEmptyVectorTest) {
+TEST(FunctionalVectorTest, FindLastIndexEmptyVectorTest) {
     const auto vector_under_test = functional_vector<int>();
-    EXPECT_FALSE(vector_under_test.last_index_of(-3).has_value());
+    EXPECT_FALSE(vector_under_test.find_last_index(-3).has_value());
 }
 
-TEST(FunctionalVectorTest, LastIndexOfFilledVectorWithoutMatchTest) {
+TEST(FunctionalVectorTest, FindLastIndexFilledVectorWithoutMatchTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    EXPECT_FALSE(vector_under_test.last_index_of(9).has_value());
+    EXPECT_FALSE(vector_under_test.find_last_index(9).has_value());
 }
 
-TEST(FunctionalVectorTest, LastIndexOfFilledVectorTest) {
+TEST(FunctionalVectorTest, FindLastIndexFilledVectorTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    EXPECT_EQ(8, vector_under_test.last_index_of(1).value());
-    EXPECT_EQ(7, vector_under_test.last_index_of(7).value());
-    EXPECT_EQ(3, vector_under_test.last_index_of(5).value());
+    EXPECT_EQ(8, vector_under_test.find_last_index(1).value());
+    EXPECT_EQ(7, vector_under_test.find_last_index(7).value());
+    EXPECT_EQ(3, vector_under_test.find_last_index(5).value());
 }
 
-TEST(FunctionalVectorTest, AllIndicesOfEmptyVectorTest) {
+TEST(FunctionalVectorTest, FindAllIndicesEmptyVectorTest) {
     const auto vector_under_test = functional_vector<int>();
-    EXPECT_EQ(0, vector_under_test.all_indices_of(-3).size());
+    EXPECT_EQ(0, vector_under_test.find_all_indices(-3).size());
 }
 
-TEST(FunctionalVectorTest, AllIndicesOfFilledVectorWithoutMatchTest) {
+TEST(FunctionalVectorTest, FindAllIndicesFilledVectorWithoutMatchTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    EXPECT_EQ(0, vector_under_test.all_indices_of(9).size());
+    EXPECT_EQ(0, vector_under_test.find_all_indices(9).size());
 }
 
-TEST(FunctionalVectorTest, AllIndicesOfFilledVectorTest) {
+TEST(FunctionalVectorTest, FindAllIndicesFilledVectorTest) {
     const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 9, 1});
-    const auto one_indices = vector_under_test.all_indices_of(1);
+    const auto one_indices = vector_under_test.find_all_indices(1);
     EXPECT_EQ(std::vector<size_t>({0, 6, 8}), one_indices);
-    const auto seven_indices = vector_under_test.all_indices_of(9);
+    const auto seven_indices = vector_under_test.find_all_indices(9);
     EXPECT_EQ(std::vector<size_t>({7}), seven_indices);
 }
 

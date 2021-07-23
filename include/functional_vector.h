@@ -285,7 +285,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] std::optional<size_t> first_index_of(const T& element) const
+    [[nodiscard]] std::optional<size_t> find_first_index(const T& element) const
     {
 	    if (auto it = std::find(backing_vector_.begin(),
 	                            backing_vector_.end(),
@@ -295,7 +295,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] std::optional<size_t> last_index_of(const T& element) const
+    [[nodiscard]] std::optional<size_t> find_last_index(const T& element) const
     {
 	    if (auto it = std::find(backing_vector_.rbegin(),
 	                            backing_vector_.rend(),
@@ -305,7 +305,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] std::vector<size_t> all_indices_of(const T& element) const
+    [[nodiscard]] std::vector<size_t> find_all_indices(const T& element) const
     {
         std::vector<size_t> indices;
         auto it = std::find(backing_vector_.begin(),
