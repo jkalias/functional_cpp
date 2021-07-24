@@ -24,7 +24,7 @@ Then open the generated ```functional_vector.xcodeproj``` in the ```build``` fol
 cd functional_vector
 cmake -S . -B build
 cmake --build build
-build/tests/functional_vector_test
+build/tests/unit_tests
 ```
 
 ### Windows (Visual Studio)

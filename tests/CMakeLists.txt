@@ -1,4 +1,4 @@
-set(EXENAME tests)
+set(EXENAME unit_tests)
 
 # Enable test detection
 enable_testing()
