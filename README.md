@@ -4,7 +4,37 @@ A wrapper for C++ std::vector geared towards functional programming and fluent A
 The primary focus is readability at the call site (not performance) and eliminating manual management of vector indices.
 This is heavily influenced and inspired by C# and Swift.
 
-## Examples
+## Compilation (Cmake)
+### Dependencies
+* CMake >= 3.14
+
+### Minimum C++ version
+* C++17
+
+An out-of-source build strategy is used. All following examples assume an output build folder named ```build```.
+### macOS (Xcode)
+```console
+cd functional_vector
+cmake -S . -B build -G Xcode
+```
+Then open the generated ```functional_vector.xcodeproj``` in the ```build``` folder.
+
+### macOS and Linux (Makefiles)
+```console
+cd functional_vector
+cmake -S . -B build
+cmake --build build
+build/tests/functional_vector_test
+```
+
+### Windows (Visual Studio)
+```console
+cd functional_vector
+cmake -S . -B build
+```
+Then open the generated ```functional_vector.sln``` in the ```build``` folder.
+
+## Usage
 ### zip, map, filter, sort
 ```c++
 #include "functional_vector.h" // instead of <vector>
