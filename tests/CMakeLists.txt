@@ -8,7 +8,9 @@ include(GoogleTest)
 include_directories ("${PROJECT_SOURCE_DIR}/src/include")
 
 # Collect test sources into the variable TEST_SOURCES
-file (GLOB TEST_SOURCES "*.cc")
+file (GLOB TEST_SOURCES
+      "*.cpp"
+      "*.cc")
 
 # Set Properties->General->Configuration Type to Application
 add_executable (${EXENAME} ${TEST_SOURCES})
@@ -16,8 +18,7 @@ add_executable (${EXENAME} ${TEST_SOURCES})
 # Properties->Linker->Input->Additional Dependencies
 target_link_libraries(${EXENAME} PUBLIC functional_vector gtest_main)
 
-# Creates a folder "executables" and adds target 
-# project under it
+# Creates a folder "executables" and adds target project under it
 set_property(TARGET ${EXENAME} PROPERTY FOLDER "executables")
 
 # The official site of Google Test suggests the gtest_discover_tests
@@ -26,4 +27,6 @@ set_property(TARGET ${EXENAME} PROPERTY FOLDER "executables")
 gtest_add_tests(TARGET ${EXENAME} TEST_PREFIX fp:)
 
 # Adds logic to copy executable to destination directory
-install (TARGETS ${EXENAME} RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/bin)
+install (TARGETS ${EXENAME}
+		 RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/bin
+		 LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/bin)
