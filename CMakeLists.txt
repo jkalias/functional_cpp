@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(functional_vector)
+project(functional_vector VERSION 0.1)
 
 # GoogleTest requires at least C++11
 set(CMAKE_CXX_STANDARD 17)
@@ -32,4 +32,5 @@ endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Include the testing subdirectory
+add_subdirectory(src)
 add_subdirectory(tests)
