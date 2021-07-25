@@ -44,6 +44,14 @@ index_range index_range::from_start_and_end(size_t start, size_t end)
     return index_range(start, end - start + 1);
 }
 
+size_t index_range::end() const
+{
+    if (!is_valid) {
+        return -1;
+    }
+    return start + count - 1;
+}
+
 bool index_range::operator == (const index_range& rhs) const
 {
     return start == rhs.start && count == rhs.count;

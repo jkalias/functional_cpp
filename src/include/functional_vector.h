@@ -26,6 +26,7 @@
 #include <functional>
 #include <algorithm>
 #include <optional>
+#include "index_range.h"
 
 template <typename T>
 class functional_vector {
@@ -354,6 +355,27 @@ public:
     [[nodiscard]] functional_vector inserting_at(size_t index, const std::initializer_list<T>& list) const
     {
         return inserting_at(index, std::vector(list));
+    }
+    
+    functional_vector& remove_range(index_range range)
+    {
+        if (!range.is_valid || size() < range.end() + 1) {
+            return *this;
+        }
+        backing_vector_.erase(begin() + range.start,
+                              begin() + range.start + range.count);
+        return *this;
+    }
+    
+    [[nodiscard]] functional_vector removing_range(index_range range) const
+    {
+        if (!range.is_valid || size() < range.end() + 1) {
+            return *this;
+        }
+        auto shorter_vector(backing_vector_);
+        shorter_vector.erase(shorter_vector.begin() + range.start,
+                             shorter_vector.begin() + range.start + range.count);
+        return functional_vector(shorter_vector);
     }
     
     bool operator == (const functional_vector<T>& rhs) const

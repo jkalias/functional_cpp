@@ -40,6 +40,7 @@ public:
     static index_range invalid;
     static index_range from_start_and_count(size_t start, size_t count);
     static index_range from_start_and_end(size_t start, size_t end);
+    size_t end() const;
     
     bool operator == (const index_range& rhs) const;
     bool operator != (const index_range& rhs) const;

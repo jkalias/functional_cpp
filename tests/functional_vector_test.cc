@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include "functional_vector.h"
+#include "index_range.h"
 
 struct child {
     child(int age)
@@ -682,4 +683,52 @@ TEST(FunctionalVectorTest, InsertingRangeExistingInitializerListTest) {
     const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto result_vector = vector_under_test.inserting_at(3, {9, -5, 6});
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
+}
+
+TEST(FunctionalVectorTest, RemoveRangeWithInvalidRangeTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.remove_range(index_range::invalid);
+    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, RemoveRangeEmptyVectorTest) {
+    auto vector_under_test = functional_vector<int>();
+    vector_under_test.remove_range(index_range::from_start_and_count(1, 12));
+    EXPECT_EQ(functional_vector<int>(), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, RemoveRangeStartCountSuccessTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.remove_range(index_range::from_start_and_count(2, 3));
+    EXPECT_EQ(functional_vector<int>({1, 4, 3, 1, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, RemoveRangeStartEndSuccessTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.remove_range(index_range::from_start_and_end(3, 6));
+    EXPECT_EQ(functional_vector<int>({1, 4, 2, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, RemovingRangeWithInvalidRangeTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto shorter_vector = vector_under_test.removing_range(index_range::invalid);
+    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), shorter_vector);
+}
+
+TEST(FunctionalVectorTest, RemovingRangeEmptyVectorTest) {
+    const auto vector_under_test = functional_vector<int>();
+    const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_count(1, 12));
+    EXPECT_EQ(functional_vector<int>(), shorter_vector);
+}
+
+TEST(FunctionalVectorTest, RemovingRangeStartCountSuccessTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_count(2, 3));
+    EXPECT_EQ(functional_vector<int>({1, 4, 3, 1, 7, 1}), shorter_vector);
+}
+
+TEST(FunctionalVectorTest, RemovingRangeStartEndSuccessTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_end(3, 6));
+    EXPECT_EQ(functional_vector<int>({1, 4, 2, 7, 1}), shorter_vector);
 }
