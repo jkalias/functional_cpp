@@ -329,6 +329,21 @@ public:
         backing_vector_.insert(begin() + index, element);
         return *this;
     }
+    
+    functional_vector& insert_at(size_t index, const functional_vector<T>& vector)
+    {
+        return insert_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    functional_vector& insert_at(size_t index, const std::vector<T>& vector)
+    {
+        return insert_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    functional_vector& insert_at(size_t index, const std::initializer_list<T>& list)
+    {
+        return insert_at(index, std::vector(list));
+    }
 
     [[nodiscard]] functional_vector inserting_at(size_t index, const T& element) const
     {
@@ -336,6 +351,21 @@ public:
         auto copy(backing_vector_);
         copy.insert(copy.begin() + index, element);
         return functional_vector(copy);
+    }
+    
+    [[nodiscard]] functional_vector inserting_at(size_t index, const functional_vector<T>& vector) const
+    {
+        return inserting_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    [[nodiscard]] functional_vector inserting_at(size_t index, const std::vector<T>& vector) const
+    {
+        return inserting_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    [[nodiscard]] functional_vector inserting_at(size_t index, const std::initializer_list<T>& list) const
+    {
+        return inserting_at(index, std::vector(list));
     }
     
     bool operator == (const functional_vector<T>& rhs) const
@@ -353,6 +383,34 @@ public:
     
 private:
     std::vector<T> backing_vector_;
+    
+    functional_vector& insert_at_impl(size_t index,
+                                      const typename std::vector<T>::const_iterator& vec_begin,
+                                      const typename std::vector<T>::const_iterator& vec_end)
+    {
+        if (vec_begin != vec_end) {
+            assert(index <= size());
+            backing_vector_.insert(begin() + index,
+                                   vec_begin,
+                                   vec_end);
+        }
+        return *this;
+    }
+    
+    [[nodiscard]] functional_vector inserting_at_impl(size_t index,
+                                                      const typename std::vector<T>::const_iterator& vec_begin,
+                                                      const typename std::vector<T>::const_iterator& vec_end) const
+    {
+        if (vec_begin == vec_end) {
+            return *this;
+        }
+        assert(index <= size());
+        auto augmented_vector(backing_vector_);
+        augmented_vector.insert(augmented_vector.begin() + index,
+                    vec_begin,
+                    vec_end);
+        return functional_vector(augmented_vector);
+    }
 };
 
 #endif /* FUNCTIONAL_VECTOR_H */

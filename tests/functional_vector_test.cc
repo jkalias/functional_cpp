@@ -529,3 +529,123 @@ TEST(FunctionalVectorTest, InsertingAtFilledVectorTest) {
     EXPECT_EQ(functional_vector<int>({1, 4, 2, 18, 5, 8, 3, 1, 7, 1}), augmented_vector);
     EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
+
+TEST(FunctionalVectorTest, InsertRangeEmptyFunctionalVectorTest) {
+    auto vector_under_test = functional_vector<int>();
+    const auto vector_to_insert = functional_vector({4, 7, 3, -5});
+    vector_under_test.insert_at(0, vector_to_insert);
+    EXPECT_EQ(functional_vector({4, 7, 3, -5}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexFunctionalVectorTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = functional_vector({9, -5, 6});
+    EXPECT_DEATH(vector_under_test.insert_at(-1, vector_to_insert), "");
+    EXPECT_DEATH(vector_under_test.insert_at(10, vector_to_insert), "");
+}
+
+TEST(FunctionalVectorTest, InsertRangeExistingFunctionalVectorTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = functional_vector({9, -5, 6});
+    vector_under_test.insert_at(3, vector_to_insert);
+    EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, InsertRangeEmptyStdVectorTest) {
+    auto vector_under_test = functional_vector<int>();
+    const auto vector_to_insert = std::vector<int> {4, 7, 3, -5};
+    vector_under_test.insert_at(0, vector_to_insert);
+    EXPECT_EQ(functional_vector({4, 7, 3, -5}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexStdVectorTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = std::vector<int> {9, -5, 6};
+    EXPECT_DEATH(vector_under_test.insert_at(-1, vector_to_insert), "");
+    EXPECT_DEATH(vector_under_test.insert_at(10, vector_to_insert), "");
+}
+
+TEST(FunctionalVectorTest, InsertRangeExistingStdVectorTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = std::vector<int> {9, -5, 6};
+    vector_under_test.insert_at(3, vector_to_insert);
+    EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, InsertRangeEmptyInitializerListTest) {
+    auto vector_under_test = functional_vector<int>();
+    vector_under_test.insert_at(0, {4, 7, 3, -5});
+    EXPECT_EQ(functional_vector({4, 7, 3, -5}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexInitializerListTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_DEATH(vector_under_test.insert_at(-1, {9, -5, 6}), "");
+    EXPECT_DEATH(vector_under_test.insert_at(10, {9, -5, 6}), "");
+}
+
+TEST(FunctionalVectorTest, InsertRangeExistingInitializerListTest) {
+    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.insert_at(3, {9, -5, 6});
+    EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, InsertingRangeEmptyFunctionalVectorTest) {
+    const auto vector_under_test = functional_vector<int>();
+    const auto vector_to_insert = functional_vector({4, 7, 3, -5});
+    const auto result_vector = vector_under_test.inserting_at(0, vector_to_insert);
+    EXPECT_EQ(functional_vector({4, 7, 3, -5}), result_vector);
+}
+
+TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexFunctionalVectorTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = functional_vector({9, -5, 6});
+    EXPECT_DEATH(vector_under_test.inserting_at(-1, vector_to_insert), "");
+    EXPECT_DEATH(vector_under_test.inserting_at(10, vector_to_insert), "");
+}
+
+TEST(FunctionalVectorTest, InsertingRangeExistingFunctionalVectorTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = functional_vector({9, -5, 6});
+    const auto result_vector = vector_under_test.inserting_at(3, vector_to_insert);
+    EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
+}
+
+TEST(FunctionalVectorTest, InsertingRangeEmptyStdVectorTest) {
+    const auto vector_under_test = functional_vector<int>();
+    const auto vector_to_insert = std::vector {4, 7, 3, -5};
+    const auto result_vector = vector_under_test.inserting_at(0, vector_to_insert);
+    EXPECT_EQ(functional_vector({4, 7, 3, -5}), result_vector);
+}
+
+TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexStdVectorTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = std::vector {9, -5, 6};
+    EXPECT_DEATH(vector_under_test.inserting_at(-1, vector_to_insert), "");
+    EXPECT_DEATH(vector_under_test.inserting_at(10, vector_to_insert), "");
+}
+
+TEST(FunctionalVectorTest, InsertingRangeExistingStdVectorTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = std::vector {9, -5, 6};
+    const auto result_vector = vector_under_test.inserting_at(3, vector_to_insert);
+    EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
+}
+
+TEST(FunctionalVectorTest, InsertingRangeEmptyInitializerListTest) {
+    const auto vector_under_test = functional_vector<int>();
+    const auto result_vector = vector_under_test.inserting_at(0, {4, 7, 3, -5});
+    EXPECT_EQ(functional_vector({4, 7, 3, -5}), result_vector);
+}
+
+TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexInitializerListTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_DEATH(vector_under_test.inserting_at(-1, {9, -5, 6}), "");
+    EXPECT_DEATH(vector_under_test.inserting_at(10, {9, -5, 6}), "");
+}
+
+TEST(FunctionalVectorTest, InsertingRangeExistingInitializerListTest) {
+    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto result_vector = vector_under_test.inserting_at(3, {9, -5, 6});
+    EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
+}
