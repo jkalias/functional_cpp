@@ -22,7 +22,7 @@
 
 #include "index_range.h"
 
-index_range index_range::invalid = index_range::from_start_and_count(-1, -1);
+index_range index_range::invalid = from_start_and_count(-1, -1);
 
 index_range::index_range(size_t start, size_t count)
 : start(-1), count(-1)
