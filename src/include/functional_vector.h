@@ -196,7 +196,7 @@ public:
         return sorted(std::greater_equal<T>());
     }
 
-    [[nodiscard]] size_t size() const
+    size_t size() const
     {
         return backing_vector_.size();
     }
@@ -319,21 +319,6 @@ public:
         return *this;
     }
     
-    functional_vector& insert_at(size_t index, const functional_vector<T>& vector)
-    {
-        return insert_at_impl(index, vector.begin(), vector.end());
-    }
-    
-    functional_vector& insert_at(size_t index, const std::vector<T>& vector)
-    {
-        return insert_at_impl(index, vector.begin(), vector.end());
-    }
-    
-    functional_vector& insert_at(size_t index, const std::initializer_list<T>& list)
-    {
-        return insert_at(index, std::vector(list));
-    }
-
     [[nodiscard]] functional_vector inserting_at(size_t index, const T& element) const
     {
         assert(index <= size());
@@ -342,14 +327,29 @@ public:
         return functional_vector(copy);
     }
     
+    functional_vector& insert_at(size_t index, const functional_vector<T>& vector)
+    {
+        return insert_at_impl(index, vector.begin(), vector.end());
+    }
+    
     [[nodiscard]] functional_vector inserting_at(size_t index, const functional_vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
     }
     
+    functional_vector& insert_at(size_t index, const std::vector<T>& vector)
+    {
+        return insert_at_impl(index, vector.begin(), vector.end());
+    }
+    
     [[nodiscard]] functional_vector inserting_at(size_t index, const std::vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    functional_vector& insert_at(size_t index, const std::initializer_list<T>& list)
+    {
+        return insert_at(index, std::vector(list));
     }
     
     [[nodiscard]] functional_vector inserting_at(size_t index, const std::initializer_list<T>& list) const
