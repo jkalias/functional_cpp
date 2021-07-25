@@ -19,8 +19,8 @@ include_directories ("./include")
 # Set Properties->General->Configuration Type to Dynamic Library (.dll/.so/.dylib)
 add_library(${LIBNAME} SHARED ${HEADERS} ${SOURCES})
 
-# creates preprocessor definition functional_vector_EXPORTS
-add_compile_definitions()
+# creates preprocessor definition used for library exports
+add_compile_definitions("FUNCTIONAL_VECTOR_EXPORTS")
 
 set_target_properties(${LIBNAME} PROPERTIES 
 	OUTPUT_NAME ${LIBNAME}
