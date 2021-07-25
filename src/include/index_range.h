@@ -22,7 +22,7 @@
 
 #ifndef INDEX_RANGE_H
 #define INDEX_RANGE_H
-#include <stddef.h>
+#include <cstddef>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     #ifdef functional_vector_EXPORTS
