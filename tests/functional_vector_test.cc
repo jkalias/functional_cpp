@@ -732,3 +732,75 @@ TEST(FunctionalVectorTest, RemovingRangeStartEndSuccessTest) {
     const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_end(3, 6));
     EXPECT_EQ(functional_vector<int>({1, 4, 2, 7, 1}), shorter_vector);
 }
+
+TEST(FunctionalVectorTest, ReplaceRangeAtWithEmptySource) {
+    auto vector_under_test = functional_vector({5, -3 , 4, -9});
+    vector_under_test.replace_range_at(3, std::vector<int>());
+    EXPECT_EQ(functional_vector({5, -3 , 4, -9}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, ReplaceRangeAtWrongIndex) {
+    auto vector_under_test = functional_vector({5, -3 , 4, -9});
+    EXPECT_DEATH(vector_under_test.replace_range_at(-1, {1, 2, 6, 4}), "");
+    EXPECT_DEATH(vector_under_test.replace_range_at(4, {1, 2, 6, 4}), "");
+    EXPECT_DEATH(vector_under_test.replace_range_at(5, {1, 2, 6, 4}), "");
+}
+
+TEST(FunctionalVectorTest, ReplaceRangeAtMoreElementsInSourceThanCapacityTest) {
+    auto vector_under_test = functional_vector({5, -3 , 4, -9});
+    EXPECT_DEATH(vector_under_test.replace_range_at(2, {1, 2, 6, 4, 8, 9, -10}), "");
+}
+
+TEST(FunctionalVectorTest, ReplaceRangeAtWithFunctionalVectorTest) {
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.replace_range_at(4, functional_vector({9, -10, 8}));
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, ReplaceRangeAtWithStdVectorTest) {
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.replace_range_at(4, std::vector({9, -10, 8}));
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, ReplaceRangeAtWithInitializerListTest) {
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.replace_range_at(4, std::initializer_list<int>({9, -10, 8}));
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, ReplacingRangeAtWithEmptySource) {
+    const auto vector_under_test = functional_vector({5, -3 , 4, -9});
+    const auto replaced_vector = vector_under_test.replacing_range_at(3, std::vector<int>());
+    EXPECT_EQ(functional_vector({5, -3 , 4, -9}), replaced_vector);
+}
+
+TEST(FunctionalVectorTest, ReplacingRangeAtWrongIndex) {
+    const auto vector_under_test = functional_vector({5, -3 , 4, -9});
+    EXPECT_DEATH(vector_under_test.replacing_range_at(-1, {1, 2, 6, 4}), "");
+    EXPECT_DEATH(vector_under_test.replacing_range_at(4, {1, 2, 6, 4}), "");
+    EXPECT_DEATH(vector_under_test.replacing_range_at(5, {1, 2, 6, 4}), "");
+}
+
+TEST(FunctionalVectorTest, ReplacingRangeAtMoreElementsInSourceThanCapacityTest) {
+    const auto vector_under_test = functional_vector({5, -3 , 4, -9});
+    EXPECT_DEATH(vector_under_test.replacing_range_at(2, {1, 2, 6, 4, 8, 9, -10}), "");
+}
+
+TEST(FunctionalVectorTest, ReplacingRangeAtWithFunctionalVectorTest) {
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto replaced_vector = vector_under_test.replacing_range_at(4, functional_vector({9, -10, 8}));
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), replaced_vector);
+}
+
+TEST(FunctionalVectorTest, ReplacingRangeAtWithStdVectorTest) {
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto replaced_vector = vector_under_test.replacing_range_at(4, std::vector({9, -10, 8}));
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), replaced_vector);
+}
+
+TEST(FunctionalVectorTest, ReplacingRangeAtWithInitializerListTest) {
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto replaced_vector = vector_under_test.replacing_range_at(4, std::initializer_list<int>({9, -10, 8}));
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), replaced_vector);
+}

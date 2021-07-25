@@ -35,7 +35,7 @@ public:
     : backing_vector_()
     {
     }
-
+    
     explicit functional_vector(const std::vector<T> &vector)
     : backing_vector_(std::move(vector))
     {
@@ -51,7 +51,7 @@ public:
         backing_vector_.push_back(value);
         return *this;
     }
-
+    
     [[nodiscard]] functional_vector adding(T value) const
     {
         auto augmented_vector(backing_vector_);
@@ -73,7 +73,7 @@ public:
     {
         return add_range_impl(vector.begin(), vector.end());
     }
-
+    
     [[nodiscard]] functional_vector adding_range(const std::vector<T>& vector) const
     {
         return adding_range_impl(vector.begin(), vector.end());
@@ -83,12 +83,12 @@ public:
     {
         return add_range(std::vector(list));
     }
-
+    
     [[nodiscard]] functional_vector adding_range(const std::initializer_list<T>& list) const
     {
         return adding_range(std::vector(list));
     }
-        
+    
     template <typename U>
     functional_vector<U> map(const std::function<U(T)>& transform) const
     {
@@ -126,7 +126,7 @@ public:
         std::reverse(backing_vector_.begin(), backing_vector_.end());
         return *this;
     }
-
+    
     [[nodiscard]] functional_vector reversed() const
     {
         std::vector<T> reversed_vector(backing_vector_);
@@ -185,17 +185,17 @@ public:
                   comparison_predicate);
         return functional_vector(sorted_vector);
     }
-
+    
     [[nodiscard]] functional_vector sorted_ascending() const
     {
         return sorted(std::less_equal<T>());
     }
-
+    
     [[nodiscard]] functional_vector sorted_descending() const
     {
         return sorted(std::greater_equal<T>());
     }
-
+    
     size_t size() const
     {
         return backing_vector_.size();
@@ -212,12 +212,12 @@ public:
         assert(index < size());
         return backing_vector_[index];
     }
-
+    
     [[nodiscard]] typename std::vector<T>::const_iterator begin() const
     {
         return backing_vector_.begin();
     }
-
+    
     [[nodiscard]] typename std::vector<T>::const_iterator end() const
     {
         return backing_vector_.end();
@@ -230,27 +230,27 @@ public:
                       operation);
         return *this;
     }
-
+    
     [[nodiscard]] std::optional<size_t> find_first_index(const T& element) const
     {
-	    if (auto it = std::find(backing_vector_.begin(),
-	                            backing_vector_.end(),
-	                            element); it != backing_vector_.end()) {
+        if (auto it = std::find(backing_vector_.begin(),
+                                backing_vector_.end(),
+                                element); it != backing_vector_.end()) {
             return std::distance(backing_vector_.begin(), it);
         }
         return std::nullopt;
     }
-
+    
     [[nodiscard]] std::optional<size_t> find_last_index(const T& element) const
     {
-	    if (auto it = std::find(backing_vector_.rbegin(),
-	                            backing_vector_.rend(),
-	                            element); it != backing_vector_.rend()) {
+        if (auto it = std::find(backing_vector_.rbegin(),
+                                backing_vector_.rend(),
+                                element); it != backing_vector_.rend()) {
             return std::distance(it, backing_vector_.rend()) - 1;
         }
         return std::nullopt;
     }
-
+    
     [[nodiscard]] std::vector<size_t> find_all_indices(const T& element) const
     {
         std::vector<size_t> indices;
@@ -271,7 +271,7 @@ public:
         backing_vector_.erase(begin() + index);
         return *this;
     }
-
+    
     [[nodiscard]] functional_vector removing_at(size_t index) const
     {
         assert(index < size());
@@ -287,7 +287,7 @@ public:
         }
         return remove_at(size() - 1);
     }
-
+    
     [[nodiscard]] functional_vector removing_last() const
     {
         if (size() == 0) {
@@ -303,7 +303,7 @@ public:
         }
         return remove_at(0);
     }
-
+    
     [[nodiscard]] functional_vector removing_first() const
     {
         if (size() == 0) {
@@ -376,6 +376,36 @@ public:
         shorter_vector.erase(shorter_vector.begin() + range.start,
                              shorter_vector.begin() + range.start + range.count);
         return functional_vector(shorter_vector);
+    }
+    
+    functional_vector& replace_range_at(size_t index, const functional_vector<T>& vector)
+    {
+        return replace_range_at_imp(index, vector.begin(), vector.end());
+    }
+    
+    functional_vector& replace_range_at(size_t index, const std::vector<T>& vector)
+    {
+        return replace_range_at_imp(index, vector.begin(), vector.end());
+    }
+    
+    functional_vector& replace_range_at(size_t index, const std::initializer_list<T>& list)
+    {
+        return replace_range_at(index, std::vector(list));
+    }
+    
+    [[nodiscard]] functional_vector replacing_range_at(size_t index, const functional_vector<T>& vector) const
+    {
+        return replacing_range_at_imp(index, vector.begin(), vector.end());
+    }
+    
+    [[nodiscard]] functional_vector replacing_range_at(size_t index, const std::vector<T>& vector) const
+    {
+        return replacing_range_at_imp(index, vector.begin(), vector.end());
+    }
+    
+    [[nodiscard]] functional_vector replacing_range_at(size_t index, const std::initializer_list<T>& list) const
+    {
+        return replacing_range_at(index, std::vector(list));
     }
     
     bool operator == (const functional_vector<T>& rhs) const
@@ -451,9 +481,34 @@ private:
         assert(index <= size());
         auto augmented_vector(backing_vector_);
         augmented_vector.insert(augmented_vector.begin() + index,
-                    vec_begin,
-                    vec_end);
+                                vec_begin,
+                                vec_end);
         return functional_vector(augmented_vector);
+    }
+    
+    functional_vector& replace_range_at_imp(size_t index,
+                                            const typename std::vector<T>::const_iterator& vec_begin,
+                                            const typename std::vector<T>::const_iterator& vec_end)
+    {
+        const auto vec_size = std::distance(vec_begin, vec_end);
+        assert(index + vec_size >= vec_size && index + vec_size <= size());
+        std::copy(vec_begin,
+                  vec_end,
+                  backing_vector_.begin() + index);
+        return *this;
+    }
+    
+    [[nodiscard]] functional_vector replacing_range_at_imp(size_t index,
+                                                           const typename std::vector<T>::const_iterator& vec_begin,
+                                                           const typename std::vector<T>::const_iterator& vec_end) const
+    {
+        const auto vec_size = std::distance(vec_begin, vec_end);
+        assert(index + vec_size >= vec_size && index + vec_size <= size());
+        auto replaced_vector(backing_vector_);
+        std::copy(vec_begin,
+                  vec_end,
+                  replaced_vector.begin() + index);
+        return functional_vector(replaced_vector);
     }
 };
 
