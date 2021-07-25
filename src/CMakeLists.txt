@@ -22,10 +22,9 @@ add_library(${LIBNAME} SHARED ${HEADERS} ${SOURCES})
 # creates preprocessor definition functional_vector_EXPORTS
 add_compile_definitions()
 
-set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME})
-
-# Creates a folder "libraries" and adds target project under it
-set_property(TARGET ${LIBNAME} PROPERTY FOLDER "lib")
+set_target_properties(${LIBNAME} PROPERTIES 
+	OUTPUT_NAME ${LIBNAME}
+	FOLDER "lib")
 
 # Adds logic to install the library to the destination directory
 install (TARGETS ${LIBNAME}
