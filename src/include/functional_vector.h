@@ -58,40 +58,34 @@ public:
         return functional_vector(augmented_vector);
     }
     
+    functional_vector& add_range(const functional_vector<T>& vector)
+    {
+        return add_range_impl(vector.begin(), vector.end());
+    }
+    
+    [[nodiscard]] functional_vector adding_range(const functional_vector<T>& vector) const
+    {
+        return adding_range_impl(vector.begin(), vector.end());
+    }
+    
     functional_vector& add_range(const std::vector<T>& vector)
     {
-        backing_vector_.insert(backing_vector_.end(),
-                               vector.begin(),
-                               vector.end());
-        return *this;
+        return add_range_impl(vector.begin(), vector.end());
     }
 
     [[nodiscard]] functional_vector adding_range(const std::vector<T>& vector) const
     {
-        auto augmented_vector(backing_vector_);
-        augmented_vector.reserve(augmented_vector.size() + vector.size());
-        augmented_vector.insert(augmented_vector.end(),
-                                vector.begin(),
-                                vector.end());
-        return functional_vector(augmented_vector);
+        return adding_range_impl(vector.begin(), vector.end());
     }
     
     functional_vector& add_range(const std::initializer_list<T>& list)
     {
-        backing_vector_.insert(backing_vector_.end(),
-                               list.begin(),
-                               list.end());
-        return *this;
+        return add_range(std::vector(list));
     }
 
     [[nodiscard]] functional_vector adding_range(const std::initializer_list<T>& list) const
     {
-        auto augmented_vector(backing_vector_);
-        augmented_vector.reserve(augmented_vector.size() + list.size());
-        augmented_vector.insert(augmented_vector.end(),
-                                list.begin(),
-                                list.end());
-        return functional_vector(augmented_vector);
+        return adding_range(std::vector(list));
     }
         
     template <typename U>
@@ -147,27 +141,21 @@ public:
     };
     
     template <typename U>
-    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const std::vector<U>& vector) const
+    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const functional_vector<U>& vector) const
     {
-        assert(backing_vector_.size() == vector.size());
-        std::vector<functional_vector_tuple<U>> combined_vector;
-        combined_vector.reserve(vector.size());
-        for (size_t i = 0; i < backing_vector_.size(); i++) {
-            combined_vector.push_back({ backing_vector_[i], vector[i] });
-        }
-        return functional_vector<functional_vector_tuple<U>>(combined_vector);
+        return zip_impl<U>(vector.begin(), vector.end());
     }
     
     template <typename U>
-    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const functional_vector<U>& vector) const
+    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const std::vector<U>& vector) const
     {
-        assert(backing_vector_.size() == vector.size());
-        std::vector<functional_vector_tuple<U>> combined_vector;
-        combined_vector.reserve(vector.size());
-        for (size_t i = 0; i < backing_vector_.size(); i++) {
-            combined_vector.push_back({ backing_vector_[i], vector[i] });
-        }
-        return functional_vector<functional_vector_tuple<U>>(combined_vector);
+        return zip_impl<U>(vector.begin(), vector.end());
+    }
+    
+    template <typename U>
+    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const std::initializer_list<U>& list) const
+    {
+        return zip(std::vector(list));
     }
     
     functional_vector& sort(const std::function<bool(T, T)>& comparison_predicate)
@@ -383,6 +371,40 @@ public:
     
 private:
     std::vector<T> backing_vector_;
+    
+    functional_vector& add_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
+                                      const typename std::vector<T>::const_iterator& vec_end)
+    {
+        backing_vector_.insert(backing_vector_.end(),
+                               vec_begin,
+                               vec_end);
+        return *this;
+    }
+    
+    [[nodiscard]] functional_vector adding_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
+                                                      const typename std::vector<T>::const_iterator& vec_end) const
+    {
+        auto augmented_vector(backing_vector_);
+        augmented_vector.reserve(augmented_vector.size() + std::distance(vec_begin, vec_end));
+        augmented_vector.insert(augmented_vector.end(),
+                                vec_begin,
+                                vec_end);
+        return functional_vector(augmented_vector);
+    }
+    
+    template <typename U>
+    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
+                                                                         const typename std::vector<U>::const_iterator& vec_end) const
+    {
+        const auto vec_size = std::distance(vec_begin, vec_end);
+        assert(backing_vector_.size() == vec_size);
+        std::vector<functional_vector_tuple<U>> combined_vector;
+        combined_vector.reserve(vec_size);
+        for (size_t i = 0; i < vec_size; i++) {
+            combined_vector.push_back({ backing_vector_[i], *(vec_begin + i) });
+        }
+        return functional_vector<functional_vector_tuple<U>>(combined_vector);
+    }
     
     functional_vector& insert_at_impl(size_t index,
                                       const typename std::vector<T>::const_iterator& vec_begin,

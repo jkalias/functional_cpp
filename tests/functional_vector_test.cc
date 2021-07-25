@@ -95,6 +95,15 @@ TEST(FunctionalVectorTest, AddingTest) {
     EXPECT_EQ(5, vector_new_instance[0]);
 }
 
+TEST(FunctionalVectorTest, AddRangeFromFunctionalVectorTest) {
+    auto vector_under_test = functional_vector<int>();
+    vector_under_test.add_range(functional_vector {1, 2, 3});
+    EXPECT_EQ(3, vector_under_test.size());
+    EXPECT_EQ(1, vector_under_test[0]);
+    EXPECT_EQ(2, vector_under_test[1]);
+    EXPECT_EQ(3, vector_under_test[2]);
+}
+
 TEST(FunctionalVectorTest, AddRangeFromStdVectorTest) {
     auto vector_under_test = functional_vector<int>();
     vector_under_test.add_range(std::vector {1, 2, 3});
@@ -111,6 +120,16 @@ TEST(FunctionalVectorTest, AddRangeFromInitializerListTest) {
     EXPECT_EQ(1, vector_under_test[0]);
     EXPECT_EQ(2, vector_under_test[1]);
     EXPECT_EQ(3, vector_under_test[2]);
+}
+
+TEST(FunctionalVectorTest, AddingRangeFromFunctionalVectorTest) {
+    const auto vector_under_test = functional_vector<int>();
+    const auto vector_new_instance = vector_under_test.adding_range(functional_vector {1, 2, 3});
+    EXPECT_EQ(0, vector_under_test.size());
+    EXPECT_EQ(3, vector_new_instance.size());
+    EXPECT_EQ(1, vector_new_instance[0]);
+    EXPECT_EQ(2, vector_new_instance[1]);
+    EXPECT_EQ(3, vector_new_instance[2]);
 }
 
 TEST(FunctionalVectorTest, AddingRangeFromStdVectorTest) {
@@ -201,6 +220,22 @@ TEST(FunctionalVectorTest, ZipWithFunctionalVectorUnequalSizesThrowsTest) {
     EXPECT_DEATH({ const auto zipped_vector = ages_vector.zip(names_vector); }, "");
 }
 
+TEST(FunctionalVectorTest, ZipWithFunctionalVectorTest) {
+    const auto ages_vector = functional_vector({32, 25, 53});
+    const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
+    const auto zipped_vector = ages_vector.zip(names_vector);
+    EXPECT_EQ(3, zipped_vector.size());
+    
+    EXPECT_EQ(32, zipped_vector[0].first);
+    EXPECT_EQ("Jake", zipped_vector[0].second);
+    
+    EXPECT_EQ(25, zipped_vector[1].first);
+    EXPECT_EQ("Mary", zipped_vector[1].second);
+    
+    EXPECT_EQ(53, zipped_vector[2].first);
+    EXPECT_EQ("John", zipped_vector[2].second);
+}
+
 TEST(FunctionalVectorTest, ZipWithStdVectorTest) {
     const auto ages_vector = functional_vector({32, 25, 53});
     const auto zipped_vector = ages_vector.zip(std::vector<std::string>{"Jake", "Mary", "John"});
@@ -216,10 +251,9 @@ TEST(FunctionalVectorTest, ZipWithStdVectorTest) {
     EXPECT_EQ("John", zipped_vector[2].second);
 }
 
-TEST(FunctionalVectorTest, ZipWithFunctionalVectorTest) {
+TEST(FunctionalVectorTest, ZipWithInitializerListTest) {
     const auto ages_vector = functional_vector({32, 25, 53});
-    const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
-    const auto zipped_vector = ages_vector.zip(names_vector);
+    const auto zipped_vector = ages_vector.zip(std::initializer_list<std::string>{"Jake", "Mary", "John"});
     EXPECT_EQ(3, zipped_vector.size());
     
     EXPECT_EQ(32, zipped_vector[0].first);
