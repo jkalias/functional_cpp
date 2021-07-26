@@ -1,3 +1,4 @@
+[![CMake Build Matrix](https://github.com/jkalias/functional_vector/actions/workflows/cmake.yml/badge.svg)](https://github.com/jkalias/functional_vector/actions/workflows/cmake.yml)
 [![GitHub license](https://img.shields.io/github/license/jkalias/functional_vector)](https://github.com/jkalias/functional_vector/blob/main/LICENSE)
 # Say hello to functional C++ vectors
 A wrapper for C++ std::vector geared towards functional programming and fluent APIs.
