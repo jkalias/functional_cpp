@@ -21,7 +21,7 @@ jobs:
       matrix:
         config: 
         - {
-            name: "Windows Latest MSVC",
+            name: "Windows Latest MSVC (Debug)",
             os: windows-latest,
             build_type: "Debug",
             cc: "cl",
@@ -30,7 +30,16 @@ jobs:
             generators: "Visual Studio 16 2019"
           }
         - {
-            name: "Ubuntu Latest GCC",
+            name: "Windows Latest MSVC (Release)",
+            os: windows-latest,
+            build_type: "Release",
+            cc: "cl",
+            cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            generators: "Visual Studio 16 2019"
+          }
+        - {
+            name: "Ubuntu Latest GCC (Debug)",
             os: ubuntu-latest,
             build_type: "Debug",
             cc: "gcc",
@@ -38,9 +47,25 @@ jobs:
             generators: "Ninja"
           }
         - {
-            name: "macOS Latest Clang",
+            name: "Ubuntu Latest GCC (Release)",
+            os: ubuntu-latest,
+            build_type: "Release",
+            cc: "gcc",
+            cxx: "g++",
+            generators: "Ninja"
+          }
+        - {
+            name: "macOS Latest Clang (Debug)",
             os: macos-latest,
             build_type: "Debug",
+            cc: "clang",
+            cxx: "clang++",
+            generators: "Xcode"
+          }
+        - {
+            name: "macOS Latest Clang (Release)",
+            os: macos-latest,
+            build_type: "Release",
             cc: "clang",
             cxx: "clang++",
             generators: "Xcode"
