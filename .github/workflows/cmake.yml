@@ -96,7 +96,7 @@ jobs:
         shell: bash
         run: |
           build/bin/${{ matrix.config.build_type }}/unit_tests
-          return %errorlevel%
+          exit %errorlevel%
           
       - name: Run tests on macos
         if: startsWith(matrix.config.os, 'macos')
