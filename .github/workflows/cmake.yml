@@ -104,4 +104,4 @@ jobs:
       - name: Run tests on Ubuntu
         if: startsWith(matrix.config.name, 'Ubuntu Latest GCC')
         shell: bash
-        run: find ./ -type f -name unit_tests -exec "{}" \;
+        run: find ./ -type f -name unit_tests
