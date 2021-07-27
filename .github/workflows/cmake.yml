@@ -95,8 +95,11 @@ jobs:
         if: startsWith(matrix.config.os, 'windows')
         shell: bash
         run: |
-          build/bin/${{ matrix.config.build_type }}/unit_tests
-          exit %errorlevel%
+          status=$?
+          cmd="build/bin/${{ matrix.config.build_type }}/unit_tests"
+          $cmd
+          status=$?
+          [ $status -eq 0 ] && exit 0 || exit 1
           
       - name: Run tests on macos
         if: startsWith(matrix.config.os, 'macos')
