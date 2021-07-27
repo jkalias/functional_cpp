@@ -80,7 +80,6 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          mkdir instdir
           cmake \
             -S . \
             -B build \

@@ -1,9 +1,12 @@
 set (LIBNAME functional_vector)
 
+# Properties->C/C++->General->Additional Include Directories
+include_directories ("../include")
+
 # Collect files without having to explicitly list each header and source file
 file (GLOB HEADERS
-	  "include/*.h"
-	  "include/*.hpp")
+	  "../include/*.h"
+	  "../include/*.hpp")
 
 file (GLOB SOURCES
       "*.cpp"
@@ -12,9 +15,6 @@ file (GLOB SOURCES
 # Create named folders for the sources within the project
 source_group("include" FILES ${HEADERS})
 source_group("src" FILES ${SOURCES})
-
-# Properties->C/C++->General->Additional Include Directories
-include_directories ("./include")
 
 # Set Properties->General->Configuration Type to Dynamic Library (.dll/.so/.dylib)
 add_library(${LIBNAME} SHARED ${HEADERS} ${SOURCES})

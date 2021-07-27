@@ -5,7 +5,7 @@ enable_testing()
 include(GoogleTest)
 
 # Properties->C/C++->General->Additional Include Directories
-include_directories ("${PROJECT_SOURCE_DIR}/src/include")
+include_directories ("${PROJECT_SOURCE_DIR}/include")
 
 # Collect test sources into the variable TEST_SOURCES
 file (GLOB TEST_SOURCES
