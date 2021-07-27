@@ -91,8 +91,32 @@ jobs:
         shell: bash
         run: cmake --build build --config ${{ matrix.config.build_type }}
 
-      - name: Run tests
+      - name: Run tests on Windows
+        if: startsWith(matrix.config.os, 'windows')
         shell: bash
-        run:  |
-          find ./ -type f -name unit_tests -exec "{}" \;
-          #build/tests/"${{ matrix.config.build_type }}"/unit_tests
+        run: |
+          status=$?
+          cmd="build/bin/${{ matrix.config.build_type }}/unit_tests"
+          $cmd
+          status=$?
+          [ $status -eq 0 ] && exit 0 || exit 1
+          
+      - name: Run tests on macos
+        if: startsWith(matrix.config.os, 'macos')
+        shell: bash
+        run: |
+          status=$?
+          cmd="build/tests/${{ matrix.config.build_type }}/unit_tests"
+          $cmd
+          status=$?
+          [ $status -eq 0 ] && exit 0 || exit 1
+        
+      - name: Run tests on Ubuntu
+        if: startsWith(matrix.config.name, 'Ubuntu Latest GCC')
+        shell: bash
+        run: |
+          status=$?
+          cmd="./build/tests/unit_tests"
+          $cmd
+          status=$?
+          [ $status -eq 0 ] && exit 0 || exit 1
