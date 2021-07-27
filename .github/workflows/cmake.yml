@@ -104,4 +104,4 @@ jobs:
       - name: Run tests on Ubuntu
         if: startsWith(matrix.config.name, 'Ubuntu Latest GCC')
         shell: bash
-        run: ./build/tests/${{ matrix.config.build_type }}/unit_tests
+        run: ./build/tests/unit_tests
