@@ -72,7 +72,7 @@ TEST(RangeTest, ValidFromStartAndEndTest) {
     
     range = index_range::from_start_and_end(13, 13);
     EXPECT_TRUE(range.is_valid);
-    EXPECT_EQ(12, range.start);
+    EXPECT_EQ(13, range.start);
     EXPECT_EQ(13, range.end());
     EXPECT_EQ(1, range.count);
 }
