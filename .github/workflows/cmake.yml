@@ -99,9 +99,9 @@ jobs:
       - name: Run tests on macos
         if: startsWith(matrix.config.os, 'macos')
         shell: bash
-        run: build/tests/${{ matrix.config.build_type }}/unit_tests
+        run: find ./ -type f -name unit_tests -exec "{}" \;
         
       - name: Run tests on Ubuntu
         if: startsWith(matrix.config.name, 'Ubuntu Latest GCC')
         shell: bash
-        run: build/tests/${{ matrix.config.build_type }}/unit_tests
+        run: find ./ -type f -name unit_tests -exec "{}" \;
