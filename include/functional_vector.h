@@ -408,6 +408,24 @@ public:
         return replacing_range_at(index, std::vector(list));
     }
     
+    functional_vector& fill(const T& element)
+    {
+        std::fill(backing_vector_.begin(),
+                  backing_vector_.end(),
+                  element);
+        return *this;
+    }
+    
+    [[nodiscard]] static functional_vector filled(const T& element, size_t count)
+    {
+        auto backing_vector = std::vector<T>();
+        backing_vector.resize(count);
+        std::fill(backing_vector.begin(),
+                  backing_vector.end(),
+                  element);
+        return functional_vector(backing_vector);
+    }
+    
     bool operator == (const functional_vector<T>& rhs) const
     {
         return std::equal(backing_vector_.begin(),

@@ -837,3 +837,14 @@ TEST(FunctionalVectorTest, ReplacingRangeAtWithInitializerListTest) {
     const auto replaced_vector = vector_under_test.replacing_range_at(4, std::initializer_list<int>({9, -10, 8}));
     EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), replaced_vector);
 }
+
+TEST(FunctionalVectorTest, FillTest) {
+    auto vector_under_test = functional_vector({1, 3, -6, 4, -9});
+    vector_under_test.fill(7);
+    EXPECT_EQ(functional_vector({7, 7, 7, 7, 7}), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, FilledTest) {
+    const auto vector_under_test = functional_vector<std::string>::filled("John", 3);
+    EXPECT_EQ(functional_vector<std::string>({"John", "John", "John"}), vector_under_test);
+}
