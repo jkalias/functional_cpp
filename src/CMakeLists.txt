@@ -28,5 +28,4 @@ set_target_properties(${LIBNAME} PROPERTIES
 
 # Adds logic to install the library to the destination directory
 install (TARGETS ${LIBNAME}
-		 RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/bin
-		 LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/bin)
+		 RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/bin)

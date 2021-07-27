@@ -28,5 +28,4 @@ gtest_add_tests(TARGET ${EXENAME} TEST_PREFIX fp:)
 
 # Adds logic to copy executable to destination directory
 install (TARGETS ${EXENAME}
-		 RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/bin
-		 LIBRARY DESTINATION ${PROJECT_BINARY_DIR}/bin)
+		 RUNTIME DESTINATION ${PROJECT_BINARY_DIR}/bin)
