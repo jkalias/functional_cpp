@@ -51,14 +51,14 @@ public:
     {
     }
 
-	// Adds a value at the end of the vector (mutating)
+	// Adds a value at the end of the vector in place (mutating)
     functional_vector& push_back(T value)
     {
         backing_vector_.push_back(value);
         return *this;
     }
 
-    // Adds a value at the end of the vector and returns the result (non-mutating)
+    // Makes a copy of the vector, adds value at the end of the copy and returns the copy (non-mutating)
     [[nodiscard]] functional_vector pushing_back(T value) const
     {
         auto augmented_vector(backing_vector_);
@@ -66,56 +66,59 @@ public:
         return functional_vector(augmented_vector);
     }
 
-    // Adds a range of values at the end of the vector (mutating)
+    // Adds a range of values at the end of the vector in place (mutating)
     functional_vector& push_back(const functional_vector<T>& vector)
     {
         return add_range_impl(vector.begin(), vector.end());
     }
 
-    // Adds a range of values at the end of the vector and returns the result (non-mutating)
+    // Makes a copy of the vector, adds a range of values at the end of the copy, and returns the copy (non-mutating)
     [[nodiscard]] functional_vector pushing_back(const functional_vector<T>& vector) const
     {
         return adding_range_impl(vector.begin(), vector.end());
     }
 
-    // Adds a range of values at the end of the vector (mutating)
+    // Adds a range of values at the end of the vector in place (mutating)
     functional_vector& push_back(const std::vector<T>& vector)
     {
         return add_range_impl(vector.begin(), vector.end());
     }
     
-    // Adds a range of values at the end of the vector and returns the result (non-mutating)
+    // Makes a copy of the vector, adds a range of values at the end of the copy, and returns the copy (non-mutating)
 	[[nodiscard]] functional_vector pushing_back(const std::vector<T>& vector) const
     {
         return adding_range_impl(vector.begin(), vector.end());
     }
 
-    // Adds a range of values at the end of the vector (mutating)
+    // Adds a range of values at the end of the vector in place (mutating)
     functional_vector& push_back(const std::initializer_list<T>& list)
     {
         return push_back(std::vector(list));
     }
 
-    // Adds a range of values at the end of the vector and returns the result (non-mutating)
+    // Makes a copy of the vector, adds a range of values at the end of the copy, and returns the copy (non-mutating)
     [[nodiscard]] functional_vector pushing_back(const std::initializer_list<T>& list) const
     {
         return pushing_back(std::vector(list));
     }
 
-	// Performs the functional map algorithm, in which every element of the result vector is the
-	// output of applying the transform function on every element of this instance
+	// Performs the functional `map` algorithm, in which every element of the result vector is the
+	// output of applying the transform function on every element of this instance.
     //
 	// example:
 	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
 	//      const auto output_vector = input_vector.map<std::string>([](const auto& element) {
 	//      	return std::to_string(element);
 	//      });
+    //
+    // outcome:
+    //      output_vector -> functional_vector<std::string>({ "1", "3", "-5" })
 	//
 	// is equivalent to:
 	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
-	//      auto for_output_vector = functional_vector<std::string>();
+	//      auto output_vector = functional_vector<std::string>();
 	//      for (auto i = 0; i < input_vector.size(); i++) {
-	//      	for_output_vector.push_back(std::to_string(input_vector[i]));
+	//      	output_vector.push_back(std::to_string(input_vector[i]));
 	//      }
     template <typename U>
     functional_vector<U> map(const std::function<U(T)>& transform) const
@@ -129,6 +132,27 @@ public:
         return functional_vector<U>(transformed_vector);
     }
     
+    // Performs the functional `filter` algorithm, in which all elements of this instance
+    // which do match the given predicate are filtered out, i.e. removed (mutating)
+    //
+    // example:
+    //      auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      input_vector.filter([](const auto& element) {
+    //          return element >= 1.5;
+    //      });
+    //
+    // outcome:
+    //      input_vector -> functional_vector<std::string>({ 3, 2, 9 });
+    //
+    // is equivalent to:
+    //      auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      for (auto i = 0; i < input_vector.size(); i++) {
+    //          if (input_vector[i] >= 1.5) {
+    //              continue;
+    //          }
+    //          input_vector.remove_at(i);
+    //          i--;
+    //      }
     functional_vector& filter(const std::function<bool(T)>& predicate_to_keep)
     {
         backing_vector_.erase(std::remove_if(backing_vector_.begin(),
@@ -138,6 +162,29 @@ public:
         return *this;
     }
     
+    // Performs the functional `filter` algorithm in a copy of this instance, in which all elements of
+    // the copy which do match the given predicate are filtered out, i.e. removed (non-mutating)
+    //
+    // example:
+    //      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      const auto filtered_vector = input_vector.filtered([](const auto& element) {
+    //          return element >= 1.5;
+    //      });
+    //
+    // outcome:
+    //      input_vector -> functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 })
+    //      filtered_vector -> functional_vector<std::string>({ 3, 2, 9 })
+    //
+    // is equivalent to:
+    //      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      auto filtered_vector(input_vector);
+    //      for (auto i = 0; i < filtered_vector.size(); i++) {
+    //          if (filtered_vector[i] >= 1.5) {
+    //              continue;
+    //          }
+    //          filtered_vector.remove_at(i);
+    //          i--;
+    //      }
     functional_vector filtered(const std::function<bool(T)>& predicate_to_keep) const
     {
         std::vector<T> filtered_vector;
@@ -149,12 +196,29 @@ public:
         return functional_vector(filtered_vector);
     }
     
+    // Reverses the order of the elements in place (mutating)
+    //
+    // example:
+    //      auto my_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      my_vector.reverse();
+    //
+    // outcome:
+    //      my_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
     functional_vector& reverse()
     {
         std::reverse(backing_vector_.begin(), backing_vector_.end());
         return *this;
     }
     
+    // Makes a copy of this instance, whose elements are in reverse order (non-mutating)
+    //
+    // example:
+    //      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      const auto reversed_vector = input_vector.reversed();
+    //
+    // outcome:
+    //      input_vector -> functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      reversed_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
     [[nodiscard]] functional_vector reversed() const
     {
         std::vector<T> reversed_vector(backing_vector_);
