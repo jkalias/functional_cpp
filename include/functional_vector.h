@@ -102,7 +102,7 @@ public:
         return pushing_back(std::vector(list));
     }
 
-	// Performs the functional `map` algorithm, in which every element of the result vector is the
+	// Performs the functional `map` algorithm, in which every element of the resulting vector is the
 	// output of applying the transform function on every element of this instance.
     //
 	// example:
@@ -117,7 +117,7 @@ public:
 	// is equivalent to:
 	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
 	//      auto output_vector = functional_vector<std::string>();
-	//      for (auto i = 0; i < input_vector.size(); i++) {
+	//      for (auto i = 0; i < input_vector.size(); ++i) {
 	//      	output_vector.push_back(std::to_string(input_vector[i]));
 	//      }
     template <typename U>
@@ -146,7 +146,7 @@ public:
     //
     // is equivalent to:
     //      auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
-    //      for (auto i = 0; i < input_vector.size(); i++) {
+    //      for (auto i = 0; i < input_vector.size(); ++i) {
     //          if (input_vector[i] >= 1.5) {
     //              continue;
     //          }
@@ -178,7 +178,7 @@ public:
     // is equivalent to:
     //      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
     //      auto filtered_vector(input_vector);
-    //      for (auto i = 0; i < filtered_vector.size(); i++) {
+    //      for (auto i = 0; i < filtered_vector.size(); ++i) {
     //          if (filtered_vector[i] >= 1.5) {
     //              continue;
     //          }
@@ -210,7 +210,7 @@ public:
         return *this;
     }
     
-    // Makes a copy of this instance, whose elements are in reverse order (non-mutating)
+    // Returns a copy of this instance, whose elements are in reverse order (non-mutating)
     //
     // example:
     //      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
@@ -227,26 +227,104 @@ public:
     }
     
     template <typename U>
-    struct functional_vector_tuple {
+    struct functional_tuple {
     public:
         T first;
         U second;
     };
     
+    // Performs the functional `zip` algorithm, in which every element of the resulting vector is a
+    // tuple of this instance's element (first) and the second vector's element (second) at the same
+    // index. The sizes of the two vectors must be equal.
+    //
+    // example:
+    //      const auto ages_vector = functional_vector({32, 25, 53});
+    //      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
+    //      const auto zipped_vector = ages_vector.zip(names_vector);
+    //
+    // outcome:
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //                          (32, "Jake"),
+    //                          (25, "Mary"),
+    //                          (53, "John"),
+    //                       })
+    //
+    // is equivalent to:
+    //      const auto ages_vector = functional_vector({32, 25, 53});
+    //      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
+    //      auto zipped_vector = functional_vector<functional_vector<int>::functional_tuple<std::string>>();
+    //      for (auto i = 0; i < ages_vector.size(); ++i) {
+    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          tuple.first = ages_vector[i];
+    //          tuple.second = names_vector[i];
+    //          zipped_vector[i] = tuple;
+    //      }
     template <typename U>
-    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const functional_vector<U>& vector) const
+    [[nodiscard]] functional_vector<functional_tuple<U>> zip(const functional_vector<U>& vector) const
     {
         return zip_impl<U>(vector.begin(), vector.end());
     }
     
+    // Performs the functional `zip` algorithm, in which every element of the resulting vector is a
+    // tuple of this instance's element (first) and the second vector's element (second) at the same
+    // index. The sizes of the two vectors must be equal.
+    //
+    // example:
+    //      const auto ages_vector = functional_vector({32, 25, 53});
+    //      const auto names_vector = std::vector<std::string>({"Jake", "Mary", "John"});
+    //      const auto zipped_vector = ages_vector.zip(names_vector);
+    //
+    // outcome:
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //                          (32, "Jake"),
+    //                          (25, "Mary"),
+    //                          (53, "John"),
+    //                       })
+    //
+    // is equivalent to:
+    //      const auto ages_vector = functional_vector({32, 25, 53});
+    //      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
+    //      auto zipped_vector = functional_vector<functional_vector<int>::functional_tuple<std::string>>();
+    //      for (auto i = 0; i < ages_vector.size(); ++i) {
+    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          tuple.first = ages_vector[i];
+    //          tuple.second = names_vector[i];
+    //          zipped_vector[i] = tuple;
+    //      }
     template <typename U>
-    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const std::vector<U>& vector) const
+    [[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::vector<U>& vector) const
     {
         return zip_impl<U>(vector.begin(), vector.end());
     }
     
+    // Performs the functional `zip` algorithm, in which every element of the resulting vector is a
+    // tuple of this instance's element (first) and the second vector's element (second) at the same
+    // index. The sizes of the two vectors must be equal.
+    //
+    // example:
+    //      const auto ages_vector = functional_vector({32, 25, 53});
+    //      const auto names_vector = std::initializer_list<std::string>({"Jake", "Mary", "John"});
+    //      const auto zipped_vector = ages_vector.zip(names_vector);
+    //
+    // outcome:
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //                          (32, "Jake"),
+    //                          (25, "Mary"),
+    //                          (53, "John"),
+    //                       })
+    //
+    // is equivalent to:
+    //      const auto ages_vector = functional_vector({32, 25, 53});
+    //      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
+    //      auto zipped_vector = functional_vector<functional_vector<int>::functional_tuple<std::string>>();
+    //      for (auto i = 0; i < ages_vector.size(); ++i) {
+    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          tuple.first = ages_vector[i];
+    //          tuple.second = names_vector[i];
+    //          zipped_vector[i] = tuple;
+    //      }
     template <typename U>
-    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip(const std::initializer_list<U>& list) const
+    [[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::initializer_list<U>& list) const
     {
         return zip(std::vector(list));
     }
@@ -555,17 +633,17 @@ private:
     }
     
     template <typename U>
-    [[nodiscard]] functional_vector<functional_vector_tuple<U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
+    [[nodiscard]] functional_vector<functional_tuple<U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
                                                                          const typename std::vector<U>::const_iterator& vec_end) const
     {
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(backing_vector_.size() == vec_size);
-        std::vector<functional_vector_tuple<U>> combined_vector;
+        std::vector<functional_tuple<U>> combined_vector;
         combined_vector.reserve(vec_size);
-        for (size_t i = 0; i < vec_size; i++) {
+        for (size_t i = 0; i < vec_size; ++i) {
             combined_vector.push_back({ backing_vector_[i], *(vec_begin + i) });
         }
-        return functional_vector<functional_vector_tuple<U>>(combined_vector);
+        return functional_vector<functional_tuple<U>>(combined_vector);
     }
     
     functional_vector& insert_at_impl(int index,
