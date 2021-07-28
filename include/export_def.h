@@ -21,23 +21,13 @@
 // SOFTWARE.
 
 #pragma once
-#include <cstddef>
-#include "export_def.h"
 
-struct FunctionalVectorExport index_range
-{
-	static index_range invalid;
-    static index_range from_start_and_count(size_t start, size_t count);
-    static index_range from_start_and_end(size_t start, size_t end);
-    [[nodiscard]] size_t end() const;
-    
-    bool operator == (const index_range& rhs) const;
-    bool operator != (const index_range& rhs) const;
-    
-    size_t start;
-    size_t count;
-    bool is_valid;
-    
-private:
-    index_range(size_t start, size_t count);
-};
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    #ifdef FUNCTIONAL_VECTOR_EXPORTS
+        #define FunctionalVectorExport __declspec( dllexport )
+    #else
+        #define FunctionalVectorExport __declspec( dllimport )
+    #endif
+#else
+    #define FunctionalVectorExport __attribute__ ((__visibility__("default")))
+#endif

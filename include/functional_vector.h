@@ -20,8 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef FUNCTIONAL_VECTOR_H
-#define FUNCTIONAL_VECTOR_H
+#pragma once
 #include <vector>
 #include <functional>
 #include <algorithm>
@@ -529,5 +528,3 @@ private:
         return functional_vector(replaced_vector);
     }
 };
-
-#endif /* FUNCTIONAL_VECTOR_H */
