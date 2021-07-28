@@ -27,17 +27,17 @@
 struct FunctionalVectorExport index_range
 {
 	static index_range invalid;
-    static index_range from_start_and_count(size_t start, size_t count);
-    static index_range from_start_and_end(size_t start, size_t end);
-    [[nodiscard]] size_t end() const;
+    static index_range from_start_and_count(int start, int count);
+    static index_range from_start_and_end(int start, int end);
+    [[nodiscard]] int end() const;
     
     bool operator == (const index_range& rhs) const;
     bool operator != (const index_range& rhs) const;
     
-    size_t start;
-    size_t count;
+    int start;
+    int count;
     bool is_valid;
     
 private:
-    index_range(size_t start, size_t count);
+    index_range(int start, int count);
 };

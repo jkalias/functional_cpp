@@ -55,22 +55,22 @@ TEST(FunctionalVectorTest, EqualityOperatorEmptyVectorsTest) {
 }
 
 TEST(FunctionalVectorTest, EqualityOperatorUnequalSizesTest) {
-    const auto vec1 = functional_vector<int>({1, 2, 3});
-    const auto vec2 = functional_vector<int>({1, 2, 3, 4});
+    const auto vec1 = functional_vector({1, 2, 3});
+    const auto vec2 = functional_vector({1, 2, 3, 4});
     EXPECT_TRUE(vec1 != vec2);
     EXPECT_FALSE(vec1 == vec2);
 }
 
 TEST(FunctionalVectorTest, EqualityOperatorEqualSizesDifferentElementsTest) {
-    const auto vec1 = functional_vector<int>({1, 2, 3});
-    const auto vec2 = functional_vector<int>({1, 2, 4});
+    const auto vec1 = functional_vector({1, 2, 3});
+    const auto vec2 = functional_vector({1, 2, 4});
     EXPECT_TRUE(vec1 != vec2);
     EXPECT_FALSE(vec1 == vec2);
 }
 
 TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest) {
-    const auto vec1 = functional_vector<int>({1, 2, 3});
-    const auto vec2 = functional_vector<int>({1, 2, 3});
+    const auto vec1 = functional_vector({1, 2, 3});
+    const auto vec2 = functional_vector({1, 2, 3});
     EXPECT_TRUE(vec1 == vec2);
     EXPECT_FALSE(vec1 != vec2);
 }
@@ -98,7 +98,7 @@ TEST(FunctionalVectorTest, AddingTest) {
 
 TEST(FunctionalVectorTest, AddRangeFromFunctionalVectorTest) {
     auto vector_under_test = functional_vector<int>();
-    vector_under_test.add_range(functional_vector {1, 2, 3});
+    vector_under_test.add_range(functional_vector({1, 2, 3}));
     EXPECT_EQ(3, vector_under_test.size());
     EXPECT_EQ(1, vector_under_test[0]);
     EXPECT_EQ(2, vector_under_test[1]);
@@ -107,7 +107,7 @@ TEST(FunctionalVectorTest, AddRangeFromFunctionalVectorTest) {
 
 TEST(FunctionalVectorTest, AddRangeFromStdVectorTest) {
     auto vector_under_test = functional_vector<int>();
-    vector_under_test.add_range(std::vector {1, 2, 3});
+    vector_under_test.add_range(std::vector({1, 2, 3}));
     EXPECT_EQ(3, vector_under_test.size());
     EXPECT_EQ(1, vector_under_test[0]);
     EXPECT_EQ(2, vector_under_test[1]);
@@ -125,7 +125,7 @@ TEST(FunctionalVectorTest, AddRangeFromInitializerListTest) {
 
 TEST(FunctionalVectorTest, AddingRangeFromFunctionalVectorTest) {
     const auto vector_under_test = functional_vector<int>();
-    const auto vector_new_instance = vector_under_test.adding_range(functional_vector {1, 2, 3});
+    const auto vector_new_instance = vector_under_test.adding_range(functional_vector({1, 2, 3}));
     EXPECT_EQ(0, vector_under_test.size());
     EXPECT_EQ(3, vector_new_instance.size());
     EXPECT_EQ(1, vector_new_instance[0]);
@@ -455,7 +455,7 @@ TEST(FunctionalVectorTest, FindAllIndicesFilledVectorWithoutMatchTest) {
 }
 
 TEST(FunctionalVectorTest, FindAllIndicesFilledVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 9, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 9, 1});
     const auto one_indices = vector_under_test.find_all_indices(1);
     EXPECT_EQ(std::vector<size_t>({0, 6, 8}), one_indices);
     const auto seven_indices = vector_under_test.find_all_indices(9);
@@ -477,13 +477,13 @@ TEST(FunctionalVectorTest, RemoveAtFilledVectorAboveSizeTest) {
 #endif
 
 TEST(FunctionalVectorTest, RemoveAtFilledVectorTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.remove_at(1);
-    EXPECT_EQ(functional_vector<int>({1, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
     vector_under_test.remove_at(1);
-    EXPECT_EQ(functional_vector<int>({1, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 5, 8, 3, 1, 7, 1}), vector_under_test);
     vector_under_test.remove_at(4);
-    EXPECT_EQ(functional_vector<int>({1, 5, 8, 3, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 5, 8, 3, 7, 1}), vector_under_test);
 }
 
 #ifndef NDEBUG
@@ -501,44 +501,44 @@ TEST(FunctionalVectorTest, RemovingAtFilledVectorAboveSizeTest) {
 #endif
 
 TEST(FunctionalVectorTest, RemovingAtFilledVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto shorter_vector = vector_under_test.removing_at(1);
-    EXPECT_EQ(functional_vector<int>({1, 2, 5, 8, 3, 1, 7, 1}), shorter_vector);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 2, 5, 8, 3, 1, 7, 1}), shorter_vector);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemoveLastTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.remove_last();
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7}), vector_under_test);
     vector_under_test.remove_last();
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1}), vector_under_test);
     vector_under_test.remove_last();
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemovingLastTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_without_last_element = vector_under_test.removing_last();
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7}), vector_without_last_element);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7}), vector_without_last_element);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemoveFirstTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.remove_first();
-    EXPECT_EQ(functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
     vector_under_test.remove_first();
-    EXPECT_EQ(functional_vector<int>({2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({2, 5, 8, 3, 1, 7, 1}), vector_under_test);
     vector_under_test.remove_first();
-    EXPECT_EQ(functional_vector<int>({5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemovingFirstTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_without_first_element = vector_under_test.removing_first();
-    EXPECT_EQ(functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1}), vector_without_first_element);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({4, 2, 5, 8, 3, 1, 7, 1}), vector_without_first_element);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 
@@ -553,12 +553,12 @@ TEST(FunctionalVectorTest, InsertAtEmptyVectorTest) {
 }
 
 TEST(FunctionalVectorTest, InsertAtFilledVectorTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
 #ifndef NDEBUG
     EXPECT_DEATH(vector_under_test.insert_at(15, -1), "");
 #endif
     vector_under_test.insert_at(3, 18);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 18, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, InsertingAtEmptyVectorTest) {
@@ -573,13 +573,13 @@ TEST(FunctionalVectorTest, InsertingAtEmptyVectorTest) {
 }
 
 TEST(FunctionalVectorTest, InsertingAtFilledVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
 #ifndef NDEBUG
     EXPECT_DEATH(vector_under_test.inserting_at(15, -1), "");
 #endif
     const auto augmented_vector = vector_under_test.inserting_at(3, 18);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 18, 5, 8, 3, 1, 7, 1}), augmented_vector);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1}), augmented_vector);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, InsertRangeEmptyFunctionalVectorTest) {
@@ -591,7 +591,7 @@ TEST(FunctionalVectorTest, InsertRangeEmptyFunctionalVectorTest) {
 
 #ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexFunctionalVectorTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_to_insert = functional_vector({9, -5, 6});
     EXPECT_DEATH(vector_under_test.insert_at(-1, vector_to_insert), "");
     EXPECT_DEATH(vector_under_test.insert_at(10, vector_to_insert), "");
@@ -599,7 +599,7 @@ TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexFunctionalVecto
 #endif
 
 TEST(FunctionalVectorTest, InsertRangeExistingFunctionalVectorTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_to_insert = functional_vector({9, -5, 6});
     vector_under_test.insert_at(3, vector_to_insert);
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), vector_under_test);
@@ -607,23 +607,23 @@ TEST(FunctionalVectorTest, InsertRangeExistingFunctionalVectorTest) {
 
 TEST(FunctionalVectorTest, InsertRangeEmptyStdVectorTest) {
     auto vector_under_test = functional_vector<int>();
-    const auto vector_to_insert = std::vector<int> {4, 7, 3, -5};
+    const auto vector_to_insert = std::vector {4, 7, 3, -5};
     vector_under_test.insert_at(0, vector_to_insert);
     EXPECT_EQ(functional_vector({4, 7, 3, -5}), vector_under_test);
 }
 
 #ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexStdVectorTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    const auto vector_to_insert = std::vector<int> {9, -5, 6};
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = std::vector {9, -5, 6};
     EXPECT_DEATH(vector_under_test.insert_at(-1, vector_to_insert), "");
     EXPECT_DEATH(vector_under_test.insert_at(10, vector_to_insert), "");
 }
 #endif
 
 TEST(FunctionalVectorTest, InsertRangeExistingStdVectorTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    const auto vector_to_insert = std::vector<int> {9, -5, 6};
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_to_insert = std::vector {9, -5, 6};
     vector_under_test.insert_at(3, vector_to_insert);
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
@@ -636,14 +636,14 @@ TEST(FunctionalVectorTest, InsertRangeEmptyInitializerListTest) {
 
 #ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexInitializerListTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_DEATH(vector_under_test.insert_at(-1, {9, -5, 6}), "");
     EXPECT_DEATH(vector_under_test.insert_at(10, {9, -5, 6}), "");
 }
 #endif
 
 TEST(FunctionalVectorTest, InsertRangeExistingInitializerListTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.insert_at(3, {9, -5, 6});
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
@@ -657,7 +657,7 @@ TEST(FunctionalVectorTest, InsertingRangeEmptyFunctionalVectorTest) {
 
 #ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexFunctionalVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_to_insert = functional_vector({9, -5, 6});
     EXPECT_DEATH(vector_under_test.inserting_at(-1, vector_to_insert), "");
     EXPECT_DEATH(vector_under_test.inserting_at(10, vector_to_insert), "");
@@ -665,7 +665,7 @@ TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexFunctionalVe
 #endif
 
 TEST(FunctionalVectorTest, InsertingRangeExistingFunctionalVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_to_insert = functional_vector({9, -5, 6});
     const auto result_vector = vector_under_test.inserting_at(3, vector_to_insert);
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
@@ -680,7 +680,7 @@ TEST(FunctionalVectorTest, InsertingRangeEmptyStdVectorTest) {
 
 #ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexStdVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_to_insert = std::vector {9, -5, 6};
     EXPECT_DEATH(vector_under_test.inserting_at(-1, vector_to_insert), "");
     EXPECT_DEATH(vector_under_test.inserting_at(10, vector_to_insert), "");
@@ -688,7 +688,7 @@ TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexStdVectorTes
 #endif
 
 TEST(FunctionalVectorTest, InsertingRangeExistingStdVectorTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto vector_to_insert = std::vector {9, -5, 6};
     const auto result_vector = vector_under_test.inserting_at(3, vector_to_insert);
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
@@ -702,22 +702,22 @@ TEST(FunctionalVectorTest, InsertingRangeEmptyInitializerListTest) {
 
 #ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexInitializerListTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_DEATH(vector_under_test.inserting_at(-1, {9, -5, 6}), "");
     EXPECT_DEATH(vector_under_test.inserting_at(10, {9, -5, 6}), "");
 }
 #endif
 
 TEST(FunctionalVectorTest, InsertingRangeExistingInitializerListTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto result_vector = vector_under_test.inserting_at(3, {9, -5, 6});
     EXPECT_EQ(functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1}), result_vector);
 }
 
 TEST(FunctionalVectorTest, RemoveRangeWithInvalidRangeTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.remove_range(index_range::invalid);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemoveRangeEmptyVectorTest) {
@@ -727,21 +727,21 @@ TEST(FunctionalVectorTest, RemoveRangeEmptyVectorTest) {
 }
 
 TEST(FunctionalVectorTest, RemoveRangeStartCountSuccessTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.remove_range(index_range::from_start_and_count(2, 3));
-    EXPECT_EQ(functional_vector<int>({1, 4, 3, 1, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemoveRangeStartEndSuccessTest) {
-    auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.remove_range(index_range::from_start_and_end(3, 6));
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 7, 1}), vector_under_test);
+    EXPECT_EQ(functional_vector({1, 4, 2, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemovingRangeWithInvalidRangeTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto shorter_vector = vector_under_test.removing_range(index_range::invalid);
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1}), shorter_vector);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1}), shorter_vector);
 }
 
 TEST(FunctionalVectorTest, RemovingRangeEmptyVectorTest) {
@@ -751,15 +751,15 @@ TEST(FunctionalVectorTest, RemovingRangeEmptyVectorTest) {
 }
 
 TEST(FunctionalVectorTest, RemovingRangeStartCountSuccessTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_count(2, 3));
-    EXPECT_EQ(functional_vector<int>({1, 4, 3, 1, 7, 1}), shorter_vector);
+    EXPECT_EQ(functional_vector({1, 4, 3, 1, 7, 1}), shorter_vector);
 }
 
 TEST(FunctionalVectorTest, RemovingRangeStartEndSuccessTest) {
-    const auto vector_under_test = functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
     const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_end(3, 6));
-    EXPECT_EQ(functional_vector<int>({1, 4, 2, 7, 1}), shorter_vector);
+    EXPECT_EQ(functional_vector({1, 4, 2, 7, 1}), shorter_vector);
 }
 
 TEST(FunctionalVectorTest, ReplaceRangeAtWithEmptySource) {
@@ -796,7 +796,7 @@ TEST(FunctionalVectorTest, ReplaceRangeAtWithStdVectorTest) {
 
 TEST(FunctionalVectorTest, ReplaceRangeAtWithInitializerListTest) {
     auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    vector_under_test.replace_range_at(4, std::initializer_list<int>({9, -10, 8}));
+    vector_under_test.replace_range_at(4, std::initializer_list({9, -10, 8}));
     EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), vector_under_test);
 }
 
@@ -834,7 +834,7 @@ TEST(FunctionalVectorTest, ReplacingRangeAtWithStdVectorTest) {
 
 TEST(FunctionalVectorTest, ReplacingRangeAtWithInitializerListTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    const auto replaced_vector = vector_under_test.replacing_range_at(4, std::initializer_list<int>({9, -10, 8}));
+    const auto replaced_vector = vector_under_test.replacing_range_at(4, std::initializer_list({9, -10, 8}));
     EXPECT_EQ(functional_vector({1, 4, 2, 5, 9, -10, 8, 7, 1}), replaced_vector);
 }
 

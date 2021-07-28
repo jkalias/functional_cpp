@@ -194,21 +194,21 @@ public:
     {
         return sorted(std::greater_equal<T>());
     }
-    
-    size_t size() const
+
+    [[nodiscard]] size_t size() const
     {
         return backing_vector_.size();
     }
     
-    T& operator[] (size_t index)
+    T& operator[] (int index)
     {
-        assert(index < size());
+        assert_smaller_size(index);
         return backing_vector_[index];
     }
     
-    const T& operator[] (size_t index) const
+    const T& operator[] (int index) const
     {
-        assert(index < size());
+        assert_smaller_size(index);
         return backing_vector_[index];
     }
     
@@ -264,16 +264,16 @@ public:
         return indices;
     }
     
-    functional_vector& remove_at(size_t index)
+    functional_vector& remove_at(int index)
     {
-        assert(index < size());
+        assert_smaller_size(index);
         backing_vector_.erase(begin() + index);
         return *this;
     }
     
-    [[nodiscard]] functional_vector removing_at(size_t index) const
+    [[nodiscard]] functional_vector removing_at(int index) const
     {
-        assert(index < size());
+        assert_smaller_size(index);
         auto copy(backing_vector_);
         copy.erase(copy.begin() + index);
         return functional_vector(copy);
@@ -311,47 +311,47 @@ public:
         return removing_at(0);
     }
     
-    functional_vector& insert_at(size_t index, const T& element)
+    functional_vector& insert_at(int index, const T& element)
     {
-        assert(index <= size());
+        assert_smaller_or_equal_size(index);
         backing_vector_.insert(begin() + index, element);
         return *this;
     }
     
-    [[nodiscard]] functional_vector inserting_at(size_t index, const T& element) const
+    [[nodiscard]] functional_vector inserting_at(int index, const T& element) const
     {
-        assert(index <= size());
+        assert_smaller_or_equal_size(index);
         auto copy(backing_vector_);
         copy.insert(copy.begin() + index, element);
         return functional_vector(copy);
     }
     
-    functional_vector& insert_at(size_t index, const functional_vector<T>& vector)
+    functional_vector& insert_at(int index, const functional_vector<T>& vector)
     {
         return insert_at_impl(index, vector.begin(), vector.end());
     }
     
-    [[nodiscard]] functional_vector inserting_at(size_t index, const functional_vector<T>& vector) const
+    [[nodiscard]] functional_vector inserting_at(int index, const functional_vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
     }
     
-    functional_vector& insert_at(size_t index, const std::vector<T>& vector)
+    functional_vector& insert_at(int index, const std::vector<T>& vector)
     {
         return insert_at_impl(index, vector.begin(), vector.end());
     }
     
-    [[nodiscard]] functional_vector inserting_at(size_t index, const std::vector<T>& vector) const
+    [[nodiscard]] functional_vector inserting_at(int index, const std::vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
     }
     
-    functional_vector& insert_at(size_t index, const std::initializer_list<T>& list)
+    functional_vector& insert_at(int index, const std::initializer_list<T>& list)
     {
         return insert_at(index, std::vector(list));
     }
     
-    [[nodiscard]] functional_vector inserting_at(size_t index, const std::initializer_list<T>& list) const
+    [[nodiscard]] functional_vector inserting_at(int index, const std::initializer_list<T>& list) const
     {
         return inserting_at(index, std::vector(list));
     }
@@ -377,32 +377,32 @@ public:
         return functional_vector(shorter_vector);
     }
     
-    functional_vector& replace_range_at(size_t index, const functional_vector<T>& vector)
+    functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
     {
         return replace_range_at_imp(index, vector.begin(), vector.end());
     }
     
-    functional_vector& replace_range_at(size_t index, const std::vector<T>& vector)
+    functional_vector& replace_range_at(int index, const std::vector<T>& vector)
     {
         return replace_range_at_imp(index, vector.begin(), vector.end());
     }
     
-    functional_vector& replace_range_at(size_t index, const std::initializer_list<T>& list)
+    functional_vector& replace_range_at(int index, const std::initializer_list<T>& list)
     {
         return replace_range_at(index, std::vector(list));
     }
     
-    [[nodiscard]] functional_vector replacing_range_at(size_t index, const functional_vector<T>& vector) const
+    [[nodiscard]] functional_vector replacing_range_at(int index, const functional_vector<T>& vector) const
     {
         return replacing_range_at_imp(index, vector.begin(), vector.end());
     }
     
-    [[nodiscard]] functional_vector replacing_range_at(size_t index, const std::vector<T>& vector) const
+    [[nodiscard]] functional_vector replacing_range_at(int index, const std::vector<T>& vector) const
     {
         return replacing_range_at_imp(index, vector.begin(), vector.end());
     }
     
-    [[nodiscard]] functional_vector replacing_range_at(size_t index, const std::initializer_list<T>& list) const
+    [[nodiscard]] functional_vector replacing_range_at(int index, const std::initializer_list<T>& list) const
     {
         return replacing_range_at(index, std::vector(list));
     }
@@ -475,12 +475,12 @@ private:
         return functional_vector<functional_vector_tuple<U>>(combined_vector);
     }
     
-    functional_vector& insert_at_impl(size_t index,
+    functional_vector& insert_at_impl(int index,
                                       const typename std::vector<T>::const_iterator& vec_begin,
                                       const typename std::vector<T>::const_iterator& vec_end)
     {
         if (vec_begin != vec_end) {
-            assert(index <= size());
+            assert_smaller_or_equal_size(index);
             backing_vector_.insert(begin() + index,
                                    vec_begin,
                                    vec_end);
@@ -488,14 +488,14 @@ private:
         return *this;
     }
     
-    [[nodiscard]] functional_vector inserting_at_impl(size_t index,
+    [[nodiscard]] functional_vector inserting_at_impl(int index,
                                                       const typename std::vector<T>::const_iterator& vec_begin,
                                                       const typename std::vector<T>::const_iterator& vec_end) const
     {
         if (vec_begin == vec_end) {
             return *this;
         }
-        assert(index <= size());
+        assert_smaller_or_equal_size(index);
         auto augmented_vector(backing_vector_);
         augmented_vector.insert(augmented_vector.begin() + index,
                                 vec_begin,
@@ -503,7 +503,7 @@ private:
         return functional_vector(augmented_vector);
     }
     
-    functional_vector& replace_range_at_imp(size_t index,
+    functional_vector& replace_range_at_imp(int index,
                                             const typename std::vector<T>::const_iterator& vec_begin,
                                             const typename std::vector<T>::const_iterator& vec_end)
     {
@@ -515,7 +515,7 @@ private:
         return *this;
     }
     
-    [[nodiscard]] functional_vector replacing_range_at_imp(size_t index,
+    [[nodiscard]] functional_vector replacing_range_at_imp(int index,
                                                            const typename std::vector<T>::const_iterator& vec_begin,
                                                            const typename std::vector<T>::const_iterator& vec_end) const
     {
@@ -526,5 +526,15 @@ private:
                   vec_end,
                   replaced_vector.begin() + index);
         return functional_vector(replaced_vector);
+    }
+
+	void assert_smaller_size(int index) const
+	{
+        assert(index < size() && index >= 0);
+    }
+
+	void assert_smaller_or_equal_size(int index) const
+	{
+        assert(index <= size() && index >= 0);
     }
 };

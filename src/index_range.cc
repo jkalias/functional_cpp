@@ -24,27 +24,27 @@
 
 index_range index_range::invalid = from_start_and_count(-1, -1);
 
-index_range::index_range(size_t start, size_t count)
+index_range::index_range(int start, int count)
 : start(-1), count(-1)
 {
-    is_valid = start >= 0 && start != -1 && count > 0 && count != -1;
+    is_valid = start >= 0 && count > 0;
     if (is_valid) {
         this->start = start;
         this->count = count;
     }
 }
 
-index_range index_range::from_start_and_count(size_t start, size_t count)
+index_range index_range::from_start_and_count(int start, int count)
 {
     return index_range(start, count);
 }
 
-index_range index_range::from_start_and_end(size_t start, size_t end)
+index_range index_range::from_start_and_end(int start, int end)
 {
     return index_range(start, end - start + 1);
 }
 
-size_t index_range::end() const
+int index_range::end() const
 {
     if (!is_valid) {
         return -1;
