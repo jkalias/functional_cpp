@@ -26,14 +26,14 @@
 struct FunctionalVectorExport index_range
 {
 	static index_range invalid;
-    static index_range from_start_and_count(int start, int count);
-    static index_range from_start_and_end(int start, int end);
-    [[nodiscard]] int end() const;
+    static index_range start_count(int start, int count);
+    static index_range start_end(int start, int end);
     
     bool operator == (const index_range& rhs) const;
     bool operator != (const index_range& rhs) const;
     
     int start;
+    int end;
     int count;
     bool is_valid;
     

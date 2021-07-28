@@ -358,7 +358,7 @@ public:
     
     functional_vector& remove_range(index_range range)
     {
-        if (!range.is_valid || size() < range.end() + 1) {
+        if (!range.is_valid || size() < range.end + 1) {
             return *this;
         }
         backing_vector_.erase(begin() + range.start,
@@ -368,7 +368,7 @@ public:
     
     [[nodiscard]] functional_vector removing_range(index_range range) const
     {
-        if (!range.is_valid || size() < range.end() + 1) {
+        if (!range.is_valid || size() < range.end + 1) {
             return *this;
         }
         auto shorter_vector(backing_vector_);

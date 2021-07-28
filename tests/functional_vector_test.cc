@@ -722,19 +722,19 @@ TEST(FunctionalVectorTest, RemoveRangeWithInvalidRangeTest) {
 
 TEST(FunctionalVectorTest, RemoveRangeEmptyVectorTest) {
     auto vector_under_test = functional_vector<int>();
-    vector_under_test.remove_range(index_range::from_start_and_count(1, 12));
+    vector_under_test.remove_range(index_range::start_count(1, 12));
     EXPECT_EQ(functional_vector<int>(), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemoveRangeStartCountSuccessTest) {
     auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    vector_under_test.remove_range(index_range::from_start_and_count(2, 3));
+    vector_under_test.remove_range(index_range::start_count(2, 3));
     EXPECT_EQ(functional_vector({1, 4, 3, 1, 7, 1}), vector_under_test);
 }
 
 TEST(FunctionalVectorTest, RemoveRangeStartEndSuccessTest) {
     auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    vector_under_test.remove_range(index_range::from_start_and_end(3, 6));
+    vector_under_test.remove_range(index_range::start_end(3, 6));
     EXPECT_EQ(functional_vector({1, 4, 2, 7, 1}), vector_under_test);
 }
 
@@ -746,19 +746,19 @@ TEST(FunctionalVectorTest, RemovingRangeWithInvalidRangeTest) {
 
 TEST(FunctionalVectorTest, RemovingRangeEmptyVectorTest) {
     const auto vector_under_test = functional_vector<int>();
-    const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_count(1, 12));
+    const auto shorter_vector = vector_under_test.removing_range(index_range::start_count(1, 12));
     EXPECT_EQ(functional_vector<int>(), shorter_vector);
 }
 
 TEST(FunctionalVectorTest, RemovingRangeStartCountSuccessTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_count(2, 3));
+    const auto shorter_vector = vector_under_test.removing_range(index_range::start_count(2, 3));
     EXPECT_EQ(functional_vector({1, 4, 3, 1, 7, 1}), shorter_vector);
 }
 
 TEST(FunctionalVectorTest, RemovingRangeStartEndSuccessTest) {
     const auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    const auto shorter_vector = vector_under_test.removing_range(index_range::from_start_and_end(3, 6));
+    const auto shorter_vector = vector_under_test.removing_range(index_range::start_end(3, 6));
     EXPECT_EQ(functional_vector({1, 4, 2, 7, 1}), shorter_vector);
 }
 
