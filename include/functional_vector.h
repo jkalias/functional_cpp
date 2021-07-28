@@ -27,6 +27,12 @@
 #include <optional>
 #include "index_range.h"
 
+// A lightweight wrapper around std::vector, enabling fluent and functional
+// programming on the vector itself, rather than using the more procedural style
+// of the standard library algorithms.
+//
+// Member functions can be mutating (eg. my_vector.reverse()) or
+// non-mutating (eg. my_vector.reversed()) enforcing thread safety if needed
 template <typename T>
 class functional_vector {
 public:
@@ -44,50 +50,73 @@ public:
     : backing_vector_(std::move(list))
     {
     }
-    
-    functional_vector& add(T value)
+
+	// Adds a value at the end of the vector (mutating)
+    functional_vector& push_back(T value)
     {
         backing_vector_.push_back(value);
         return *this;
     }
-    
-    [[nodiscard]] functional_vector adding(T value) const
+
+    // Adds a value at the end of the vector and returns the result (non-mutating)
+    [[nodiscard]] functional_vector pushing_back(T value) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.push_back(value);
         return functional_vector(augmented_vector);
     }
-    
-    functional_vector& add_range(const functional_vector<T>& vector)
+
+    // Adds a range of values at the end of the vector (mutating)
+    functional_vector& push_back(const functional_vector<T>& vector)
+    {
+        return add_range_impl(vector.begin(), vector.end());
+    }
+
+    // Adds a range of values at the end of the vector and returns the result (non-mutating)
+    [[nodiscard]] functional_vector pushing_back(const functional_vector<T>& vector) const
+    {
+        return adding_range_impl(vector.begin(), vector.end());
+    }
+
+    // Adds a range of values at the end of the vector (mutating)
+    functional_vector& push_back(const std::vector<T>& vector)
     {
         return add_range_impl(vector.begin(), vector.end());
     }
     
-    [[nodiscard]] functional_vector adding_range(const functional_vector<T>& vector) const
+    // Adds a range of values at the end of the vector and returns the result (non-mutating)
+	[[nodiscard]] functional_vector pushing_back(const std::vector<T>& vector) const
     {
         return adding_range_impl(vector.begin(), vector.end());
     }
-    
-    functional_vector& add_range(const std::vector<T>& vector)
+
+    // Adds a range of values at the end of the vector (mutating)
+    functional_vector& push_back(const std::initializer_list<T>& list)
     {
-        return add_range_impl(vector.begin(), vector.end());
+        return push_back(std::vector(list));
     }
-    
-    [[nodiscard]] functional_vector adding_range(const std::vector<T>& vector) const
+
+    // Adds a range of values at the end of the vector and returns the result (non-mutating)
+    [[nodiscard]] functional_vector pushing_back(const std::initializer_list<T>& list) const
     {
-        return adding_range_impl(vector.begin(), vector.end());
+        return pushing_back(std::vector(list));
     }
-    
-    functional_vector& add_range(const std::initializer_list<T>& list)
-    {
-        return add_range(std::vector(list));
-    }
-    
-    [[nodiscard]] functional_vector adding_range(const std::initializer_list<T>& list) const
-    {
-        return adding_range(std::vector(list));
-    }
-    
+
+	// Performs the functional map algorithm, in which every element of the result vector is the
+	// output of applying the transform function on every element of this instance
+    //
+	// example:
+	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
+	//      const auto output_vector = input_vector.map<std::string>([](const auto& element) {
+	//      	return std::to_string(element);
+	//      });
+	//
+	// is equivalent to:
+	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
+	//      auto for_output_vector = functional_vector<std::string>();
+	//      for (auto i = 0; i < input_vector.size(); i++) {
+	//      	for_output_vector.push_back(std::to_string(input_vector[i]));
+	//      }
     template <typename U>
     functional_vector<U> map(const std::function<U(T)>& transform) const
     {

@@ -87,63 +87,63 @@ TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest)
 	EXPECT_FALSE(vec1 != vec2);
 }
 
-TEST(FunctionalVectorTest, AddTest)
+TEST(FunctionalVectorTest, PushBackTest)
 {
 	auto vector_under_test = functional_vector<int>();
 	EXPECT_EQ(0, vector_under_test.size());
 
-	vector_under_test.add(5);
+	vector_under_test.push_back(5);
 	EXPECT_EQ(1, vector_under_test.size());
 	EXPECT_EQ(5, vector_under_test[0]);
 
-	vector_under_test.add(-1);
+	vector_under_test.push_back(-1);
 	EXPECT_EQ(2, vector_under_test.size());
 	EXPECT_EQ(-1, vector_under_test[1]);
 }
 
-TEST(FunctionalVectorTest, AddingTest)
+TEST(FunctionalVectorTest, PushingBackTest)
 {
 	const auto vector_under_test = functional_vector<int>();
-	const auto vector_new_instance = vector_under_test.adding(5);
+	const auto vector_new_instance = vector_under_test.pushing_back(5);
 	EXPECT_EQ(0, vector_under_test.size());
 	EXPECT_EQ(1, vector_new_instance.size());
 	EXPECT_EQ(5, vector_new_instance[0]);
 }
 
-TEST(FunctionalVectorTest, AddRangeFromFunctionalVectorTest)
+TEST(FunctionalVectorTest, PushBackFromFunctionalVectorTest)
 {
 	auto vector_under_test = functional_vector<int>();
-	vector_under_test.add_range(functional_vector({1, 2, 3}));
+	vector_under_test.push_back(functional_vector({1, 2, 3}));
 	EXPECT_EQ(3, vector_under_test.size());
 	EXPECT_EQ(1, vector_under_test[0]);
 	EXPECT_EQ(2, vector_under_test[1]);
 	EXPECT_EQ(3, vector_under_test[2]);
 }
 
-TEST(FunctionalVectorTest, AddRangeFromStdVectorTest)
+TEST(FunctionalVectorTest, PushBackFromStdVectorTest)
 {
 	auto vector_under_test = functional_vector<int>();
-	vector_under_test.add_range(std::vector{1, 2, 3});
+	vector_under_test.push_back(std::vector{1, 2, 3});
 	EXPECT_EQ(3, vector_under_test.size());
 	EXPECT_EQ(1, vector_under_test[0]);
 	EXPECT_EQ(2, vector_under_test[1]);
 	EXPECT_EQ(3, vector_under_test[2]);
 }
 
-TEST(FunctionalVectorTest, AddRangeFromInitializerListTest)
+TEST(FunctionalVectorTest, PushBackFromInitializerListTest)
 {
 	auto vector_under_test = functional_vector<int>();
-	vector_under_test.add_range({1, 2, 3});
+	vector_under_test.push_back({1, 2, 3});
 	EXPECT_EQ(3, vector_under_test.size());
 	EXPECT_EQ(1, vector_under_test[0]);
 	EXPECT_EQ(2, vector_under_test[1]);
 	EXPECT_EQ(3, vector_under_test[2]);
 }
 
-TEST(FunctionalVectorTest, AddingRangeFromFunctionalVectorTest)
+TEST(FunctionalVectorTest, PushingBackFromFunctionalVectorTest)
 {
 	const auto vector_under_test = functional_vector<int>();
-	const auto vector_new_instance = vector_under_test.adding_range(functional_vector({1, 2, 3}));
+	const auto vector_new_instance = vector_under_test.pushing_back(functional_vector({1, 2, 3}));
 	EXPECT_EQ(0, vector_under_test.size());
 	EXPECT_EQ(3, vector_new_instance.size());
 	EXPECT_EQ(1, vector_new_instance[0]);
@@ -151,10 +151,10 @@ TEST(FunctionalVectorTest, AddingRangeFromFunctionalVectorTest)
 	EXPECT_EQ(3, vector_new_instance[2]);
 }
 
-TEST(FunctionalVectorTest, AddingRangeFromStdVectorTest)
+TEST(FunctionalVectorTest, PushingBackFromStdVectorTest)
 {
 	const auto vector_under_test = functional_vector<int>();
-	const auto vector_new_instance = vector_under_test.adding_range(std::vector({1, 2, 3}));
+	const auto vector_new_instance = vector_under_test.pushing_back(std::vector({1, 2, 3}));
 	EXPECT_EQ(0, vector_under_test.size());
 	EXPECT_EQ(3, vector_new_instance.size());
 	EXPECT_EQ(1, vector_new_instance[0]);
@@ -162,10 +162,10 @@ TEST(FunctionalVectorTest, AddingRangeFromStdVectorTest)
 	EXPECT_EQ(3, vector_new_instance[2]);
 }
 
-TEST(FunctionalVectorTest, AddingRangeFromInitializerListTest)
+TEST(FunctionalVectorTest, PushingBackFromInitializerListTest)
 {
 	const auto vector_under_test = functional_vector<int>();
-	const auto vector_new_instance = vector_under_test.adding_range({1, 2, 3});
+	const auto vector_new_instance = vector_under_test.pushing_back({1, 2, 3});
 	EXPECT_EQ(0, vector_under_test.size());
 	EXPECT_EQ(3, vector_new_instance.size());
 	EXPECT_EQ(1, vector_new_instance[0]);
