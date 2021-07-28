@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #pragma once
-#include <cstddef>
 #include "export_def.h"
 
 struct FunctionalVectorExport index_range
