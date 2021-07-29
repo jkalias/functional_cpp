@@ -547,6 +547,7 @@ public:
         return indices;
     }
     
+    // Removes the element at `index` (mutating)
     functional_vector& remove_at(int index)
     {
         assert_smaller_size(index);
@@ -554,6 +555,7 @@ public:
         return *this;
     }
     
+    // Returns a copy of itself in which the element at `index` is removed (non-mutating)
     [[nodiscard]] functional_vector removing_at(int index) const
     {
         assert_smaller_size(index);
@@ -562,22 +564,22 @@ public:
         return functional_vector(copy);
     }
     
+    // Removes the last element, if present (mutating)
     functional_vector& remove_last()
     {
-        if (size() == 0) {
-            return *this;
-        }
-        return remove_at(size() - 1);
+        backing_vector_.pop_back();
+        return *this;
     }
     
+    // Returns a copy of itself in which last element is removed (non-mutating)
     [[nodiscard]] functional_vector removing_last() const
     {
-        if (size() == 0) {
-            return *this;
-        }
-        return removing_at(size() - 1);
+        auto copy(backing_vector_);
+        copy.pop_back();
+        return functional_vector(copy);
     }
     
+    // Removes the first element, if present (mutating)
     functional_vector& remove_first()
     {
         if (size() == 0) {
@@ -586,6 +588,7 @@ public:
         return remove_at(0);
     }
     
+    // Returns a copy of itself in which first element is removed (non-mutating)
     [[nodiscard]] functional_vector removing_first() const
     {
         if (size() == 0) {
@@ -594,6 +597,14 @@ public:
         return removing_at(0);
     }
     
+    // Inserts an element at the given index, therefore changing the vector's contents (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.insert_at(3, 18);
+    //
+    // outcome:
+    //      numbers -> functional_vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
     functional_vector& insert_at(int index, const T& element)
     {
         assert_smaller_or_equal_size(index);
@@ -601,6 +612,14 @@ public:
         return *this;
     }
     
+    // Returns a copy by inserting an element at the given index (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto augmented_numbers = numbers.inserting_at(3, 18);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
     [[nodiscard]] functional_vector inserting_at(int index, const T& element) const
     {
         assert_smaller_or_equal_size(index);
@@ -609,31 +628,85 @@ public:
         return functional_vector(copy);
     }
     
+    // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const functional_vector vector_to_insert({9, -5, 6});
+    //      numbers.insert_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     functional_vector& insert_at(int index, const functional_vector<T>& vector)
     {
         return insert_at_impl(index, vector.begin(), vector.end());
     }
     
+    // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const functional_vector vector_to_insert({9, -5, 6});
+    //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     [[nodiscard]] functional_vector inserting_at(int index, const functional_vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
     }
     
+    // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const std::vector vector_to_insert({9, -5, 6});
+    //      numbers.insert_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     functional_vector& insert_at(int index, const std::vector<T>& vector)
     {
         return insert_at_impl(index, vector.begin(), vector.end());
     }
     
+    // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const std::vector vector_to_insert({9, -5, 6});
+    //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     [[nodiscard]] functional_vector inserting_at(int index, const std::vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
     }
     
+    // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const std::initializer_list vector_to_insert({9, -5, 6});
+    //      numbers.insert_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     functional_vector& insert_at(int index, const std::initializer_list<T>& list)
     {
         return insert_at(index, std::vector(list));
     }
     
+    // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const std::initializer_list vector_to_insert({9, -5, 6});
+    //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     [[nodiscard]] functional_vector inserting_at(int index, const std::initializer_list<T>& list) const
     {
         return inserting_at(index, std::vector(list));
