@@ -321,7 +321,7 @@ public:
     //          functional_vector<int>::functional_tuple<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
-    //          zipped_vector[i] = tuple;
+    //          zipped_vector.push_back(tuple);
     //      }
     template <typename U>
     [[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::initializer_list<U>& list) const
@@ -329,6 +329,27 @@ public:
         return zip(std::vector(list));
     }
     
+    // Sorts the vector in place (mutating). The comparison predicate takes two elements
+    // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
+    //
+    // example:
+    //      struct person
+    //      {
+    //          int age;
+    //          std::string name;
+    //      };
+    //      ...
+    //      functional_vector persons_vector({
+    //          person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
+    //      });
+    //      persons_vector.sort([](const auto& person1, const auto& person2) {
+    //          return person1.name < person2.name;
+    //      });
+    //
+    // outcome:
+    //      person_vector -> functional_vector({
+    //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
+    //      });
     functional_vector& sort(const std::function<bool(T, T)>& comparison_predicate)
     {
         std::sort(backing_vector_.begin(),
@@ -337,16 +358,53 @@ public:
         return *this;
     }
     
+    // Sorts the vector in place in ascending order, when its elements support comparison by < (mutating).
+    //
+    // example:
+    //      functional_vector numbers({3, 1, 9, -4});
+    //      numbers.sort_ascending();
+    //
+    // outcome:
+    //      numbers -> functional_vector({-4, 1, 3, 9});
     functional_vector& sort_ascending()
     {
         return sort(std::less_equal<T>());
     }
     
+    // Sorts the vector in place in descending order, when its elements support comparison by > (mutating).
+    //
+    // example:
+    //      functional_vector numbers({3, 1, 9, -4});
+    //      numbers.sort_ascending();
+    //
+    // outcome:
+    //      numbers -> functional_vector({9, 3, 1, -4});
     functional_vector& sort_descending()
     {
         return sort(std::greater_equal<T>());
     }
     
+    // Returns its elements copied and sorted (non-mutating). The comparison predicate takes two elements
+    // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
+    //
+    // example:
+    //      struct person
+    //      {
+    //          int age;
+    //          std::string name;
+    //      };
+    //      ...
+    //      const functional_vector persons_vector({
+    //          person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
+    //      });
+    //      auto sorted_persons_vector = persons_vector.sorted([](const auto& person1, const auto& person2) {
+    //          return person1.name < person2.name;
+    //      });
+    //
+    // outcome:
+    //      sorted_persons_vector -> functional_vector({
+    //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
+    //      });
     functional_vector sorted(const std::function<bool(T, T)>& comparison_predicate) const
     {
         auto sorted_vector(backing_vector_);
@@ -356,17 +414,33 @@ public:
         return functional_vector(sorted_vector);
     }
     
+    // Sorts its elements copied and sorted in ascending order, when its elements support comparison by < (non-mutating).
+    //
+    // example:
+    //      const functional_vector numbers({3, 1, 9, -4});
+    //      auto sorted_numbers = numbers.sorted_ascending();
+    //
+    // outcome:
+    //      sorted_numbers -> functional_vector({-4, 1, 3, 9});
     [[nodiscard]] functional_vector sorted_ascending() const
     {
         return sorted(std::less_equal<T>());
     }
     
+    // Sorts its elements copied and sorted in descending order, when its elements support comparison by > (non-mutating).
+    //
+    // example:
+    //      const functional_vector numbers({3, 1, 9, -4});
+    //      auto sorted_numbers = numbers.sorted_descending();
+    //
+    // outcome:
+    //      sorted_numbers -> functional_vector({9, 3, 1, -4});
     [[nodiscard]] functional_vector sorted_descending() const
     {
         return sorted(std::greater_equal<T>());
     }
 
-    [[nodiscard]] size_t size() const
+    size_t size() const
     {
         return backing_vector_.size();
     }
@@ -393,6 +467,8 @@ public:
         return backing_vector_.end();
     }
     
+    // Performs the given operation for each element of the vector. The operation isn't
+    // allowed to change the vector during traversal.
     const functional_vector& for_each(const std::function<void(T)>& operation) const
     {
         std::for_each(backing_vector_.begin(),
@@ -401,6 +477,19 @@ public:
         return *this;
     }
     
+    // Returns the first index in which the given element is found in the vector.
+    // In case of multiple occurrences, only the first index is returned
+    // (see find_all_indices).
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const auto index_of_one = numbers.find_first_index(1);
+    //      const auto index_of_nine = numbers.find_first_index(9);
+    //
+    // outcome:
+    //      index_of_one.value() -> 0
+    //      index_of_one.has_value() -> true
+    //      index_of_nine.has_value() -> false
     [[nodiscard]] std::optional<size_t> find_first_index(const T& element) const
     {
         if (auto it = std::find(backing_vector_.begin(),
@@ -411,6 +500,19 @@ public:
         return std::nullopt;
     }
     
+    // Returns the last index in which the given element is found in the vector.
+    // In case of multiple occurrences, only the last index is returned
+    // (see find_all_indices).
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, -6, 3, 1, 7, 1});
+    //      const auto index_of_one = numbers.find_last_index(1);
+    //      const auto index_of_nine = numbers.find_last_index(9);
+    //
+    // outcome:
+    //      index_of_one.value() -> 8
+    //      index_of_one.has_value() -> true
+    //      index_of_nine.has_value() -> false
     [[nodiscard]] std::optional<size_t> find_last_index(const T& element) const
     {
         if (auto it = std::find(backing_vector_.rbegin(),
@@ -421,6 +523,16 @@ public:
         return std::nullopt;
     }
     
+    // Returns all indices in which the given element is found in the vector.
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 9, 1});
+    //      const auto indices_of_one = numbers.find_all_indices(1);
+    //      const auto indices_of_ten = numbers.find_all_indices(10);
+    //
+    // outcome:
+    //      indices_of_one -> { 0, 6, 8 }
+    //      indices_of_ten -> empty vector
     [[nodiscard]] std::vector<size_t> find_all_indices(const T& element) const
     {
         std::vector<size_t> indices;
