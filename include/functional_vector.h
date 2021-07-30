@@ -932,32 +932,79 @@ public:
 		return inserting_first(std::vector(list));
 	}
 
-	// todo: continue here
+	// Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
+    //
+    // example:
+    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, functional_vector({9, -10, 8}));
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
 	{
 		return replace_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
+    //
+    // example:
+    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, std::vector({9, -10, 8}));
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	functional_vector& replace_range_at(int index, const std::vector<T>& vector)
 	{
 		return replace_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
+    //
+    // example:
+    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, std::initializer_list({9, -10, 8}));
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	functional_vector& replace_range_at(int index, const std::initializer_list<T>& list)
 	{
 		return replace_range_at(index, std::vector(list));
 	}
 
+    // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto replaced_numbers = numbers.replacing_range_at(4, functional_vector({9, -10, 8}));
+    //
+    // outcome:
+    //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	[[nodiscard]] functional_vector replacing_range_at(int index, const functional_vector<T>& vector) const
 	{
 		return replacing_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto replaced_numbers = numbers.replacing_range_at(4, std::vector({9, -10, 8}));
+    //
+    // outcome:
+    //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	[[nodiscard]] functional_vector replacing_range_at(int index, const std::vector<T>& vector) const
 	{
 		return replacing_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto replaced_numbers = numbers.replacing_range_at(4, std::initializer_list({9, -10, 8}));
+    //
+    // outcome:
+    //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	[[nodiscard]] functional_vector replacing_range_at(int index, const std::initializer_list<T>& list) const
 	{
 		return replacing_range_at(index, std::vector(list));
