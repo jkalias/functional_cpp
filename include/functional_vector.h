@@ -474,6 +474,13 @@ public:
 	}
 
 	// Removes the element at `index` (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.remove_at(4);
+    //
+    // outcome:
+    //      numbers -> functional_vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
 	functional_vector& remove_at(int index)
 	{
 		assert_smaller_size(index);
@@ -482,6 +489,13 @@ public:
 	}
 
 	// Returns a copy of itself in which the element at `index` is removed (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto shorter_vector = numbers.removing_at(4);
+    //
+    // outcome:
+    //      shorter_vector -> functional_vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
 	[[nodiscard]] functional_vector removing_at(int index) const
 	{
 		assert_smaller_size(index);
@@ -491,6 +505,13 @@ public:
 	}
 
 	// Removes the last element, if present (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.remove_last();
+    //
+    // outcome:
+    //      numbers -> functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
 	functional_vector& remove_last()
 	{
 		backing_vector_.pop_back();
@@ -498,6 +519,13 @@ public:
 	}
 
 	// Returns a copy of itself in which the last element is removed (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto shorter_vector = numbers.removing_last();
+    //
+    // outcome:
+    //      shorter_vector -> functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
 	[[nodiscard]] functional_vector removing_last() const
 	{
 		auto copy(backing_vector_);
@@ -506,6 +534,13 @@ public:
 	}
 
 	// Removes the first element, if present (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.remove_first();
+    //
+    // outcome:
+    //      numbers -> functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
 	functional_vector& remove_first()
 	{
 		if (size() == 0)
@@ -516,6 +551,13 @@ public:
 	}
 
 	// Returns a copy of itself in which the first element is removed (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto shorter_numbers = numbers.removing_first();
+    //
+    // outcome:
+    //      shorter_numbers -> functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
 	[[nodiscard]] functional_vector removing_first() const
 	{
 		if (size() == 0)
@@ -680,6 +722,13 @@ public:
 	}
 
 	// Inserts a value at the end of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.insert_last(18);
+    //
+    // outcome:
+    //      numbers -> functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
 	functional_vector& insert_last(T value)
 	{
 		backing_vector_.push_back(value);
@@ -687,12 +736,26 @@ public:
 	}
 
 	// Inserts a value at the beginning of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.insert_first(18);
+    //
+    // outcome:
+    //      numbers -> functional_vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
 	functional_vector& insert_first(T value)
 	{
 		return insert_at(0, value);
 	}
 
 	// Makes a copy of the vector, inserts value at the end of the copy and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto augmented_numbers = numbers.inserting_last(18);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
 	[[nodiscard]] functional_vector inserting_last(T value) const
 	{
 		auto augmented_vector(backing_vector_);
@@ -701,78 +764,169 @@ public:
 	}
 
 	// Makes a copy of the vector, inserts value at the beginning of the copy and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto augmented_numbers = numbers.inserting_first(18);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
 	[[nodiscard]] functional_vector inserting_first(T value) const
 	{
 		return inserting_at(0, value);
 	}
 
 	// Inserts a range of values at the end of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_last(functional_vector({1, 2, 3}));
+    //
+    // outcome:
+    //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	functional_vector& insert_last(const functional_vector<T>& vector)
 	{
 		return insert_last_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the beginning of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_first(functional_vector({1, 2, 3}));
+    //
+    // outcome:
+    //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	functional_vector& insert_first(const functional_vector<T>& vector)
 	{
 		return insert_first_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_last(functional_vector({1, 2, 3}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	[[nodiscard]] functional_vector inserting_last(const functional_vector<T>& vector) const
 	{
 		return inserting_last_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_first(functional_vector({1, 2, 3}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	[[nodiscard]] functional_vector inserting_first(const functional_vector<T>& vector) const
 	{
 		return inserting_first_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the end of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_last(std::vector({1, 2, 3}));
+    //
+    // outcome:
+    //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	functional_vector& insert_last(const std::vector<T>& vector)
 	{
 		return insert_last_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the beginning of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_first(std::vector({1, 2, 3}));
+    //
+    // outcome:
+    //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	functional_vector& insert_first(const std::vector<T>& vector)
 	{
 		return insert_first_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_last(std::vector({1, 2, 3}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	[[nodiscard]] functional_vector inserting_last(const std::vector<T>& vector) const
 	{
 		return inserting_last_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_first(std::vector({1, 2, 3}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	[[nodiscard]] functional_vector inserting_first(const std::vector<T>& vector) const
 	{
 		return inserting_first_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the end of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_last(std::initializer_list({1, 2, 3}));
+    //
+    // outcome:
+    //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	functional_vector& insert_last(const std::initializer_list<T>& list)
 	{
 		return insert_last(std::vector(list));
 	}
 
 	// Inserts a range of values at the beginning of the vector in place (mutating)
+    //
+    // example:
+    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_first(std::initializer_list({1, 2, 3}));
+    //
+    // outcome:
+    //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	functional_vector& insert_first(const std::initializer_list<T>& list)
 	{
 		return insert_first(std::vector(list));
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_last(std::initializer_list({1, 2, 3}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	[[nodiscard]] functional_vector inserting_last(const std::initializer_list<T>& list) const
 	{
 		return inserting_last(std::vector(list));
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
+    //
+    // example:
+    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_first(std::initializer_list({1, 2, 3}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	[[nodiscard]] functional_vector inserting_first(const std::initializer_list<T>& list) const
 	{
 		return inserting_first(std::vector(list));
