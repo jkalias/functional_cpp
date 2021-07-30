@@ -1010,6 +1010,14 @@ public:
 		return replacing_range_at(index, std::vector(list));
 	}
 
+    // Replaces all existing elements with a constant element (mutating)
+    //
+    // example:
+    //      functional_vector numbers({1, 3, -6, 4, -9});
+    //      numbers.fill(7);
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 7, 7, 7, 7, 7 })
 	functional_vector& fill(const T& element)
 	{
 		std::fill(backing_vector_.begin(),
@@ -1018,6 +1026,13 @@ public:
 		return *this;
 	}
 
+    // Creates a new vector of a given size, where all elements are equal
+    //
+    // example:
+    //      const auto filled_vector = functional_vector<std::string>::filled("John", 3);
+    //
+    // outcome:
+    //      filled_vector -> functional_vector<std::string>({ "John", "John", "John" })
 	[[nodiscard]] static functional_vector filled(const T& element, size_t count)
 	{
 		auto backing_vector = std::vector<T>();
