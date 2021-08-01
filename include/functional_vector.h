@@ -501,11 +501,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      numbers.remove_last();
+    //      numbers.remove_back();
     //
     // outcome:
     //      numbers -> functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
-	functional_vector& remove_last()
+	functional_vector& remove_back()
 	{
 		backing_vector_.pop_back();
 		return *this;
@@ -515,11 +515,11 @@ public:
     //
     // example:
     //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      auto shorter_vector = numbers.removing_last();
+    //      auto shorter_vector = numbers.removing_back();
     //
     // outcome:
     //      shorter_vector -> functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
-	[[nodiscard]] functional_vector removing_last() const
+	[[nodiscard]] functional_vector removing_back() const
 	{
 		auto copy(backing_vector_);
 		copy.pop_back();
@@ -530,11 +530,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      numbers.remove_first();
+    //      numbers.remove_front();
     //
     // outcome:
     //      numbers -> functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
-	functional_vector& remove_first()
+	functional_vector& remove_front()
 	{
 		if (size() == 0)
 		{
@@ -547,11 +547,11 @@ public:
     //
     // example:
     //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      auto shorter_numbers = numbers.removing_first();
+    //      auto shorter_numbers = numbers.removing_front();
     //
     // outcome:
     //      shorter_numbers -> functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
-	[[nodiscard]] functional_vector removing_first() const
+	[[nodiscard]] functional_vector removing_front() const
 	{
 		if (size() == 0)
 		{
@@ -745,11 +745,11 @@ public:
     //
     // example:
     //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      auto augmented_numbers = numbers.inserting_last(18);
+    //      auto augmented_numbers = numbers.inserting_back(18);
     //
     // outcome:
     //      augmented_numbers -> functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
-	[[nodiscard]] functional_vector inserting_last(T value) const
+	[[nodiscard]] functional_vector inserting_back(T value) const
 	{
 		auto augmented_vector(backing_vector_);
 		augmented_vector.push_back(value);
@@ -760,11 +760,11 @@ public:
     //
     // example:
     //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      auto augmented_numbers = numbers.inserting_first(18);
+    //      auto augmented_numbers = numbers.inserting_front(18);
     //
     // outcome:
     //      augmented_numbers -> functional_vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
-	[[nodiscard]] functional_vector inserting_first(T value) const
+	[[nodiscard]] functional_vector inserting_front(T value) const
 	{
 		return inserting_at(0, value);
 	}
@@ -779,7 +779,7 @@ public:
     //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	functional_vector& insert_back(const functional_vector<T>& vector)
 	{
-		return insert_last_range_impl(vector.begin(), vector.end());
+		return insert_back_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the beginning of the vector in place (mutating)
@@ -792,33 +792,33 @@ public:
     //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	functional_vector& insert_front(const functional_vector<T>& vector)
 	{
-		return insert_first_range_impl(vector.begin(), vector.end());
+		return insert_front_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
     //
     // example:
     //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_last(functional_vector({1, 2, 3}));
+    //      auto augmented_numbers = numbers.inserting_back(functional_vector({1, 2, 3}));
     //
     // outcome:
     //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-	[[nodiscard]] functional_vector inserting_last(const functional_vector<T>& vector) const
+	[[nodiscard]] functional_vector inserting_back(const functional_vector<T>& vector) const
 	{
-		return inserting_last_range_impl(vector.begin(), vector.end());
+		return inserting_back_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
     //
     // example:
     //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_first(functional_vector({1, 2, 3}));
+    //      auto augmented_numbers = numbers.inserting_front(functional_vector({1, 2, 3}));
     //
     // outcome:
     //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-	[[nodiscard]] functional_vector inserting_first(const functional_vector<T>& vector) const
+	[[nodiscard]] functional_vector inserting_front(const functional_vector<T>& vector) const
 	{
-		return inserting_first_range_impl(vector.begin(), vector.end());
+		return inserting_front_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the end of the vector in place (mutating)
@@ -831,7 +831,7 @@ public:
     //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
 	functional_vector& insert_back(const std::vector<T>& vector)
 	{
-		return insert_last_range_impl(vector.begin(), vector.end());
+		return insert_back_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the beginning of the vector in place (mutating)
@@ -844,33 +844,33 @@ public:
     //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
 	functional_vector& insert_front(const std::vector<T>& vector)
 	{
-		return insert_first_range_impl(vector.begin(), vector.end());
+		return insert_front_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
     //
     // example:
     //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_last(std::vector({1, 2, 3}));
+    //      auto augmented_numbers = numbers.inserting_back(std::vector({1, 2, 3}));
     //
     // outcome:
     //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-	[[nodiscard]] functional_vector inserting_last(const std::vector<T>& vector) const
+	[[nodiscard]] functional_vector inserting_back(const std::vector<T>& vector) const
 	{
-		return inserting_last_range_impl(vector.begin(), vector.end());
+		return inserting_back_range_impl(vector.begin(), vector.end());
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
     //
     // example:
     //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_first(std::vector({1, 2, 3}));
+    //      auto augmented_numbers = numbers.inserting_front(std::vector({1, 2, 3}));
     //
     // outcome:
     //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-	[[nodiscard]] functional_vector inserting_first(const std::vector<T>& vector) const
+	[[nodiscard]] functional_vector inserting_front(const std::vector<T>& vector) const
 	{
-		return inserting_first_range_impl(vector.begin(), vector.end());
+		return inserting_front_range_impl(vector.begin(), vector.end());
 	}
 
 	// Inserts a range of values at the end of the vector in place (mutating)
@@ -903,26 +903,26 @@ public:
     //
     // example:
     //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_last(std::initializer_list({1, 2, 3}));
+    //      auto augmented_numbers = numbers.inserting_back(std::initializer_list({1, 2, 3}));
     //
     // outcome:
     //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-	[[nodiscard]] functional_vector inserting_last(const std::initializer_list<T>& list) const
+	[[nodiscard]] functional_vector inserting_back(const std::initializer_list<T>& list) const
 	{
-		return inserting_last(std::vector(list));
+		return inserting_back(std::vector(list));
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
     //
     // example:
     //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_first(std::initializer_list({1, 2, 3}));
+    //      auto augmented_numbers = numbers.inserting_front(std::initializer_list({1, 2, 3}));
     //
     // outcome:
     //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-	[[nodiscard]] functional_vector inserting_first(const std::initializer_list<T>& list) const
+	[[nodiscard]] functional_vector inserting_front(const std::initializer_list<T>& list) const
 	{
-		return inserting_first(std::vector(list));
+		return inserting_front(std::vector(list));
 	}
 
 	// Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
@@ -1088,7 +1088,7 @@ public:
 private:
 	std::vector<T> backing_vector_;
 
-	functional_vector& insert_last_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
+	functional_vector& insert_back_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
 	                                          const typename std::vector<T>::const_iterator& vec_end)
 	{
 		backing_vector_.insert(backing_vector_.end(),
@@ -1097,7 +1097,7 @@ private:
 		return *this;
 	}
 
-	functional_vector& insert_first_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
+	functional_vector& insert_front_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
 	                                           const typename std::vector<T>::const_iterator& vec_end)
 	{
 		backing_vector_.insert(backing_vector_.begin(),
@@ -1106,7 +1106,7 @@ private:
 		return *this;
 	}
 
-	[[nodiscard]] functional_vector inserting_last_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
+	[[nodiscard]] functional_vector inserting_back_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
 	                                                          const typename std::vector<T>::const_iterator& vec_end)
 	const
 	{
@@ -1118,7 +1118,7 @@ private:
 		return functional_vector(augmented_vector);
 	}
 
-	[[nodiscard]] functional_vector inserting_first_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
+	[[nodiscard]] functional_vector inserting_front_range_impl(const typename std::vector<T>::const_iterator& vec_begin,
 	                                                           const typename std::vector<T>::const_iterator& vec_end)
 	const
 	{
