@@ -22,7 +22,6 @@
 
 #pragma once
 #include <vector>
-#include <functional>
 #include <algorithm>
 #include <optional>
 #include "index_range.h"
@@ -47,7 +46,7 @@ public:
 	{
 	}
 
-	functional_vector(const std::initializer_list<T>& list)
+    explicit functional_vector(const std::initializer_list<T>& list)
 		: backing_vector_(std::move(list))
 	{
 	}
@@ -1037,33 +1036,41 @@ public:
 		return functional_vector(backing_vector);
 	}
 	
+    // Returns the size of the vector (how many elements it contains)
 	size_t size() const
 	{
 		return backing_vector_.size();
 	}
 
+    // Returns the constant begin iterator, useful for other standard library algorithms
 	[[nodiscard]] typename std::vector<T>::const_iterator begin() const
 	{
 		return backing_vector_.begin();
 	}
 
+    // Returns the constant end iterator, useful for other standard library algorithms
 	[[nodiscard]] typename std::vector<T>::const_iterator end() const
 	{
 		return backing_vector_.end();
 	}
 	
+    // Returns a reference to the element in the given index, allowing subscripting and value editing.
+    // Bounds checking (assert) is enabled for debug builds.
 	T& operator[](int index)
 	{
 		assert_smaller_size(index);
 		return backing_vector_[index];
 	}
 
+    // Returns a constant reference to the element in the given index, allowing subscripting.
+    // Bounds checking (assert) is enabled for debug builds.
 	const T& operator[](int index) const
 	{
 		assert_smaller_size(index);
 		return backing_vector_[index];
 	}
 	
+    // Returns true if both instances have equal sizes and the corresponding elements (same index) are equal
 	bool operator ==(const functional_vector<T>& rhs) const
 	{
 		return std::equal(backing_vector_.begin(),
@@ -1072,6 +1079,7 @@ public:
 		                  rhs.end());
 	}
 
+    // Returns false if either the sizes are not equal or at least corresponding element (same index) is not equal
 	bool operator !=(const functional_vector<T>& rhs) const
 	{
 		return !((*this) == rhs);
@@ -1188,7 +1196,7 @@ private:
 		assert(index + vec_size >= vec_size && index + vec_size <= size());
 		auto replaced_vector(backing_vector_);
 		std::copy(vec_begin,
-		          vec_end,
+                  vec_end,
 		          replaced_vector.begin() + index);
 		return functional_vector(replaced_vector);
 	}

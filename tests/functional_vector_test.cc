@@ -55,38 +55,6 @@ void debug_vector(const functional_vector<T>& vec)
 	});
 }
 
-TEST(FunctionalVectorTest, EqualityOperatorEmptyVectorsTest)
-{
-	const functional_vector<int> vec1;
-	const functional_vector<int> vec2;
-	EXPECT_TRUE(vec1 == vec2);
-	EXPECT_FALSE(vec1 != vec2);
-}
-
-TEST(FunctionalVectorTest, EqualityOperatorUnequalSizesTest)
-{
-	const functional_vector<int> vec1({1, 2, 3});
-	const functional_vector<int> vec2({1, 2, 3, 4});
-	EXPECT_TRUE(vec1 != vec2);
-	EXPECT_FALSE(vec1 == vec2);
-}
-
-TEST(FunctionalVectorTest, EqualityOperatorEqualSizesDifferentElementsTest)
-{
-	const functional_vector<int> vec1({1, 2, 3});
-	const functional_vector<int> vec2({1, 2, 4});
-	EXPECT_TRUE(vec1 != vec2);
-	EXPECT_FALSE(vec1 == vec2);
-}
-
-TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest)
-{
-	const functional_vector<int> vec1({1, 2, 3});
-	const functional_vector<int> vec2({1, 2, 3});
-	EXPECT_TRUE(vec1 == vec2);
-	EXPECT_FALSE(vec1 != vec2);
-}
-
 TEST(FunctionalVectorTest, InsertLastTest)
 {
 	functional_vector<int> vector_under_test;
@@ -1017,4 +985,36 @@ TEST(FunctionalVectorTest, FilledTest)
 {
 	const auto vector_under_test = functional_vector<std::string>::filled("John", 3);
 	EXPECT_EQ(functional_vector<std::string>({ "John", "John", "John" }), vector_under_test);
+}
+
+TEST(FunctionalVectorTest, EqualityOperatorEmptyVectorsTest)
+{
+    const functional_vector<int> vec1;
+    const functional_vector<int> vec2;
+    EXPECT_TRUE(vec1 == vec2);
+    EXPECT_FALSE(vec1 != vec2);
+}
+
+TEST(FunctionalVectorTest, EqualityOperatorUnequalSizesTest)
+{
+    const functional_vector<int> vec1({1, 2, 3});
+    const functional_vector<int> vec2({1, 2, 3, 4});
+    EXPECT_TRUE(vec1 != vec2);
+    EXPECT_FALSE(vec1 == vec2);
+}
+
+TEST(FunctionalVectorTest, EqualityOperatorEqualSizesDifferentElementsTest)
+{
+    const functional_vector<int> vec1({1, 2, 3});
+    const functional_vector<int> vec2({1, 2, 4});
+    EXPECT_TRUE(vec1 != vec2);
+    EXPECT_FALSE(vec1 == vec2);
+}
+
+TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest)
+{
+    const functional_vector<int> vec1({1, 2, 3});
+    const functional_vector<int> vec2({1, 2, 3});
+    EXPECT_TRUE(vec1 == vec2);
+    EXPECT_FALSE(vec1 != vec2);
 }
