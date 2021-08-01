@@ -67,7 +67,7 @@ public:
 	//      const functional_vector<int> input_vector({ 1, 3, -5 });
 	//      functional_vector<std::string> output_vector;
 	//      for (auto i = 0; i < input_vector.size(); ++i) {
-	//      	output_vector.insert_last(std::to_string(input_vector[i]));
+	//      	output_vector.insert_back(std::to_string(input_vector[i]));
 	//      }
 	template <typename U>
 	functional_vector<U> map(const std::function<U(T)>& transform) const
@@ -129,7 +129,7 @@ public:
 	//      functional_vector<int> filtered_numbers;
 	//      for (auto i = 0; i < numbers.size(); ++i) {
 	//          if (numbers[i] >= 1.5) {
-	//              filtered_numbers.insert_last(numbers[i]);
+	//              filtered_numbers.insert_back(numbers[i]);
 	//          }
 	//      }
 	functional_vector filtered(const std::function<bool(T)>& predicate_to_keep) const
@@ -204,7 +204,7 @@ public:
 	//          functional_vector<int>::functional_tuple<std::string> tuple;
 	//          tuple.first = ages_vector[i];
 	//          tuple.second = names_vector[i];
-	//          zipped_vector.insert_last(tuple);
+	//          zipped_vector.insert_back(tuple);
 	//      }
 	template <typename U>
 	[[nodiscard]] functional_vector<functional_tuple<U>> zip(const functional_vector<U>& vector) const
@@ -236,7 +236,7 @@ public:
     //          functional_vector<int>::functional_tuple<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
-    //          zipped_vector.insert_last(tuple);
+    //          zipped_vector.insert_back(tuple);
     //      }
 	template <typename U>
 	[[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::vector<U>& vector) const
@@ -264,7 +264,7 @@ public:
     //          functional_vector<int>::functional_tuple<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
-    //          zipped_vector.insert_last(tuple);
+    //          zipped_vector.insert_back(tuple);
     //      }
 	template <typename U>
 	[[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::initializer_list<U>& list) const
@@ -718,11 +718,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      numbers.insert_last(18);
+    //      numbers.insert_back(18);
     //
     // outcome:
     //      numbers -> functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
-	functional_vector& insert_last(T value)
+	functional_vector& insert_back(T value)
 	{
 		backing_vector_.push_back(value);
 		return *this;
@@ -773,11 +773,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_last(functional_vector({1, 2, 3}));
+    //      numbers.insert_back(functional_vector({1, 2, 3}));
     //
     // outcome:
     //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-	functional_vector& insert_last(const functional_vector<T>& vector)
+	functional_vector& insert_back(const functional_vector<T>& vector)
 	{
 		return insert_last_range_impl(vector.begin(), vector.end());
 	}
@@ -825,11 +825,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_last(std::vector({1, 2, 3}));
+    //      numbers.insert_back(std::vector({1, 2, 3}));
     //
     // outcome:
     //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-	functional_vector& insert_last(const std::vector<T>& vector)
+	functional_vector& insert_back(const std::vector<T>& vector)
 	{
 		return insert_last_range_impl(vector.begin(), vector.end());
 	}
@@ -877,13 +877,13 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_last(std::initializer_list({1, 2, 3}));
+    //      numbers.insert_back(std::initializer_list({1, 2, 3}));
     //
     // outcome:
     //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-	functional_vector& insert_last(const std::initializer_list<T>& list)
+	functional_vector& insert_back(const std::initializer_list<T>& list)
 	{
-		return insert_last(std::vector(list));
+		return insert_back(std::vector(list));
 	}
 
 	// Inserts a range of values at the beginning of the vector in place (mutating)
