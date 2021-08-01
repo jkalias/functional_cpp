@@ -56,7 +56,7 @@ public:
 	// output of applying the transform function on every element of this instance.
 	//
 	// example:
-	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
+	//      const functional_vector<int> input_vector({ 1, 3, -5 });
 	//      const auto output_vector = input_vector.map<std::string>([](const auto& element) {
 	//      	return std::to_string(element);
 	//      });
@@ -65,10 +65,10 @@ public:
 	//      output_vector -> functional_vector<std::string>({ "1", "3", "-5" })
 	//
 	// is equivalent to:
-	//      const auto input_vector = functional_vector<int>({ 1, 3, -5 });
-	//      auto output_vector = functional_vector<std::string>();
+	//      const functional_vector<int> input_vector({ 1, 3, -5 });
+	//      functional_vector<std::string> output_vector;
 	//      for (auto i = 0; i < input_vector.size(); ++i) {
-	//      	output_vector.push_back(std::to_string(input_vector[i]));
+	//      	output_vector.insert_last(std::to_string(input_vector[i]));
 	//      }
 	template <typename U>
 	functional_vector<U> map(const std::function<U(T)>& transform) const
@@ -83,24 +83,24 @@ public:
 	}
 
 	// Performs the functional `filter` algorithm, in which all elements of this instance
-	// which do match the given predicate are filtered out, i.e. removed (mutating)
+	// which match the given predicate are kept (mutating)
 	//
 	// example:
-	//      auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
-	//      input_vector.filter([](const auto& element) {
+	//      functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+	//      numbers.filter([](const auto& element) {
 	//          return element >= 1.5;
 	//      });
 	//
 	// outcome:
-	//      input_vector -> functional_vector<std::string>({ 3, 2, 9 });
+	//      numbers -> functional_vector<int>({ 3, 2, 9 });
 	//
 	// is equivalent to:
-	//      auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
-	//      for (auto i = 0; i < input_vector.size(); ++i) {
-	//          if (input_vector[i] >= 1.5) {
+	//      functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+	//      for (auto i = 0; i < numbers.size(); ++i) {
+	//          if (numbers[i] >= 1.5) {
 	//              continue;
 	//          }
-	//          input_vector.remove_at(i);
+	//          numbers.remove_at(i);
 	//          i--;
 	//      }
 	functional_vector& filter(const std::function<bool(T)>& predicate_to_keep)
@@ -113,27 +113,25 @@ public:
 	}
 
 	// Performs the functional `filter` algorithm in a copy of this instance, in which all elements of
-	// the copy which do match the given predicate are filtered out, i.e. removed (non-mutating)
+	// the copy which match the given predicate (non-mutating)
 	//
 	// example:
-	//      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
-	//      const auto filtered_vector = input_vector.filtered([](const auto& element) {
+	//      const functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+	//      const auto filtered_numbers = numbers.filtered([](const auto& element) {
 	//          return element >= 1.5;
 	//      });
 	//
 	// outcome:
-	//      input_vector -> functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 })
-	//      filtered_vector -> functional_vector<std::string>({ 3, 2, 9 })
+	//      numbers -> functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 })
+	//      filtered_numbers -> functional_vector<int>({ 3, 2, 9 })
 	//
 	// is equivalent to:
-	//      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
-	//      auto filtered_vector(input_vector);
-	//      for (auto i = 0; i < filtered_vector.size(); ++i) {
-	//          if (filtered_vector[i] >= 1.5) {
-	//              continue;
+	//      const functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+	//      functional_vector<int> filtered_numbers;
+	//      for (auto i = 0; i < numbers.size(); ++i) {
+	//          if (numbers[i] >= 1.5) {
+	//              filtered_numbers.insert_last(numbers[i]);
 	//          }
-	//          filtered_vector.remove_at(i);
-	//          i--;
 	//      }
 	functional_vector filtered(const std::function<bool(T)>& predicate_to_keep) const
 	{
@@ -149,7 +147,7 @@ public:
 	// Reverses the order of the elements in place (mutating)
 	//
 	// example:
-	//      auto my_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+	//      functional_vector<int> my_vector({ 1, 3, -5, 2, -1, 9, -4 });
 	//      my_vector.reverse();
 	//
 	// outcome:
@@ -163,7 +161,7 @@ public:
 	// Returns a copy of this instance, whose elements are in reverse order (non-mutating)
 	//
 	// example:
-	//      const auto input_vector = functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+	//      const functional_vector<int> input_vector({ 1, 3, -5, 2, -1, 9, -4 });
 	//      const auto reversed_vector = input_vector.reversed();
 	//
 	// outcome:
@@ -188,8 +186,8 @@ public:
 	// index. The sizes of the two vectors must be equal.
 	//
 	// example:
-	//      const auto ages_vector = functional_vector({32, 25, 53});
-	//      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
+	//      const functional_vector ages_vector({32, 25, 53});
+	//      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
 	//      const auto zipped_vector = ages_vector.zip(names_vector);
 	//
 	// outcome:
@@ -200,14 +198,14 @@ public:
 	//                       })
 	//
 	// is equivalent to:
-	//      const auto ages_vector = functional_vector({32, 25, 53});
-	//      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
-	//      auto zipped_vector = functional_vector<functional_vector<int>::functional_tuple<std::string>>();
+	//      const functional_vector ages_vector({32, 25, 53});
+	//      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
+	//      functional_vector<functional_vector<int>::functional_tuple<std::string>> zipped_vector;
 	//      for (auto i = 0; i < ages_vector.size(); ++i) {
 	//          functional_vector<int>::functional_tuple<std::string> tuple;
 	//          tuple.first = ages_vector[i];
 	//          tuple.second = names_vector[i];
-	//          zipped_vector[i] = tuple;
+	//          zipped_vector.insert_last(tuple);
 	//      }
 	template <typename U>
 	[[nodiscard]] functional_vector<functional_tuple<U>> zip(const functional_vector<U>& vector) const
@@ -219,60 +217,56 @@ public:
 	// tuple of this instance's element (first) and the second vector's element (second) at the same
 	// index. The sizes of the two vectors must be equal.
 	//
-	// example:
-	//      const auto ages_vector = functional_vector({32, 25, 53});
-	//      const auto names_vector = std::vector<std::string>({"Jake", "Mary", "John"});
-	//      const auto zipped_vector = ages_vector.zip(names_vector);
-	//
-	// outcome:
-	//      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
-	//                          (32, "Jake"),
-	//                          (25, "Mary"),
-	//                          (53, "John"),
-	//                       })
-	//
-	// is equivalent to:
-	//      const auto ages_vector = functional_vector({32, 25, 53});
-	//      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
-	//      auto zipped_vector = functional_vector<functional_vector<int>::functional_tuple<std::string>>();
-	//      for (auto i = 0; i < ages_vector.size(); ++i) {
-	//          functional_vector<int>::functional_tuple<std::string> tuple;
-	//          tuple.first = ages_vector[i];
-	//          tuple.second = names_vector[i];
-	//          zipped_vector[i] = tuple;
-	//      }
+    // example:
+    //      const functional_vector ages_vector({32, 25, 53});
+    //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
+    //      const auto zipped_vector = ages_vector.zip(names_vector);
+    //
+    // outcome:
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //                          (32, "Jake"),
+    //                          (25, "Mary"),
+    //                          (53, "John"),
+    //                       })
+    //
+    // is equivalent to:
+    //      const functional_vector ages_vector({32, 25, 53});
+    //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
+    //      functional_vector<functional_vector<int>::functional_tuple<std::string>> zipped_vector;
+    //      for (auto i = 0; i < ages_vector.size(); ++i) {
+    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          tuple.first = ages_vector[i];
+    //          tuple.second = names_vector[i];
+    //          zipped_vector.insert_last(tuple);
+    //      }
 	template <typename U>
 	[[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::vector<U>& vector) const
 	{
 		return zip_impl<U>(vector.begin(), vector.end());
 	}
 
-	// Performs the functional `zip` algorithm, in which every element of the resulting vector is a
-	// tuple of this instance's element (first) and the second vector's element (second) at the same
-	// index. The sizes of the two vectors must be equal.
-	//
-	// example:
-	//      const auto ages_vector = functional_vector({32, 25, 53});
-	//      const auto names_vector = std::initializer_list<std::string>({"Jake", "Mary", "John"});
-	//      const auto zipped_vector = ages_vector.zip(names_vector);
-	//
-	// outcome:
-	//      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
-	//                          (32, "Jake"),
-	//                          (25, "Mary"),
-	//                          (53, "John"),
-	//                       })
-	//
-	// is equivalent to:
-	//      const auto ages_vector = functional_vector({32, 25, 53});
-	//      const auto names_vector = functional_vector<std::string>({"Jake", "Mary", "John"});
-	//      auto zipped_vector = functional_vector<functional_vector<int>::functional_tuple<std::string>>();
-	//      for (auto i = 0; i < ages_vector.size(); ++i) {
-	//          functional_vector<int>::functional_tuple<std::string> tuple;
-	//          tuple.first = ages_vector[i];
-	//          tuple.second = names_vector[i];
-	//          zipped_vector.push_back(tuple);
-	//      }
+    // example:
+    //      const functional_vector ages_vector({32, 25, 53});
+    //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
+    //      const auto zipped_vector = ages_vector.zip(names_vector);
+    //
+    // outcome:
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //                          (32, "Jake"),
+    //                          (25, "Mary"),
+    //                          (53, "John"),
+    //                       })
+    //
+    // is equivalent to:
+    //      const functional_vector ages_vector({32, 25, 53});
+    //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
+    //      functional_vector<functional_vector<int>::functional_tuple<std::string>> zipped_vector;
+    //      for (auto i = 0; i < ages_vector.size(); ++i) {
+    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          tuple.first = ages_vector[i];
+    //          tuple.second = names_vector[i];
+    //          zipped_vector.insert_last(tuple);
+    //      }
 	template <typename U>
 	[[nodiscard]] functional_vector<functional_tuple<U>> zip(const std::initializer_list<U>& list) const
 	{
@@ -308,7 +302,7 @@ public:
 		return *this;
 	}
 
-	// Sorts the vector in place in ascending order, when its elements support comparison by < (mutating).
+	// Sorts the vector in place in ascending order, when its elements support comparison by std::less_equal [<=] (mutating).
 	//
 	// example:
 	//      functional_vector numbers({3, 1, 9, -4});
@@ -321,7 +315,7 @@ public:
 		return sort(std::less_equal<T>());
 	}
 
-	// Sorts the vector in place in descending order, when its elements support comparison by > (mutating).
+	// Sorts the vector in place in descending order, when its elements support comparison by std::greater_equal [>=] (mutating).
 	//
 	// example:
 	//      functional_vector numbers({3, 1, 9, -4});
@@ -364,7 +358,7 @@ public:
 		return functional_vector(sorted_vector);
 	}
 
-	// Sorts its elements copied and sorted in ascending order, when its elements support comparison by < (non-mutating).
+	// Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less_equal [<=] (non-mutating).
 	//
 	// example:
 	//      const functional_vector numbers({3, 1, 9, -4});
@@ -377,7 +371,7 @@ public:
 		return sorted(std::less_equal<T>());
 	}
 
-	// Sorts its elements copied and sorted in descending order, when its elements support comparison by > (non-mutating).
+	// Sorts its elements copied and sorted in descending order, when its elements support comparison by std::greater_equal [>=] (non-mutating).
 	//
 	// example:
 	//      const functional_vector numbers({3, 1, 9, -4});
@@ -390,8 +384,8 @@ public:
 		return sorted(std::greater_equal<T>());
 	}
 
-	// Performs the given operation for each element of the vector. The operation isn't
-	// allowed to change the vector during traversal.
+	// Executes the given operation for each element of the vector. The operation must not
+	// change the vector's contents during execution.
 	const functional_vector& for_each(const std::function<void(T)>& operation) const
 	{
 		std::for_each(backing_vector_.begin(),
@@ -402,7 +396,7 @@ public:
 
 	// Returns the first index in which the given element is found in the vector.
 	// In case of multiple occurrences, only the first index is returned
-	// (see find_all_indices).
+	// (see find_all_indices for multiple occurences).
 	//
 	// example:
 	//      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -426,7 +420,7 @@ public:
 
 	// Returns the last index in which the given element is found in the vector.
 	// In case of multiple occurrences, only the last index is returned
-	// (see find_all_indices).
+	// (see find_all_indices for multiple occurences).
 	//
 	// example:
 	//      const functional_vector numbers({1, 4, 2, 5, -6, 3, 1, 7, 1});
