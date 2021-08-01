@@ -70,16 +70,16 @@ TEST(FunctionalVectorTest, InsertLastTest)
 	EXPECT_EQ(-1, vector_under_test[1]);
 }
 
-TEST(FunctionalVectorTest, InsertFirstTest)
+TEST(FunctionalVectorTest, InsertFrontTest)
 {
 	functional_vector<int> vector_under_test;
 	EXPECT_EQ(0, vector_under_test.size());
 
-	vector_under_test.insert_first(5);
+	vector_under_test.insert_front(5);
 	EXPECT_EQ(1, vector_under_test.size());
 	EXPECT_EQ(5, vector_under_test[0]);
 
-	vector_under_test.insert_first(-1);
+	vector_under_test.insert_front(-1);
 	EXPECT_EQ(2, vector_under_test.size());
 	EXPECT_EQ(-1, vector_under_test[0]);
 	EXPECT_EQ(5, vector_under_test[1]);
@@ -126,24 +126,24 @@ TEST(FunctionalVectorTest, InsertLastFromInitializerListTest)
 	EXPECT_EQ(functional_vector({ 4, 5, 6, 1, 2, 3 }), vector_under_test);
 }
 
-TEST(FunctionalVectorTest, InsertFirstFromFunctionalVectorTest)
+TEST(FunctionalVectorTest, InsertFrontFromFunctionalVectorTest)
 {
 	functional_vector<int> vector_under_test({ 4, 5, 6 });
-	vector_under_test.insert_first(functional_vector({1, 2, 3}));
+	vector_under_test.insert_front(functional_vector({1, 2, 3}));
 	EXPECT_EQ(functional_vector({ 1, 2, 3, 4, 5, 6 }), vector_under_test);
 }
 
-TEST(FunctionalVectorTest, InsertFirstFromStdVectorTest)
+TEST(FunctionalVectorTest, InsertFrontFromStdVectorTest)
 {
 	functional_vector<int> vector_under_test({ 4, 5, 6 });
-	vector_under_test.insert_first(std::vector{ 1, 2, 3 });
+	vector_under_test.insert_front(std::vector{ 1, 2, 3 });
 	EXPECT_EQ(functional_vector({ 1, 2, 3, 4, 5, 6 }), vector_under_test);
 }
 
-TEST(FunctionalVectorTest, InsertFirstFromInitializerListTest)
+TEST(FunctionalVectorTest, InsertFrontFromInitializerListTest)
 {
 	functional_vector<int> vector_under_test({ 4, 5, 6 });
-	vector_under_test.insert_first(std::initializer_list<int>{ 1, 2, 3 });
+	vector_under_test.insert_front(std::initializer_list<int>{ 1, 2, 3 });
 	EXPECT_EQ(functional_vector({ 1, 2, 3, 4, 5, 6 }), vector_under_test);
 }
 

@@ -732,11 +732,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      numbers.insert_first(18);
+    //      numbers.insert_front(18);
     //
     // outcome:
     //      numbers -> functional_vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
-	functional_vector& insert_first(T value)
+	functional_vector& insert_front(T value)
 	{
 		return insert_at(0, value);
 	}
@@ -786,11 +786,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_first(functional_vector({1, 2, 3}));
+    //      numbers.insert_front(functional_vector({1, 2, 3}));
     //
     // outcome:
     //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-	functional_vector& insert_first(const functional_vector<T>& vector)
+	functional_vector& insert_front(const functional_vector<T>& vector)
 	{
 		return insert_first_range_impl(vector.begin(), vector.end());
 	}
@@ -838,11 +838,11 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_first(std::vector({1, 2, 3}));
+    //      numbers.insert_front(std::vector({1, 2, 3}));
     //
     // outcome:
     //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-	functional_vector& insert_first(const std::vector<T>& vector)
+	functional_vector& insert_front(const std::vector<T>& vector)
 	{
 		return insert_first_range_impl(vector.begin(), vector.end());
 	}
@@ -890,13 +890,13 @@ public:
     //
     // example:
     //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_first(std::initializer_list({1, 2, 3}));
+    //      numbers.insert_front(std::initializer_list({1, 2, 3}));
     //
     // outcome:
     //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-	functional_vector& insert_first(const std::initializer_list<T>& list)
+	functional_vector& insert_front(const std::initializer_list<T>& list)
 	{
-		return insert_first(std::vector(list));
+		return insert_front(std::vector(list));
 	}
 
 	// Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
