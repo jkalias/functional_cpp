@@ -35,8 +35,8 @@ TEST(RangeTest, InvalidTest) {
     EXPECT_EQ(-1, range.start);
     EXPECT_EQ(-1, range.end);
     EXPECT_EQ(-1, range.count);
-
-	range = index_range::start_count(0, -5);
+    
+    range = index_range::start_count(0, -5);
     EXPECT_FALSE(range.is_valid);
     EXPECT_EQ(-1, range.start);
     EXPECT_EQ(-1, range.end);
@@ -47,8 +47,8 @@ TEST(RangeTest, InvalidTest) {
     EXPECT_EQ(-1, range.start);
     EXPECT_EQ(-1, range.end);
     EXPECT_EQ(-1, range.count);
-
-	range = index_range::start_count(-3, 10);
+    
+    range = index_range::start_count(-3, 10);
     EXPECT_FALSE(range.is_valid);
     EXPECT_EQ(-1, range.start);
     EXPECT_EQ(-1, range.end);
@@ -90,7 +90,7 @@ TEST(RangeTest, ValidFromStartAndEndTest) {
 }
 
 TEST(RangeTest, InvalidFromStartAndEndTest) {
-	const auto range = index_range::start_end(10, 9);
+    const auto range = index_range::start_end(10, 9);
     EXPECT_FALSE(range.is_valid);
     EXPECT_EQ(-1, range.start);
     EXPECT_EQ(-1, range.end);
