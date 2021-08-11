@@ -1123,9 +1123,10 @@ public:
     }
     
     // Clears the vector by removing all elements (mutating)
-    void clear()
+    functional_vector& clear()
     {
         backing_vector_.clear();
+        return *this;
     }
     
     // Returns true if the vector has no elements
@@ -1142,9 +1143,10 @@ public:
     
     // Reserves the necessary memory for `count` elements, so that subsequent changes in the
     // vector's size due to addition/removal of elements is more performant
-    void reserve(size_t count)
+    functional_vector& reserve(size_t count)
     {
         backing_vector_.reserve(count);
+        return *this;
     }
     
     // Resizes the vector to have given number of elements
@@ -1169,9 +1171,10 @@ public:
     //      // empty_numbers.size() = 5
     //      // empty_numbers -> functional_vector<int>({0, 0, 0, 0, 0});
     //      empty_numbers.resize(5);
-    void resize(size_t count)
+    functional_vector& resize(size_t count)
     {
         backing_vector_.resize(count);
+        return *this;
     }
     
     // Returns the begin iterator, useful for other standard library algorithms
