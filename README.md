@@ -144,3 +144,67 @@ numbers.insert_front(functional_vector({4, -6, 7}));
 // numbers -> functional_vector<int>({4, -6, 7, -10, 4, 8, 3, -2, 5, 2, 7, 9, 7, 3});
 numbers.insert_back(std::initializer_list({7, 3}));
 ```
+
+### size/capacity, reserve/resize
+```c++
+#include "functional_vector.h" // instead of <vector>
+
+// numbers.capacity() = 9
+// numbers.size() = 9
+functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+
+// numbers -> functional_vector<int>({1, 4, 2, 5, 8});
+// numbers.capacity() = 9
+// numbers.size() = 5
+numbers.resize(5);
+
+// numbers -> functional_vector<int>({1, 4, 2, 5, 8, 0, 0});
+// numbers.capacity() = 9
+// numbers.size() = 7
+numbers.resize(7);
+
+// empty_numbers.capacity() = 0
+// empty_numbers.size() = 0
+functional_vector<int> empty_numbers;
+
+// empty_numbers.capacity() = 5
+// empty_numbers.size() = 0
+empty_numbers.reserve(5);
+```
+
+### all_of, any_of, none_of
+```c++
+#include "functional_vector.h" // instead of <vector>
+
+functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+
+// returns true
+numbers.all_of([](const auto &number) {
+    return number < 10;
+});
+
+// returns false
+numbers.all_of([](const auto &number) {
+    return number > 2;
+});
+
+// returns true
+numbers.any_of([](const auto &number) {
+    return number < 5;
+});
+
+// returns false
+numbers.any_of([](const auto &number) {
+    return number > 9;
+});
+
+// returns true
+numbers.none_of([](const auto &number) {
+    return number < -2;
+});
+
+// returns false
+numbers.none_of([](const auto &number) {
+    return number > 7;
+});
+```
