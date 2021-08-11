@@ -1012,3 +1012,20 @@ TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest)
     EXPECT_TRUE(vec1 == vec2);
     EXPECT_FALSE(vec1 != vec2);
 }
+
+TEST(FunctionalVectorTest, ClearEmptyVectorTest)
+{
+    functional_vector<int> vector_under_test;
+    vector_under_test.clear();
+    EXPECT_EQ(0, vector_under_test.size());
+    EXPECT_TRUE(vector_under_test.is_empty());
+}
+
+TEST(FunctionalVectorTest, ClearFilledVectorTest)
+{
+    functional_vector vector_under_test({5, -3, 4, -9});
+    EXPECT_FALSE(vector_under_test.is_empty());
+    vector_under_test.clear();
+    EXPECT_EQ(0, vector_under_test.size());
+    EXPECT_TRUE(vector_under_test.is_empty());
+}

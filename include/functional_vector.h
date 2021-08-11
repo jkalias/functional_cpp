@@ -1056,6 +1056,18 @@ public:
         return backing_vector_.size();
     }
     
+    // Clears the vector by removing all elements (mutating)
+    void clear()
+    {
+        backing_vector_.clear();
+    }
+    
+    // Returns true if the vector has no elements
+    bool is_empty() const
+    {
+        return size() == 0;
+    }
+    
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator begin()
     {
