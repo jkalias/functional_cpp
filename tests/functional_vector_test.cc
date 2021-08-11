@@ -1012,3 +1012,100 @@ TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest)
     EXPECT_TRUE(vec1 == vec2);
     EXPECT_FALSE(vec1 != vec2);
 }
+
+TEST(FunctionalVectorTest, ClearEmptyVectorTest)
+{
+    functional_vector<int> vector_under_test;
+    EXPECT_TRUE(vector_under_test.is_empty());
+    vector_under_test.clear();
+    EXPECT_EQ(0, vector_under_test.size());
+    EXPECT_TRUE(vector_under_test.is_empty());
+}
+
+TEST(FunctionalVectorTest, ClearFilledVectorTest)
+{
+    functional_vector vector_under_test({5, -3, 4, -9});
+    EXPECT_FALSE(vector_under_test.is_empty());
+    vector_under_test.clear();
+    EXPECT_EQ(0, vector_under_test.size());
+    EXPECT_TRUE(vector_under_test.is_empty());
+}
+
+TEST(FunctionalVectorTest, CapacityReserveClearTest)
+{
+    functional_vector<int> vector_under_test;
+    EXPECT_EQ(0, vector_under_test.capacity());
+    EXPECT_EQ(0, vector_under_test.size());
+    
+    vector_under_test.reserve(5);
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(0, vector_under_test.size());
+    
+    vector_under_test.insert_back({1, 4, -5, 2});
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(4, vector_under_test.size());
+    
+    vector_under_test.clear();
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(0, vector_under_test.size());
+}
+
+TEST(FunctionalVectorTest, ResizeEmptyVectorTest)
+{
+    functional_vector<int> vector_under_test;
+    vector_under_test.resize(5);
+    EXPECT_EQ(functional_vector({ 0, 0, 0, 0, 0 }), vector_under_test);
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(5, vector_under_test.size());
+}
+
+TEST(FunctionalVectorTest, ResizeSmallerThanCurrentSizeTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_EQ(9, vector_under_test.capacity());
+    EXPECT_EQ(9, vector_under_test.size());
+    
+    vector_under_test.resize(5);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8}), vector_under_test);
+    EXPECT_EQ(9, vector_under_test.capacity());
+    EXPECT_EQ(5, vector_under_test.size());
+}
+
+TEST(FunctionalVectorTest, AllOfFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.all_of([](const auto &number) { return number > 5; }));
+}
+
+TEST(FunctionalVectorTest, AllOfTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.all_of([](const auto &number) {
+        return number < 10;
+    });
+    EXPECT_TRUE(vector_under_test.all_of([](const auto &number) { return number < 10; }));
+}
+
+TEST(FunctionalVectorTest, AnyOfFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.any_of([](const auto &number) { return number > 20; }));
+}
+
+TEST(FunctionalVectorTest, AnyOfTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_TRUE(vector_under_test.any_of([](const auto &number) { return number >= 7; }));
+}
+
+TEST(FunctionalVectorTest, NoneOfFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.none_of([](const auto &number) { return number > 7; }));
+}
+
+TEST(FunctionalVectorTest, NoneOfTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_TRUE(vector_under_test.none_of([](const auto &number) { return number < -2; }));
+}

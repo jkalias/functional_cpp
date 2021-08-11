@@ -46,9 +46,9 @@ public:
     : backing_vector_(vector)
     {
     }
-
+    
     explicit functional_vector(std::vector<T>&& vector)
-        : backing_vector_(std::move(vector))
+    : backing_vector_(std::move(vector))
     {
     }
     explicit functional_vector(std::initializer_list<T> list)
@@ -84,6 +84,72 @@ public:
                        std::back_inserter(transformed_vector),
                        std::forward<Transform>(transform));
         return functional_vector<U>(transformed_vector);
+    }
+    
+    // Returns true if all elements match the predicate (return true)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //
+    //      // returns true
+    //      numbers.all_of([](const auto &number) {
+    //          return number < 10;
+    //      });
+    //
+    //      // returns false
+    //      numbers.all_of([](const auto &number) {
+    //          return number > 2;
+    //      });
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool all_of(Callable && unary_predicate) const
+    {
+        return std::all_of(cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
+    // Returns true if at least one of the elements matches the predicate (returns true)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //
+    //      // returns true
+    //      numbers.any_of([](const auto &number) {
+    //          return number < 5;
+    //      });
+    //
+    //      // returns false
+    //      numbers.any_of([](const auto &number) {
+    //          return number > 9;
+    //      });
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool any_of(Callable && unary_predicate) const
+    {
+        return std::any_of(cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
+    // Returns true if no element matches the predicate (all return false)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //
+    //      // returns true
+    //      numbers.none_of([](const auto &number) {
+    //          return number < -2;
+    //      });
+    //
+    //      // returns false
+    //      numbers.none_of([](const auto &number) {
+    //          return number > 7;
+    //      });
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool none_of(Callable && unary_predicate) const
+    {
+        return std::none_of(cbegin(),
+                            cend(),
+                            std::forward<Callable>(unary_predicate));
     }
     
     // Performs the functional `filter` algorithm, in which all elements of this instance
@@ -194,7 +260,7 @@ public:
     struct is_valid_iterator {
         static bool const value = std::is_constructible_v<deref_type<Iterator>>;
     };
-
+    
     // Performs the functional `zip` algorithm, in which every element of the resulting vector is a
     // tuple of this instance's element (first) and the second vector's element (second) at the same
     // index. The sizes of the two vectors must be equal.
@@ -427,8 +493,8 @@ public:
     [[nodiscard]] std::optional<size_t> find_first_index(const T& element) const
     {
         if (auto const it = std::find(backing_vector_.cbegin(),
-                                backing_vector_.cend(),
-                                element); it != backing_vector_.cend())
+                                      backing_vector_.cend(),
+                                      element); it != backing_vector_.cend())
         {
             return std::distance(backing_vector_.cbegin(), it);
         }
@@ -451,8 +517,8 @@ public:
     [[nodiscard]] std::optional<size_t> find_last_index(const T& element) const
     {
         if (auto const it = std::find(backing_vector_.crbegin(),
-                                backing_vector_.crend(),
-                                element); it != backing_vector_.crend())
+                                      backing_vector_.crend(),
+                                      element); it != backing_vector_.crend())
         {
             return std::distance(it, backing_vector_.crend()) - 1;
         }
@@ -1056,18 +1122,73 @@ public:
         return backing_vector_.size();
     }
     
+    // Clears the vector by removing all elements (mutating)
+    functional_vector& clear()
+    {
+        backing_vector_.clear();
+        return *this;
+    }
+    
+    // Returns true if the vector has no elements
+    bool is_empty() const
+    {
+        return size() == 0;
+    }
+    
+    // Returns the underlying capacity of the vector, which can be larger from its size
+    size_t capacity() const
+    {
+        return backing_vector_.capacity();
+    }
+    
+    // Reserves the necessary memory for `count` elements, so that subsequent changes in the
+    // vector's size due to addition/removal of elements is more performant
+    functional_vector& reserve(size_t count)
+    {
+        backing_vector_.reserve(count);
+        return *this;
+    }
+    
+    // Resizes the vector to have given number of elements
+    // If `count` is larger than the current `size`, then `count-size` default elements are inserted at the back
+    // If `count` is smaller than the current `size`, then the last `size - count` elements are removed
+    //
+    // example:
+    //      // numbers.capacity() = 9
+    //      // numbers.size() = 9
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    
+    //      // numbers.capacity() = 9
+    //      // numbers.size() = 5
+    //      // numbers -> functional_vector<int>({1, 4, 2, 5, 8});
+    //      numbers.resize(5);
+    //
+    //      // empty_numbers.capacity() = 0
+    //      // empty_numbers.size() = 0
+    //      functional_vector<int> empty_numbers;
+    //
+    //      // empty_numbers.capacity() = 5
+    //      // empty_numbers.size() = 5
+    //      // empty_numbers -> functional_vector<int>({0, 0, 0, 0, 0});
+    //      empty_numbers.resize(5);
+    functional_vector& resize(size_t count)
+    {
+        backing_vector_.resize(count);
+        return *this;
+    }
+    
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator begin()
     {
         return backing_vector_.begin();
     }
-
+    
     // Returns the const begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::const_iterator cbegin() const
     {
         return backing_vector_.begin();
     }
-
+    
     // Returns the end iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator end()
     {
@@ -1160,10 +1281,10 @@ private:
     
     template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& vec_begin, const Iterator & vec_end) const ->
-        functional_vector<functional_pair<deref_type<Iterator>>>
+    functional_vector<functional_pair<deref_type<Iterator>>>
     {
         using U = deref_type<Iterator>;
-
+        
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(backing_vector_.size() == vec_size);
         std::vector<functional_pair<U>> combined_vector;
