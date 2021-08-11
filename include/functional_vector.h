@@ -74,8 +74,7 @@ public:
     //      for (auto i = 0; i < input_vector.size(); ++i) {
     //      	output_vector.insert_back(std::to_string(input_vector[i]));
     //      }
-    template <typename U, typename Transform,
-        typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
+    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
     functional_vector<U> map(Transform && transform) const
     {
         std::vector<U> transformed_vector;
@@ -108,14 +107,13 @@ public:
     //          numbers.remove_at(i);
     //          i--;
     //      }
-    template <typename Filter, typename = std::enable_if_t<
-        std::is_invocable_r<bool, Filter, T>::value>>
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r<bool, Filter, T>::value>>
     functional_vector& filter(Filter && predicate_to_keep)
     {
-        backing_vector_.erase(std::remove_if(
-            backing_vector_.begin(), backing_vector_.end(),
-            [predicate=std::forward<Filter>(predicate_to_keep)](const auto& element) { 
-                return !predicate(element); 
+        backing_vector_.erase(std::remove_if(backing_vector_.begin(),
+                                             backing_vector_.end(),
+                                             [predicate=std::forward<Filter>(predicate_to_keep)](const auto& element) {
+            return !predicate(element);
         }), backing_vector_.end());
         return *this;
     }
@@ -141,8 +139,7 @@ public:
     //              filtered_numbers.insert_back(numbers[i]);
     //          }
     //      }
-    template <typename Callable,
-        typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
     functional_vector filtered(Callable && predicate_to_keep) const
     {
         std::vector<T> filtered_vector;
@@ -179,8 +176,7 @@ public:
     //      reversed_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
     [[nodiscard]] functional_vector reversed() const
     {
-        std::vector<T> reversed_vector(backing_vector_.crbegin(),
-            backing_vector_.crend()); 
+        std::vector<T> reversed_vector(backing_vector_.crbegin(), backing_vector_.crend());
         return functional_vector(std::move(reversed_vector));
     }
     
@@ -196,10 +192,7 @@ public:
     
     template<typename Iterator>
     struct is_valid_iterator {
-        static bool const value =
-            // std::is_constructible_v<decltype(std::declval<Iterator&>().operator*())> &&
-            // std::is_constructible_v<decltype(std::declval<Iterator&>().operator++())> &&
-            std::is_constructible_v<deref_type<Iterator>>;
+        static bool const value = std::is_constructible_v<deref_type<Iterator>>;
     };
 
     // Performs the functional `zip` algorithm, in which every element of the resulting vector is a
@@ -212,7 +205,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_pair<std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -221,9 +214,9 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::functional_tuple<std::string>> zipped_vector;
+    //      functional_vector<functional_vector<int>::functional_pair<std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          functional_vector<int>::functional_pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
@@ -244,7 +237,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_pair<std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -253,9 +246,9 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::functional_tuple<std::string>> zipped_vector;
+    //      functional_vector<functional_vector<int>::functional_pair<std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          functional_vector<int>::functional_pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
@@ -272,7 +265,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::functional_tuple<std::string>>({
+    //      zipped_vector -> functional_vector<functional_vector<int>::functional_pair<std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -281,9 +274,9 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::functional_tuple<std::string>> zipped_vector;
+    //      functional_vector<functional_vector<int>::functional_pair<std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::functional_tuple<std::string> tuple;
+    //          functional_vector<int>::functional_pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
@@ -315,8 +308,7 @@ public:
     //      person_vector -> functional_vector({
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
-    template <typename Sortable, typename = std::enable_if_t<
-        std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
     functional_vector& sort(Sortable && comparison_predicate)
     {
         std::sort(backing_vector_.begin(),
@@ -372,8 +364,7 @@ public:
     //      sorted_persons_vector -> functional_vector({
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
-    template <typename Sortable, typename = std::enable_if_t<
-        std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
     functional_vector sorted(Sortable && comparison_predicate) const
     {
         auto sorted_vector(backing_vector_);
@@ -411,8 +402,7 @@ public:
     
     // Executes the given operation for each element of the vector. The operation must not
     // change the vector's contents during execution.
-    template <typename Callable, typename = std::enable_if_t<
-        std::is_invocable_r<void, Callable, T const &>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
     const functional_vector& for_each(Callable && operation) const
     {
         std::for_each(backing_vector_.cbegin(),
@@ -485,7 +475,7 @@ public:
         auto it = std::find(backing_vector_.cbegin(),
                             backing_vector_.cend(),
                             element);
-        while (it != backing_vector_.end())
+        while (it != backing_vector_.cend())
         {
             indices.push_back(std::distance(backing_vector_.cbegin(), it));
             ++it;
@@ -963,7 +953,7 @@ public:
     //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
     functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
     {
-        return replace_range_at_imp(index, vector.begin(), vector.end());
+        return replace_range_at_imp(index, vector.cbegin(), vector.cend());
     }
     
     // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
@@ -1073,7 +1063,7 @@ public:
     }
 
     // Returns the const begin iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::vector<T>::const_iterator begin() const
+    [[nodiscard]] typename std::vector<T>::const_iterator cbegin() const
     {
         return backing_vector_.begin();
     }
@@ -1085,16 +1075,10 @@ public:
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::vector<T>::const_iterator end() const
+    [[nodiscard]] typename std::vector<T>::const_iterator cend() const
     {
         return backing_vector_.end();
     }
-
-    // Returns the const_begin iterator, useful for other standard library algorithms
-    [[nodiscard]] auto cbegin() const { return backing_vector_.cbegin(); }
-
-    // Returns the const_iterator, useful for other standard library algorithms
-    [[nodiscard]] auto cend() const { return backing_vector_.cend(); }
     
     // Returns a reference to the element in the given index, allowing subscripting and value editing.
     // Bounds checking (assert) is enabled for debug builds.
@@ -1129,10 +1113,8 @@ public:
     
 private:
     std::vector<T> backing_vector_;
-    // The iterator passed here may not necessarily be from std::vector
-    // as long as it's a valid iterable range
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    // The iterator passed here may not necessarily be from std::vector as long as it's a valid iterable range
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     functional_vector& insert_back_range_impl(const Iterator & vec_begin,
                                               const Iterator & vec_end)
     {
@@ -1142,8 +1124,7 @@ private:
         return *this;
     }
     
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     functional_vector& insert_front_range_impl(const Iterator& vec_begin,
                                                const Iterator& vec_end)
     {
@@ -1153,8 +1134,7 @@ private:
         return *this;
     }
     
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     [[nodiscard]] functional_vector inserting_back_range_impl(const Iterator& vec_begin,
                                                               const Iterator& vec_end) const
     {
@@ -1166,8 +1146,7 @@ private:
         return functional_vector(augmented_vector);
     }
     
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     [[nodiscard]] functional_vector inserting_front_range_impl(const Iterator& vec_begin,
                                                                const Iterator& vec_end) const
     {
@@ -1178,8 +1157,8 @@ private:
                                 vec_end);
         return functional_vector(augmented_vector);
     }
-    template<typename Iterator, typename = std::enable_if_t <
-        is_valid_iterator<Iterator>::value>>
+    
+    template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& vec_begin, const Iterator & vec_end) const ->
         functional_vector<functional_pair<deref_type<Iterator>>>
     {
@@ -1197,8 +1176,7 @@ private:
     }
     
     // checks if the value of dereferencing the passed Iterators is convertible to type T
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     functional_vector& insert_at_impl(int index,
                                       const Iterator vec_begin,
                                       const Iterator& vec_end)
@@ -1213,8 +1191,7 @@ private:
         return *this;
     }
     
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     [[nodiscard]] functional_vector inserting_at_impl(int index,
                                                       const Iterator& vec_begin,
                                                       const Iterator& vec_end) const
@@ -1231,8 +1208,7 @@ private:
         return functional_vector(std::move(augmented_vector));
     }
     
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     functional_vector& replace_range_at_imp(int index,
                                             const Iterator& vec_begin,
                                             const Iterator& vec_end)
@@ -1245,8 +1221,7 @@ private:
         return *this;
     }
     
-    template<typename Iterator, typename = std::enable_if_t<
-        std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
+    template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
     [[nodiscard]] functional_vector replacing_range_at_imp(int index,
                                                            const Iterator& vec_begin,
                                                            const Iterator& vec_end) const
