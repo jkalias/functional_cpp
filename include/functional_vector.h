@@ -86,6 +86,72 @@ public:
         return functional_vector<U>(transformed_vector);
     }
     
+    // Returns true if all elements match the predicate (return true)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //
+    //      // returns true
+    //      numbers.all_of([](const auto &number) {
+    //          return number < 10;
+    //      });
+    //
+    //      // returns false
+    //      numbers.all_of([](const auto &number) {
+    //          return number > 2;
+    //      });
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool all_of(Callable && unary_predicate) const
+    {
+        return std::all_of(cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
+    // Returns true if at least one of the elements matches the predicate (returns true)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //
+    //      // returns true
+    //      numbers.any_of([](const auto &number) {
+    //          return number < 5;
+    //      });
+    //
+    //      // returns false
+    //      numbers.any_of([](const auto &number) {
+    //          return number > 9;
+    //      });
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool any_of(Callable && unary_predicate) const
+    {
+        return std::any_of(cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
+    // Returns true if no element matches the predicate (all return false)
+    //
+    // example:
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //
+    //      // returns true
+    //      numbers.none_of([](const auto &number) {
+    //          return number < -2;
+    //      });
+    //
+    //      // returns false
+    //      numbers.none_of([](const auto &number) {
+    //          return number > 7;
+    //      });
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool none_of(Callable && unary_predicate) const
+    {
+        return std::none_of(cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
     // Performs the functional `filter` algorithm, in which all elements of this instance
     // which match the given predicate are kept (mutating)
     //
