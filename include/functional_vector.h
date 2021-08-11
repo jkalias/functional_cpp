@@ -46,9 +46,9 @@ public:
     : backing_vector_(vector)
     {
     }
-
+    
     explicit functional_vector(std::vector<T>&& vector)
-        : backing_vector_(std::move(vector))
+    : backing_vector_(std::move(vector))
     {
     }
     explicit functional_vector(std::initializer_list<T> list)
@@ -148,8 +148,8 @@ public:
     bool none_of(Callable && unary_predicate) const
     {
         return std::none_of(cbegin(),
-                           cend(),
-                           std::forward<Callable>(unary_predicate));
+                            cend(),
+                            std::forward<Callable>(unary_predicate));
     }
     
     // Performs the functional `filter` algorithm, in which all elements of this instance
@@ -260,7 +260,7 @@ public:
     struct is_valid_iterator {
         static bool const value = std::is_constructible_v<deref_type<Iterator>>;
     };
-
+    
     // Performs the functional `zip` algorithm, in which every element of the resulting vector is a
     // tuple of this instance's element (first) and the second vector's element (second) at the same
     // index. The sizes of the two vectors must be equal.
@@ -493,8 +493,8 @@ public:
     [[nodiscard]] std::optional<size_t> find_first_index(const T& element) const
     {
         if (auto const it = std::find(backing_vector_.cbegin(),
-                                backing_vector_.cend(),
-                                element); it != backing_vector_.cend())
+                                      backing_vector_.cend(),
+                                      element); it != backing_vector_.cend())
         {
             return std::distance(backing_vector_.cbegin(), it);
         }
@@ -517,8 +517,8 @@ public:
     [[nodiscard]] std::optional<size_t> find_last_index(const T& element) const
     {
         if (auto const it = std::find(backing_vector_.crbegin(),
-                                backing_vector_.crend(),
-                                element); it != backing_vector_.crend())
+                                      backing_vector_.crend(),
+                                      element); it != backing_vector_.crend())
         {
             return std::distance(it, backing_vector_.crend()) - 1;
         }
@@ -1179,13 +1179,13 @@ public:
     {
         return backing_vector_.begin();
     }
-
+    
     // Returns the const begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::const_iterator cbegin() const
     {
         return backing_vector_.begin();
     }
-
+    
     // Returns the end iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator end()
     {
@@ -1278,10 +1278,10 @@ private:
     
     template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& vec_begin, const Iterator & vec_end) const ->
-        functional_vector<functional_pair<deref_type<Iterator>>>
+    functional_vector<functional_pair<deref_type<Iterator>>>
     {
         using U = deref_type<Iterator>;
-
+        
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(backing_vector_.size() == vec_size);
         std::vector<functional_pair<U>> combined_vector;
