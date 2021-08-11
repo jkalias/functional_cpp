@@ -1016,6 +1016,7 @@ TEST(FunctionalVectorTest, EqualityOperatorEqualVectorsTest)
 TEST(FunctionalVectorTest, ClearEmptyVectorTest)
 {
     functional_vector<int> vector_under_test;
+    EXPECT_TRUE(vector_under_test.is_empty());
     vector_under_test.clear();
     EXPECT_EQ(0, vector_under_test.size());
     EXPECT_TRUE(vector_under_test.is_empty());
@@ -1028,4 +1029,44 @@ TEST(FunctionalVectorTest, ClearFilledVectorTest)
     vector_under_test.clear();
     EXPECT_EQ(0, vector_under_test.size());
     EXPECT_TRUE(vector_under_test.is_empty());
+}
+
+TEST(FunctionalVectorTest, CapacityReserveClearTest)
+{
+    functional_vector<int> vector_under_test;
+    EXPECT_EQ(0, vector_under_test.capacity());
+    EXPECT_EQ(0, vector_under_test.size());
+    
+    vector_under_test.reserve(5);
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(0, vector_under_test.size());
+    
+    vector_under_test.insert_back({1, 4, -5, 2});
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(4, vector_under_test.size());
+    
+    vector_under_test.clear();
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(0, vector_under_test.size());
+}
+
+TEST(FunctionalVectorTest, ResizeEmptyVectorTest)
+{
+    functional_vector<int> vector_under_test;
+    vector_under_test.resize(5);
+    EXPECT_EQ(functional_vector({ 0, 0, 0, 0, 0 }), vector_under_test);
+    EXPECT_EQ(5, vector_under_test.capacity());
+    EXPECT_EQ(5, vector_under_test.size());
+}
+
+TEST(FunctionalVectorTest, ResizeSmallerThanCurrentSizeTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_EQ(9, vector_under_test.capacity());
+    EXPECT_EQ(9, vector_under_test.size());
+    
+    vector_under_test.resize(5);
+    EXPECT_EQ(functional_vector({1, 4, 2, 5, 8}), vector_under_test);
+    EXPECT_EQ(9, vector_under_test.capacity());
+    EXPECT_EQ(5, vector_under_test.size());
 }

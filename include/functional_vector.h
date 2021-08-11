@@ -1068,6 +1068,46 @@ public:
         return size() == 0;
     }
     
+    // Returns the underlying capacity of the vector, which can be larger from its size
+    size_t capacity() const
+    {
+        return backing_vector_.capacity();
+    }
+    
+    // Reserves the necessary memory for `count` elements, so that subsequent changes in the
+    // vector's size due to addition/removal of elements is more performant
+    void reserve(size_t count)
+    {
+        backing_vector_.reserve(count);
+    }
+    
+    // Resizes the vector to have given number of elements
+    // If `count` is larger than the current `size`, then `count-size` default elements are inserted at the back
+    // If `count` is smaller than the current `size`, then the last `size - count` elements are removed
+    //
+    // example:
+    //      // numbers.capacity() = 9
+    //      // numbers.size() = 9
+    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    
+    //      // numbers.capacity() = 9
+    //      // numbers.size() = 5
+    //      // numbers -> functional_vector<int>({1, 4, 2, 5, 8});
+    //      numbers.resize(5);
+    //
+    //      // empty_numbers.capacity() = 0
+    //      // empty_numbers.size() = 0
+    //      functional_vector<int> empty_numbers;
+    //
+    //      // empty_numbers.capacity() = 5
+    //      // empty_numbers.size() = 5
+    //      // empty_numbers -> functional_vector<int>({0, 0, 0, 0, 0});
+    //      empty_numbers.resize(5);
+    void resize(size_t count)
+    {
+        backing_vector_.resize(count);
+    }
+    
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator begin()
     {
