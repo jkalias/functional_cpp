@@ -154,11 +154,11 @@ public:
     // Reverses the order of the elements in place (mutating)
     //
     // example:
-    //      functional_vector<int> my_vector({ 1, 3, -5, 2, -1, 9, -4 });
-    //      my_vector.reverse();
+    //      functional_vector<int> numbers_vector({ 1, 3, -5, 2, -1, 9, -4 });
+    //      numbers_vector.reverse();
     //
     // outcome:
-    //      my_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
+    //      numbers_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
     functional_vector& reverse()
     {
         std::reverse(backing_vector_.begin(), backing_vector_.end());
