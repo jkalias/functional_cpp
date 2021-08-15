@@ -1132,7 +1132,7 @@ public:
     // Returns true if the vector has no elements
     bool is_empty() const
     {
-        return size() == 0;
+        return backing_vector_.empty();
     }
     
     // Returns the underlying capacity of the vector, which can be larger from its size
