@@ -247,7 +247,7 @@ public:
     }
     
     template <typename U>
-    struct functional_pair
+    struct pair
     {
         T first;
         U second;
@@ -271,7 +271,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::functional_pair<std::string>>({
+    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -280,15 +280,15 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::functional_pair<std::string>> zipped_vector;
+    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::functional_pair<std::string> tuple;
+    //          functional_vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<functional_pair<U>> zip(const functional_vector<U>& vector) const
+    [[nodiscard]] functional_vector<pair<U>> zip(const functional_vector<U>& vector) const
     {
         return zip_impl(vector.cbegin(), vector.cend());
     }
@@ -303,7 +303,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::functional_pair<std::string>>({
+    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -312,15 +312,15 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::functional_pair<std::string>> zipped_vector;
+    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::functional_pair<std::string> tuple;
+    //          functional_vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<functional_pair<U>> zip(const std::vector<U>& vector) const
+    [[nodiscard]] functional_vector<pair<U>> zip(const std::vector<U>& vector) const
     {
         return zip_impl(vector.cbegin(), vector.cend());
     }
@@ -331,7 +331,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::functional_pair<std::string>>({
+    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -340,15 +340,15 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::functional_pair<std::string>> zipped_vector;
+    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::functional_pair<std::string> tuple;
+    //          functional_vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<functional_pair<U>> zip(const std::initializer_list<U>& list) const
+    [[nodiscard]] functional_vector<pair<U>> zip(const std::initializer_list<U>& list) const
     {
         return zip_impl(list.begin(), list.end());
     }
@@ -1281,19 +1281,19 @@ private:
     
     template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& vec_begin, const Iterator & vec_end) const ->
-    functional_vector<functional_pair<deref_type<Iterator>>>
+    functional_vector<pair<deref_type<Iterator>>>
     {
         using U = deref_type<Iterator>;
         
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(backing_vector_.size() == vec_size);
-        std::vector<functional_pair<U>> combined_vector;
+        std::vector<pair<U>> combined_vector;
         combined_vector.reserve(vec_size);
         for (size_t i = 0; i < vec_size; ++i)
         {
             combined_vector.push_back({backing_vector_[i], *(vec_begin + i)});
         }
-        return functional_vector<functional_pair<U>>(std::move(combined_vector));
+        return functional_vector<pair<U>>(std::move(combined_vector));
     }
     
     // checks if the value of dereferencing the passed Iterators is convertible to type T
