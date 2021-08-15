@@ -975,9 +975,9 @@ TEST(FunctionalVectorTest, FillTest)
     EXPECT_EQ(functional_vector({ 7, 7, 7, 7, 7 }), vector_under_test);
 }
 
-TEST(FunctionalVectorTest, FilledTest)
+TEST(FunctionalVectorTest, RepeatingConstructorTest)
 {
-    const auto vector_under_test = functional_vector<std::string>::filled("John", 3);
+    const functional_vector<std::string> vector_under_test(3, "John");
     EXPECT_EQ(functional_vector<std::string>({ "John", "John", "John" }), vector_under_test);
 }
 

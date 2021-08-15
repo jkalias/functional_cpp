@@ -56,6 +56,18 @@ public:
     {
     }
     
+    // Creates a new vector by repeating a given element.
+    //
+    // example:
+    //      const functional_vector<std::string> filled_vector(3, "John");
+    //
+    // outcome:
+    //      filled_vector -> functional_vector<std::string>({ "John", "John", "John" })
+    explicit functional_vector(size_t count, const T& element)
+    : backing_vector_(count, element)
+    {
+    }
+    
     // Performs the functional `map` algorithm, in which every element of the resulting vector is the
     // output of applying the transform function on every element of this instance.
     //
@@ -1101,19 +1113,6 @@ public:
                   backing_vector_.end(),
                   element);
         return *this;
-    }
-    
-    // Creates a new vector of a given size, where all elements are equal
-    //
-    // example:
-    //      const auto filled_vector = functional_vector<std::string>::filled("John", 3);
-    //
-    // outcome:
-    //      filled_vector -> functional_vector<std::string>({ "John", "John", "John" })
-    [[nodiscard]] static functional_vector filled(const T& element, size_t count)
-    {
-        std::vector<T> backing_vector(count, element);
-        return functional_vector(std::move(backing_vector));
     }
     
     // Returns the size of the vector (how many elements it contains)
