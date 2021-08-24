@@ -778,6 +778,7 @@ public:
 		return inserting_first(std::vector(list));
 	}
 
+	// todo: continue here
 	functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
 	{
 		return replace_range_at_imp(index, vector.begin(), vector.end());
