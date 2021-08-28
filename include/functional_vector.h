@@ -515,7 +515,7 @@ public:
     
     // Returns the last index in which the given element is found in the vector.
     // In case of multiple occurrences, only the last index is returned
-    // (see find_all_indices for multiple occurences).
+    // (see find_all_indices for multiple occurrences).
     //
     // example:
     //      const functional_vector numbers({1, 4, 2, 5, -6, 3, 1, 7, 1});
@@ -1115,7 +1115,7 @@ public:
         return *this;
     }
     
-    // Returns the size of the vector (how many elements it contains)
+    // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
     size_t size() const
     {
         return backing_vector_.size();
