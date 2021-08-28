@@ -890,31 +890,91 @@ public:
 		return inserting_first(std::vector(list));
 	}
 
+    // Replaces the current `n` elements starting from `index`, where `n` is the vector's size.
+    // Precondition: The current instance must be large enough to hold vector's elements
+    // [index + vector.size() < size()]
+    //
+    // example:
+    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, functional_vector({9, -10, 8}));
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
 	{
 		return replace_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Replaces the current `n` elements starting from `index`, where `n` is the vector's size.
+    // Precondition: The current instance must be large enough to hold vector's elements
+    // [index + vector.size() < size()]
+    //
+    // example:
+    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, std::vector{9, -10, 8});
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	functional_vector& replace_range_at(int index, const std::vector<T>& vector)
 	{
 		return replace_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Replaces the current `n` elements starting from `index`, where `n` is the vector's size.
+    // Precondition: The current instance must be large enough to hold vector's elements
+    // [index + vector.size() < size()]
+    //
+    // example:
+    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, std::initializer_list{9, -10, 8});
+    //
+    // outcome:
+    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	functional_vector& replace_range_at(int index, const std::initializer_list<T>& list)
 	{
 		return replace_range_at(index, std::vector(list));
 	}
 
+    // Replaces the current `n` elements starting from `index`, where `n` is the vector's size.
+    // Precondition: The current instance must be large enough to hold vector's elements
+    // [index + vector.size() < size()]
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto augmented_numbers = numbers.replacing_range_at(4, functional_vector({9, -10, 8}));
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	[[nodiscard]] functional_vector replacing_range_at(int index, const functional_vector<T>& vector) const
 	{
 		return replacing_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Replaces the current `n` elements starting from `index`, where `n` is the vector's size.
+    // Precondition: The current instance must be large enough to hold vector's elements
+    // [index + vector.size() < size()]
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto augmented_numbers = numbers.replacing_range_at(4, std::vector{9, -10, 8});
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	[[nodiscard]] functional_vector replacing_range_at(int index, const std::vector<T>& vector) const
 	{
 		return replacing_range_at_imp(index, vector.begin(), vector.end());
 	}
 
+    // Replaces the current `n` elements starting from `index`, where `n` is the vector's size.
+    // Precondition: The current instance must be large enough to hold vector's elements
+    // [index + vector.size() < size()]
+    //
+    // example:
+    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto augmented_numbers = numbers.replacing_range_at(4, std::initializer_list{9, -10, 8});
+    //
+    // outcome:
+    //      augmented_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
 	[[nodiscard]] functional_vector replacing_range_at(int index, const std::initializer_list<T>& list) const
 	{
 		return replacing_range_at(index, std::vector(list));
