@@ -293,7 +293,6 @@ TEST(FunctionalVectorTest, ReversedTest)
 	EXPECT_EQ(9, vector_under_test[2].age);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, ZipWithStdVectorUnequalSizesThrowsTest)
 {
 	const functional_vector ages_vector({32, 25, 53, 62});
@@ -306,7 +305,6 @@ TEST(FunctionalVectorTest, ZipWithFunctionalVectorUnequalSizesThrowsTest)
 	const auto names_vector = functional_vector<std::string>({"Jake", "Mary"});
 	EXPECT_DEATH({ const auto zipped_vector = ages_vector.zip(names_vector); }, "");
 }
-#endif
 
 TEST(FunctionalVectorTest, ZipWithFunctionalVectorTest)
 {
@@ -468,7 +466,6 @@ TEST(FunctionalVectorTest, SortedDescendingTest)
 	EXPECT_EQ(-4, sorted_vector[3]);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, SubscriptOperatorNegativeDeathTest)
 {
 	const functional_vector vector_under_test({3, 1, 9, -4});
@@ -504,7 +501,6 @@ TEST(FunctionalVectorTest, SubscriptOperatorAssignIndexLargerThanSizeDeathTest)
 	functional_vector vector_under_test({3, 1, 9, -4});
 	EXPECT_DEATH(vector_under_test[5] = -3, "");
 }
-#endif
 
 TEST(FunctionalVectorTest, SubscriptOperatorAssignTest)
 {
@@ -578,7 +574,6 @@ TEST(FunctionalVectorTest, FindAllIndicesFilledVectorTest)
 	EXPECT_EQ(std::vector<size_t>({ 7 }), seven_indices);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, RemoveAtEmptyVectorTest)
 {
 	functional_vector<int> vector_under_test;
@@ -592,7 +587,6 @@ TEST(FunctionalVectorTest, RemoveAtFilledVectorAboveSizeTest)
 	auto vector_under_test = functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1});
 	EXPECT_DEATH(vector_under_test.remove_at(15), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, RemoveAtFilledVectorTest)
 {
@@ -605,7 +599,6 @@ TEST(FunctionalVectorTest, RemoveAtFilledVectorTest)
 	EXPECT_EQ(functional_vector<int>({ 1, 5, 8, 3, 7, 1 }), vector_under_test);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, RemovingAtEmptyVectorTest)
 {
 	const functional_vector<int> vector_under_test;
@@ -619,7 +612,6 @@ TEST(FunctionalVectorTest, RemovingAtFilledVectorAboveSizeTest)
 	const functional_vector vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
 	EXPECT_DEATH(vector_under_test.removing_at(15), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, RemovingAtFilledVectorTest)
 {
@@ -671,9 +663,7 @@ TEST(FunctionalVectorTest, RemovingFirstTest)
 TEST(FunctionalVectorTest, InsertAtEmptyVectorTest)
 {
 	functional_vector<int> vector_under_test;
-#ifndef NDEBUG
 	EXPECT_DEATH(vector_under_test.insert_at(15, -1), "");
-#endif
 	vector_under_test.insert_at(0, -1);
 	EXPECT_EQ(1, vector_under_test.size());
 	EXPECT_EQ(-1, vector_under_test[0]);
@@ -682,9 +672,7 @@ TEST(FunctionalVectorTest, InsertAtEmptyVectorTest)
 TEST(FunctionalVectorTest, InsertAtFilledVectorTest)
 {
 	functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
-#ifndef NDEBUG
 	EXPECT_DEATH(vector_under_test.insert_at(15, -1), "");
-#endif
 	vector_under_test.insert_at(3, 18);
 	EXPECT_EQ(functional_vector<int>({ 1, 4, 2, 18, 5, 8, 3, 1, 7, 1 }), vector_under_test);
 }
@@ -692,9 +680,7 @@ TEST(FunctionalVectorTest, InsertAtFilledVectorTest)
 TEST(FunctionalVectorTest, InsertingAtEmptyVectorTest)
 {
 	const functional_vector<int> vector_under_test;
-#ifndef NDEBUG
 	EXPECT_DEATH(vector_under_test.inserting_at(15, -1), "");
-#endif
 	const auto augmented_vector = vector_under_test.inserting_at(0, -1);
 	EXPECT_EQ(1, augmented_vector.size());
 	EXPECT_EQ(-1, augmented_vector[0]);
@@ -704,9 +690,7 @@ TEST(FunctionalVectorTest, InsertingAtEmptyVectorTest)
 TEST(FunctionalVectorTest, InsertingAtFilledVectorTest)
 {
 	const functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
-#ifndef NDEBUG
 	EXPECT_DEATH(vector_under_test.inserting_at(15, -1), "");
-#endif
 	const auto augmented_vector = vector_under_test.inserting_at(3, 18);
 	EXPECT_EQ(functional_vector<int>({ 1, 4, 2, 18, 5, 8, 3, 1, 7, 1 }), augmented_vector);
 	EXPECT_EQ(functional_vector<int>({ 1, 4, 2, 5, 8, 3, 1, 7, 1 }), vector_under_test);
@@ -720,7 +704,6 @@ TEST(FunctionalVectorTest, InsertRangeEmptyFunctionalVectorTest)
 	EXPECT_EQ(functional_vector({ 4, 7, 3, -5 }), vector_under_test);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexFunctionalVectorTest)
 {
 	functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -728,7 +711,6 @@ TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexFunctionalVecto
 	EXPECT_DEATH(vector_under_test.insert_at(-1, vector_to_insert), "");
 	EXPECT_DEATH(vector_under_test.insert_at(10, vector_to_insert), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, InsertRangeExistingFunctionalVectorTest)
 {
@@ -746,7 +728,6 @@ TEST(FunctionalVectorTest, InsertRangeEmptyStdVectorTest)
 	EXPECT_EQ(functional_vector({ 4, 7, 3, -5 }), vector_under_test);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexStdVectorTest)
 {
 	functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -754,7 +735,6 @@ TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexStdVectorTest)
 	EXPECT_DEATH(vector_under_test.insert_at(-1, vector_to_insert), "");
 	EXPECT_DEATH(vector_under_test.insert_at(10, vector_to_insert), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, InsertRangeExistingStdVectorTest)
 {
@@ -771,14 +751,12 @@ TEST(FunctionalVectorTest, InsertRangeEmptyInitializerListTest)
 	EXPECT_EQ(functional_vector({ 4, 7, 3, -5 }), vector_under_test);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertRangeExistingWrongInsertionIndexInitializerListTest)
 {
 	functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
 	EXPECT_DEATH(vector_under_test.insert_at(-1, { 9, -5, 6 }), "");
 	EXPECT_DEATH(vector_under_test.insert_at(10, { 9, -5, 6 }), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, InsertRangeExistingInitializerListTest)
 {
@@ -795,7 +773,6 @@ TEST(FunctionalVectorTest, InsertingRangeEmptyFunctionalVectorTest)
 	EXPECT_EQ(functional_vector({ 4, 7, 3, -5 }), result_vector);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexFunctionalVectorTest)
 {
 	const functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -803,7 +780,6 @@ TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexFunctionalVe
 	EXPECT_DEATH(vector_under_test.inserting_at(-1, vector_to_insert), "");
 	EXPECT_DEATH(vector_under_test.inserting_at(10, vector_to_insert), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, InsertingRangeExistingFunctionalVectorTest)
 {
@@ -821,7 +797,6 @@ TEST(FunctionalVectorTest, InsertingRangeEmptyStdVectorTest)
 	EXPECT_EQ(functional_vector({ 4, 7, 3, -5 }), result_vector);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexStdVectorTest)
 {
 	const functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -829,7 +804,6 @@ TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexStdVectorTes
 	EXPECT_DEATH(vector_under_test.inserting_at(-1, vector_to_insert), "");
 	EXPECT_DEATH(vector_under_test.inserting_at(10, vector_to_insert), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, InsertingRangeExistingStdVectorTest)
 {
@@ -846,14 +820,12 @@ TEST(FunctionalVectorTest, InsertingRangeEmptyInitializerListTest)
 	EXPECT_EQ(functional_vector({ 4, 7, 3, -5 }), result_vector);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, InsertingRangeExistingWrongInsertionIndexInitializerListTest)
 {
 	const functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
 	EXPECT_DEATH(vector_under_test.inserting_at(-1, { 9, -5, 6 }), "");
 	EXPECT_DEATH(vector_under_test.inserting_at(10, { 9, -5, 6 }), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, InsertingRangeExistingInitializerListTest)
 {
@@ -925,7 +897,6 @@ TEST(FunctionalVectorTest, ReplaceRangeAtWithEmptySource)
 	EXPECT_EQ(functional_vector({ 5, -3 , 4, -9 }), vector_under_test);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, ReplaceRangeAtWrongIndex)
 {
 	functional_vector vector_under_test({5, -3, 4, -9});
@@ -939,7 +910,6 @@ TEST(FunctionalVectorTest, ReplaceRangeAtMoreElementsInSourceThanCapacityTest)
 	functional_vector vector_under_test({5, -3, 4, -9});
 	EXPECT_DEATH(vector_under_test.replace_range_at(2, { 1, 2, 6, 4, 8, 9, -10 }), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, ReplaceRangeAtWithFunctionalVectorTest)
 {
@@ -969,7 +939,6 @@ TEST(FunctionalVectorTest, ReplacingRangeAtWithEmptySource)
 	EXPECT_EQ(functional_vector({ 5, -3 , 4, -9 }), replaced_vector);
 }
 
-#ifndef NDEBUG
 TEST(FunctionalVectorTest, ReplacingRangeAtWrongIndex)
 {
 	const functional_vector vector_under_test({5, -3, 4, -9});
@@ -983,7 +952,6 @@ TEST(FunctionalVectorTest, ReplacingRangeAtMoreElementsInSourceThanCapacityTest)
 	const functional_vector vector_under_test({5, -3, 4, -9});
 	EXPECT_DEATH(vector_under_test.replacing_range_at(2, { 1, 2, 6, 4, 8, 9, -10 }), "");
 }
-#endif
 
 TEST(FunctionalVectorTest, ReplacingRangeAtWithFunctionalVectorTest)
 {
