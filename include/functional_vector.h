@@ -980,6 +980,14 @@ public:
 		return replacing_range_at(index, std::vector(list));
 	}
 
+    // Replaces all elements with the same value
+    //
+    // example:
+    //      functional_vector numbers({1, 3, -6, 4, -9});
+    //      vector_under_test.fill(7);
+    //
+    //  outcome:
+    //      numbers -> functional_vector({ 7, 7, 7, 7, 7 })
 	functional_vector& fill(const T& element)
 	{
 		std::fill(backing_vector_.begin(),
@@ -988,6 +996,13 @@ public:
 		return *this;
 	}
 
+    // Creates a vector by repeating a constant value
+    //
+    // example:
+    //      const auto persons = functional_vector<std::string>::filled("John", 3);
+    //
+    //  outcome:
+    //      persons -> functional_vector<std::string>({ "John", "John", "John" })
 	[[nodiscard]] static functional_vector filled(const T& element, size_t count)
 	{
 		auto backing_vector = std::vector<T>();
@@ -998,6 +1013,7 @@ public:
 		return functional_vector(backing_vector);
 	}
 	
+    // Returns the number of contained elements (can be different from its capacity)
 	size_t size() const
 	{
 		return backing_vector_.size();
