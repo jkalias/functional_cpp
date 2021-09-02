@@ -10,4 +10,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 build/
+build_cpp11/
+build_cpp17/
 /.vs
