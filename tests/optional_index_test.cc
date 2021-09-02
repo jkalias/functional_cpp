@@ -20,16 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include <gtest/gtest.h>
+#include "optional_index.h"
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_VECTOR_EXPORTS
-        #define FunctionalVectorExport __declspec( dllexport )
-    #else
-        #define FunctionalVectorExport __declspec( dllimport )
-    #endif
-#else
-    #define FunctionalVectorExport __attribute__ ((__visibility__("default")))
+#ifndef CPP17_AVAILABLE
+TEST(OptionalIndexTest, InvalidTest) {
+    auto index = optional_index::invalid;
+    EXPECT_FALSE(index.has_value());
+}
+
+TEST(OptionalIndexTest, ValidTest) {
+    const optional_index index(5);
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(5, index.value());
+}
 #endif
-
-#include "compatibility.h"

@@ -21,15 +21,29 @@
 // SOFTWARE.
 
 #pragma once
+#include "export_def.h"
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_VECTOR_EXPORTS
-        #define FunctionalVectorExport __declspec( dllexport )
-    #else
-        #define FunctionalVectorExport __declspec( dllimport )
-    #endif
-#else
-    #define FunctionalVectorExport __attribute__ ((__visibility__("default")))
+#ifndef CPP17_AVAILABLE
+#include <cstddef>
+
+// A replacement for std::optional<size_t> when C++17 is not available
+struct FunctionalVectorExport optional_index
+{
+public:
+    // This indicates that no valid index can be found
+    static optional_index invalid;
+    
+    explicit optional_index(size_t index);
+    
+    // Returns true only when an index could be found
+    bool has_value() const;
+    
+    // The wrapped index value (asserts on has_value)
+    size_t value() const;
+    
+private:
+    optional_index(size_t index, bool has_value);
+    size_t _index;
+    bool _has_value;
+};
 #endif
-
-#include "compatibility.h"
