@@ -105,7 +105,7 @@ jobs:
           
       - name: Configure C++11
         shell: bash
-        if: contains(matrix.config.os, 'C++11')
+        if: contains(matrix.config.name, 'C++11')
         run: |
           mkdir build
           cmake \
@@ -116,7 +116,7 @@ jobs:
       
       - name: Configure C++17
         shell: bash
-        if: contains(matrix.config.os, 'C++17')
+        if: contains(matrix.config.name, 'C++17')
         run: |
           mkdir build
           cmake \
