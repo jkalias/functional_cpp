@@ -32,7 +32,12 @@ build/tests/unit_tests
 Assuming you have installed Homebrew, then you can use the gcc and g++ compilers by doing the following (this example uses version gcc 11)
 ```console
 cd functional_vector
-cmake -S . -B build -DCMAKE_C_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/gcc-11 -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/g++-11
+cmake \
+    -S . \
+    -B build \
+    -DCMAKE_CXX_STANDARD=17 \
+    -DCMAKE_C_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/gcc-11 \
+    -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/g++-11
 cmake --build build
 build/tests/unit_tests
 ```
