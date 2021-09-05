@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.14)
 project(functional_vector VERSION 0.9)
 
 # GoogleTest requires at least C++11
-set(CMAKE_CXX_STANDARD 11)
+if(NOT "${CMAKE_CXX_STANDARD}")
+  set(CMAKE_CXX_STANDARD 11)
+endif()
+message("-- C++ standard version: ${CMAKE_CXX_STANDARD}")
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 if(CMAKE_HOST_WIN32)
