@@ -21,26 +21,57 @@ jobs:
       matrix:
         config: 
         - {
-            name: "Windows Latest MSVC",
+            name: "Windows Latest MSVC (C++11)",
             os: windows-latest,
             build_type: "Debug",
+            cpp_version: "11",
             cc: "cl",
             cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
             generators: "Visual Studio 16 2019"
           }
         - {
-            name: "Ubuntu Latest GCC",
+            name: "Windows Latest MSVC (C++17)",
+            os: windows-latest,
+            build_type: "Debug",
+            cpp_version: "17",
+            cc: "cl",
+            cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            generators: "Visual Studio 16 2019"
+          }
+        - {
+            name: "Ubuntu Latest GCC (C++11)",
             os: ubuntu-latest,
             build_type: "Debug",
+            cpp_version: "11",
             cc: "gcc",
             cxx: "g++",
             generators: "Ninja"
           }
         - {
-            name: "macOS Latest Clang",
+            name: "Ubuntu Latest GCC (C++17)",
+            os: ubuntu-latest,
+            build_type: "Debug",
+            cpp_version: "17",
+            cc: "gcc",
+            cxx: "g++",
+            generators: "Ninja"
+          }
+        - {
+            name: "macOS Latest Clang (C++11)",
             os: macos-latest,
             build_type: "Debug",
+            cpp_version: "11",
+            cc: "clang",
+            cxx: "clang++",
+            generators: "Xcode"
+          }
+        - {
+            name: "macOS Latest Clang (C++17)",
+            os: macos-latest,
+            build_type: "Debug",
+            cpp_version: "17",
             cc: "clang",
             cxx: "clang++",
             generators: "Xcode"
@@ -84,6 +115,7 @@ jobs:
             -S . \
             -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
+            -DCMAKE_CXX_STANDARD=${{ cpp_version }}
             -G "${{ matrix.config.generators }}"
 
       - name: Build
