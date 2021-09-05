@@ -617,10 +617,10 @@ public:
     [[nodiscard]] optional_index find_last_index(const T& element) const
 #endif
     {
-        if (auto const it = std::find(backing_vector_.crbegin(),
-                                      backing_vector_.crend(),
-                                      element); it != backing_vector_.crend())
-        {
+        auto const it = std::find(backing_vector_.crbegin(),
+                                  backing_vector_.crend(),
+                                  element);
+        if (it != backing_vector_.crend()) {
             auto index = std::distance(it, backing_vector_.crend()) - 1;
 #ifdef CPP17_AVAILABLE
             return index;
