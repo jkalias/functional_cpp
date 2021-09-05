@@ -580,9 +580,10 @@ public:
     [[nodiscard]] optional_index find_first_index(const T& element) const
 #endif
     {
-        if (auto const it = std::find(backing_vector_.cbegin(),
-                                      backing_vector_.cend(),
-                                      element); it != backing_vector_.cend())
+        auto const it = std::find(backing_vector_.cbegin(),
+                                  backing_vector_.cend(),
+                                  element);
+        if (it != backing_vector_.cend())
         {
             auto index = std::distance(backing_vector_.cbegin(), it);
 #ifdef CPP17_AVAILABLE
