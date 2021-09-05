@@ -12,4 +12,5 @@ _deps
 build/
 build_cpp11/
 build_cpp17/
+build_gcc/
 /.vs

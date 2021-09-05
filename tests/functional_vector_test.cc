@@ -259,7 +259,7 @@ TEST(FunctionalVectorTest, ReversedTest)
 TEST(FunctionalVectorTest, ZipWithStdVectorUnequalSizesThrowsTest)
 {
     const functional_vector<int> ages_vector({32, 25, 53, 62});
-    EXPECT_DEATH({ const auto zipped_vector = ages_vector.zip(std::vector<int>{"Jake", "Mary"}); }, "");
+    EXPECT_DEATH({ const auto zipped_vector = ages_vector.zip(std::vector<std::string>({"Jake", "Mary"})); }, "");
 }
 
 TEST(FunctionalVectorTest, ZipWithFunctionalVectorUnequalSizesThrowsTest)
