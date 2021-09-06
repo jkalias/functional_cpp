@@ -35,7 +35,6 @@ cd functional_vector
 cmake \
     -S . \
     -B build \
-    -DCMAKE_CXX_STANDARD=17 \
     -DCMAKE_C_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/gcc-11 \
     -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/g++-11
 cmake --build build
