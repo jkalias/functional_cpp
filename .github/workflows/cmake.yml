@@ -21,7 +21,7 @@ jobs:
       matrix:
         config: 
         - {
-            name: "Windows Latest MSVC",
+            name: "Windows Latest MSVC (C++11)",
             os: windows-latest,
             build_type: "Debug",
             cc: "cl",
@@ -30,7 +30,16 @@ jobs:
             generators: "Visual Studio 16 2019"
           }
         - {
-            name: "Ubuntu Latest GCC",
+            name: "Windows Latest MSVC (C++17)",
+            os: windows-latest,
+            build_type: "Debug",
+            cc: "cl",
+            cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            generators: "Visual Studio 16 2019"
+          }
+        - {
+            name: "Ubuntu Latest GCC (C++11)",
             os: ubuntu-latest,
             build_type: "Debug",
             cc: "gcc",
@@ -38,7 +47,23 @@ jobs:
             generators: "Ninja"
           }
         - {
-            name: "macOS Latest Clang",
+            name: "Ubuntu Latest GCC (C++17)",
+            os: ubuntu-latest,
+            build_type: "Debug",
+            cc: "gcc",
+            cxx: "g++",
+            generators: "Ninja"
+          }
+        - {
+            name: "macOS Latest Clang (C++11)",
+            os: macos-latest,
+            build_type: "Debug",
+            cc: "clang",
+            cxx: "clang++",
+            generators: "Xcode"
+          }
+        - {
+            name: "macOS Latest Clang (C++17)",
             os: macos-latest,
             build_type: "Debug",
             cc: "clang",
@@ -54,6 +79,7 @@ jobs:
         run: |
           echo github.event.action: ${{ github.event.action }}
           echo github.event_name: ${{ github.event_name }}
+
       - name: Install dependencies on windows
         if: startsWith(matrix.config.os, 'windows')
         run: |
@@ -69,6 +95,7 @@ jobs:
           ninja --version
           cmake --version
           gcc --version
+
       - name: Install dependencies on macos
         if: startsWith(matrix.config.os, 'macos')
         run: |
@@ -76,14 +103,27 @@ jobs:
           ninja --version
           cmake --version
           
-      - name: Configure
+      - name: Configure C++11
         shell: bash
+        if: contains(matrix.config.name, 'C++11')
         run: |
           mkdir build
           cmake \
             -S . \
             -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
+            -G "${{ matrix.config.generators }}"
+      
+      - name: Configure C++17
+        shell: bash
+        if: contains(matrix.config.name, 'C++17')
+        run: |
+          mkdir build
+          cmake \
+            -S . \
+            -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
+            -DCMAKE_CXX_STANDARD=17 \
             -G "${{ matrix.config.generators }}"
 
       - name: Build

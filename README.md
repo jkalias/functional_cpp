@@ -10,9 +10,9 @@ This is heavily influenced and inspired by C# and Swift.
 * CMake >= 3.14
 
 ### Minimum C++ version
-* C++17
+* C++11
 
-An out-of-source build strategy is used. All following examples assume an output build folder named ```build```.
+An out-of-source build strategy is used. All following examples assume an output build folder named ```build```. If no additional argument is passed to CMake, C++11 is used. Otherwise, you can pass ```-DCMAKE_CXX_STANDARD=17``` and it will use C++17 for example.
 ### macOS (Xcode)
 ```console
 cd functional_vector
@@ -20,7 +20,28 @@ cmake -S . -B build -G Xcode
 ```
 Then open the generated ```functional_vector.xcodeproj``` in the ```build``` folder.
 
-### macOS and Linux (Makefiles)
+### macOS (Makefiles/clang)
+```console
+cd functional_vector
+cmake -S . -B build
+cmake --build build
+build/tests/unit_tests
+```
+
+### macOS (Makefiles/g++)
+Assuming you have installed Homebrew, then you can use the gcc and g++ compilers by doing the following (this example uses version gcc 11)
+```console
+cd functional_vector
+cmake \
+    -S . \
+    -B build \
+    -DCMAKE_C_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/gcc-11 \
+    -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc/11.2.0/bin/g++-11
+cmake --build build
+build/tests/unit_tests
+```
+
+### Linux (Makefiles)
 ```console
 cd functional_vector
 cmake -S . -B build

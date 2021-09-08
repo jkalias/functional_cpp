@@ -22,14 +22,6 @@
 
 #pragma once
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_VECTOR_EXPORTS
-        #define FunctionalVectorExport __declspec( dllexport )
-    #else
-        #define FunctionalVectorExport __declspec( dllimport )
-    #endif
-#else
-    #define FunctionalVectorExport __attribute__ ((__visibility__("default")))
+#if __cplusplus >= 201703L
+#define CPP17_AVAILABLE
 #endif
-
-#include "compatibility.h"

@@ -20,16 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include <gtest/gtest.h>
+#include "optional.h"
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_VECTOR_EXPORTS
-        #define FunctionalVectorExport __declspec( dllexport )
-    #else
-        #define FunctionalVectorExport __declspec( dllimport )
-    #endif
-#else
-    #define FunctionalVectorExport __attribute__ ((__visibility__("default")))
-#endif
+TEST(OptionalTest, InvalidTest) {
+    const optional_t<int> index;
+    EXPECT_FALSE(index.has_value());
+}
 
-#include "compatibility.h"
+TEST(OptionalTest, ValidTest) {
+    const optional_t<int> index(5);
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(5, index.value());
+}
+
+TEST(OptionalTest, AssignmentTest) {
+    optional_t<int> index(5);
+    index = 3;
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(3, index.value());
+}
