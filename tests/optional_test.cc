@@ -20,33 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "compatibility.h"
+#include <gtest/gtest.h>
+#include "optional.h"
 
-#ifndef CPP17_AVAILABLE
-#include <assert.h>
-#include "optional_index.h"
-
-optional_index optional_index::invalid = optional_index(0, false);
-
-optional_index::optional_index(size_t index, bool has_value)
-: _index(index), _has_value(has_value)
-{
+TEST(OptionalTest, InvalidTest) {
+    const optional_t<int> index;
+    EXPECT_FALSE(index.has_value());
 }
 
-optional_index::optional_index(size_t index)
-: optional_index(index, true)
-{
+TEST(OptionalTest, ValidTest) {
+    const optional_t<int> index(5);
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(5, index.value());
 }
 
-bool optional_index::has_value() const
-{
-    return _has_value;
+TEST(OptionalTest, AssignmentTest) {
+    optional_t<int> index(5);
+    index = 3;
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(3, index.value());
 }
-
-size_t optional_index::value() const
-{
-    assert(_has_value);
-    return _index;
-}
-
-#endif

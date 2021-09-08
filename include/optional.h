@@ -1,5 +1,6 @@
 // MIT License
 //
+// Created by iamOgunyinka (@iamOgunyinka, https://github.com/iamOgunyinka)
 // Copyright (c) 2021 Ioannis Kaliakatsos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,29 +22,79 @@
 // SOFTWARE.
 
 #pragma once
-#include "export_def.h"
+#include "compatibility.h"
 
-#ifndef CPP17_AVAILABLE
+#ifdef CPP17_AVAILABLE
+#include <optional>
+template<typename T>
+using optional_t = std::optional<T>;
+#else
 #include <cstddef>
+#include <utility>
 
-// A replacement for std::optional<size_t> when C++17 is not available
-struct FunctionalVectorExport optional_index
-{
+// A replacement for std::optional when C++17 is not available
+template<typename T>
+class optional {
 public:
-    // This indicates that no valid index can be found
-    static optional_index invalid;
+    optional()
+    : _value{nullptr}
+    {
+    }
     
-    explicit optional_index(size_t index);
+    ~optional()
+    {
+        reset();
+    }
     
-    // Returns true only when an index could be found
-    bool has_value() const;
+    optional(T const& val)
+    : _value(new T{val})
+    {
+    }
     
-    // The wrapped index value (asserts on has_value)
-    size_t value() const;
+    bool has_value() const
+    {
+        return _value != nullptr;
+    }
+    
+    T* operator->() const
+    {
+        assert(has_value());
+        return _value;
+    }
+    
+    T& operator*() const
+    {
+        assert(has_value());
+        return *_value;
+    }
+    
+    const T& value() const
+    {
+        assert(has_value());
+        return *_value;
+    }
+    
+    optional<T>& operator= (T const& value)
+    {
+        reset();
+        _value = new T(value);
+        return *this;
+    }
     
 private:
-    optional_index(size_t index, bool has_value);
-    size_t _index;
-    bool _has_value;
+    void reset()
+    {
+        if (_value)
+        {
+            delete _value;
+            _value = nullptr;
+        }
+    }
+    
+    T* _value;
 };
+
+template<typename T>
+using optional_t = optional<T>;
+
 #endif

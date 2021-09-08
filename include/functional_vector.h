@@ -23,12 +23,9 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include <optional>
 #include <type_traits>
 #include "index_range.h"
-#ifndef CPP17_AVAILABLE
-#include "optional_index.h"
-#endif
+#include "optional.h"
 
 // A lightweight wrapper around std::vector, enabling fluent and functional
 // programming on the vector itself, rather than using the more procedural style
@@ -574,29 +571,16 @@ public:
     //      index_of_one.value() -> 0
     //      index_of_one.has_value() -> true
     //      index_of_nine.has_value() -> false
-#ifdef CPP17_AVAILABLE
-    [[nodiscard]] std::optional<size_t> find_first_index(const T& element) const
-#else
-    [[nodiscard]] optional_index find_first_index(const T& element) const
-#endif
+    [[nodiscard]] optional_t<size_t> find_first_index(const T& element) const
     {
         auto const it = std::find(backing_vector_.cbegin(),
                                   backing_vector_.cend(),
                                   element);
-        if (it != backing_vector_.cend())
-        {
+        if (it != backing_vector_.cend()) {
             auto index = std::distance(backing_vector_.cbegin(), it);
-#ifdef CPP17_AVAILABLE
             return index;
-#else
-            return optional_index(index);
-#endif
         }
-#ifdef CPP17_AVAILABLE
-        return std::nullopt;
-#else
-        return optional_index::invalid;
-#endif
+        return optional_t<size_t>();
     }
     
     // Returns the last index in which the given element is found in the vector.
@@ -612,28 +596,16 @@ public:
     //      index_of_one.value() -> 8
     //      index_of_one.has_value() -> true
     //      index_of_nine.has_value() -> false
-#ifdef CPP17_AVAILABLE
-    [[nodiscard]] std::optional<size_t> find_last_index(const T& element) const
-#else
-    [[nodiscard]] optional_index find_last_index(const T& element) const
-#endif
+    [[nodiscard]] optional_t<size_t> find_last_index(const T& element) const
     {
         auto const it = std::find(backing_vector_.crbegin(),
                                   backing_vector_.crend(),
                                   element);
         if (it != backing_vector_.crend()) {
             auto index = std::distance(it, backing_vector_.crend()) - 1;
-#ifdef CPP17_AVAILABLE
             return index;
-#else
-            return optional_index(index);
-#endif
         }
-#ifdef CPP17_AVAILABLE
-        return std::nullopt;
-#else
-        return optional_index::invalid;
-#endif
+        return optional_t<size_t>();
     }
     
     // Returns all indices in which the given element is found in the vector.
