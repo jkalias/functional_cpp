@@ -1103,6 +1103,23 @@ TEST(FunctionalVectorTest, AllOfTrueTest)
     EXPECT_TRUE(vector_under_test.all_of([](const int& number) { return number < 10; }));
 }
 
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, AllOfParallelFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.all_of_parallel([](const int& number) { return number > 5; }));
+}
+
+TEST(FunctionalVectorTest, AllOfParallelTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.all_of([](const int& number) {
+        return number < 10;
+    });
+    EXPECT_TRUE(vector_under_test.all_of_parallel([](const int& number) { return number < 10; }));
+}
+#endif
+
 TEST(FunctionalVectorTest, AnyOfFalseTest)
 {
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -1114,6 +1131,20 @@ TEST(FunctionalVectorTest, AnyOfTrueTest)
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_TRUE(vector_under_test.any_of([](const int& number) { return number >= 7; }));
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, AnyOfParallelFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.any_of_parallel([](const int& number) { return number > 20; }));
+}
+
+TEST(FunctionalVectorTest, AnyOfParallelTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_TRUE(vector_under_test.any_of_parallel([](const int& number) { return number >= 7; }));
+}
+#endif
 
 TEST(FunctionalVectorTest, NoneOfFalseTest)
 {
@@ -1128,6 +1159,18 @@ TEST(FunctionalVectorTest, NoneOfTrueTest)
 }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, NoneOfParallelFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.none_of_parallel([](const int& number) { return number > 7; }));
+}
+
+TEST(FunctionalVectorTest, NoneOfParallelTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_TRUE(vector_under_test.none_of_parallel([](const int& number) { return number < -2; }));
+}
+
 TEST(FunctionalVectorTest, ForEachParallelTest)
 {
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});

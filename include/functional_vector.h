@@ -152,6 +152,19 @@ public:
                            cend(),
                            std::forward<Callable>(unary_predicate));
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `all_of` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool all_of_parallel(Callable && unary_predicate) const
+    {
+        return std::all_of(std::execution::par,
+                           cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+#endif
     
     // Returns true if at least one of the elements matches the predicate (returns true)
     //
@@ -180,6 +193,19 @@ public:
                            cend(),
                            std::forward<Callable>(unary_predicate));
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `any_of` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool any_of_parallel(Callable && unary_predicate) const
+    {
+        return std::any_of(std::execution::par,
+                           cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+#endif
     
     // Returns true if no element matches the predicate (all return false)
     //
@@ -208,6 +234,19 @@ public:
                             cend(),
                             std::forward<Callable>(unary_predicate));
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `none_of` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    bool none_of_parallel(Callable && unary_predicate) const
+    {
+        return std::none_of(std::execution::par,
+                            cbegin(),
+                            cend(),
+                            std::forward<Callable>(unary_predicate));
+    }
+#endif
     
     // Performs the functional `filter` algorithm, in which all elements of this instance
     // which match the given predicate are kept (mutating)
