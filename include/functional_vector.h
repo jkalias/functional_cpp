@@ -110,7 +110,7 @@ public:
         
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the functional `map` algorithm in parallel.
-    // See also the sequential version for more documentation
+    // See also the sequential version for more documentation.
     template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
     functional_vector<U> map_parallel(Transform && transform) const
     {
@@ -246,6 +246,22 @@ public:
         }), backing_vector_.end());
         return *this;
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the functional `filter` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r<bool, Filter, T>::value>>
+    functional_vector& filter_parallel(Filter && predicate_to_keep)
+    {
+        backing_vector_.erase(std::remove_if(std::execution::par,
+                                             backing_vector_.begin(),
+                                             backing_vector_.end(),
+                                             [predicate=std::forward<Filter>(predicate_to_keep)](const T& element) {
+            return !predicate(element);
+        }), backing_vector_.end());
+        return *this;
+    }
+#endif
     
     // Performs the functional `filter` algorithm in a copy of this instance, in which all elements of
     // the copy which match the given predicate (non-mutating)
@@ -286,6 +302,23 @@ public:
         return functional_vector(filtered_vector);
     }
     
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `filtered` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    functional_vector filtered_parallel(Callable && predicate_to_keep) const
+    {
+        std::vector<T> filtered_vector;
+        filtered_vector.reserve(backing_vector_.size());
+        std::copy_if(std::execution::par,
+                     backing_vector_.begin(),
+                     backing_vector_.end(),
+                     std::back_inserter(filtered_vector),
+                     std::forward<Callable>(predicate_to_keep));
+        return functional_vector(filtered_vector);
+    }
+#endif
+        
     // Reverses the order of the elements in place (mutating)
     //
     // example:

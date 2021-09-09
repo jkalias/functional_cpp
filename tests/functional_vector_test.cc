@@ -240,6 +240,22 @@ TEST(FunctionalVectorTest, FilterTest)
     EXPECT_EQ(0, vector_under_test.size());
 }
 
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, FilterParallelTest)
+{
+    functional_vector<child> vector_under_test({child(1), child(3), child(4)});
+    vector_under_test.filter_parallel([](const child& child) {
+        return child.age < 2;
+    });
+    EXPECT_EQ(1, vector_under_test.size());
+    EXPECT_EQ(1, vector_under_test[0].age);
+    vector_under_test.filter_parallel([](const child& child) {
+        return child.age > 7;
+    });
+    EXPECT_EQ(0, vector_under_test.size());
+}
+#endif
+
 TEST(FunctionalVectorTest, FilteredTest)
 {
     const functional_vector<child> vector_under_test({child(1), child(3), child(4)});
@@ -250,6 +266,19 @@ TEST(FunctionalVectorTest, FilteredTest)
     EXPECT_EQ(1, filtered_vector.size());
     EXPECT_EQ(1, filtered_vector[0].age);
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, FilteredParallelTest)
+{
+    const functional_vector<child> vector_under_test({child(1), child(3), child(4)});
+    const auto filtered_vector = vector_under_test.filtered_parallel([](const child& child) {
+        return child.age < 2;
+    });
+    EXPECT_EQ(3, vector_under_test.size());
+    EXPECT_EQ(1, filtered_vector.size());
+    EXPECT_EQ(1, filtered_vector[0].age);
+}
+#endif
 
 TEST(FunctionalVectorTest, ReverseTest)
 {
