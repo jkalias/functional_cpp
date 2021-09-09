@@ -543,6 +543,20 @@ public:
                   std::forward<Sortable>(comparison_predicate));
         return *this;
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sort` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    functional_vector& sort_parallel(Sortable && comparison_predicate)
+    {
+        std::sort(std::execution::par,
+                  backing_vector_.begin(),
+                  backing_vector_.end(),
+                  std::forward<Sortable>(comparison_predicate));
+        return *this;
+    }
+#endif
     
     // Sorts the vector in place in ascending order, when its elements support comparison by std::less_equal [<=] (mutating).
     //
@@ -556,6 +570,15 @@ public:
     {
         return sort(std::less_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sort_ascending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    functional_vector& sort_ascending_parallel()
+    {
+        return sort_parallel(std::less_equal<T>());
+    }
+#endif
     
     // Sorts the vector in place in descending order, when its elements support comparison by std::greater_equal [>=] (mutating).
     //
@@ -569,6 +592,15 @@ public:
     {
         return sort(std::greater_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sort_ascending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    functional_vector& sort_descending_parallel()
+    {
+        return sort_parallel(std::greater_equal<T>());
+    }
+#endif
     
     // Returns its elements copied and sorted (non-mutating). The comparison predicate takes two elements
     // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
@@ -606,6 +638,21 @@ public:
                   std::forward<Sortable>(comparison_predicate));
         return functional_vector(sorted_vector);
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sorted` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    functional_vector sorted_parallel(Sortable && comparison_predicate) const
+    {
+        auto sorted_vector(backing_vector_);
+        std::sort(std::execution::par,
+                  sorted_vector.begin(),
+                  sorted_vector.end(),
+                  std::forward<Sortable>(comparison_predicate));
+        return functional_vector(sorted_vector);
+    }
+#endif
     
     // Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less_equal [<=] (non-mutating).
     //
@@ -619,6 +666,15 @@ public:
     {
         return sorted(std::less_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sorted_ascending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    [[nodiscard]] functional_vector sorted_ascending_parallel() const
+    {
+        return sorted_parallel(std::less_equal<T>());
+    }
+#endif
     
     // Sorts its elements copied and sorted in descending order, when its elements support comparison by std::greater_equal [>=] (non-mutating).
     //
@@ -632,6 +688,15 @@ public:
     {
         return sorted(std::greater_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sorted_descending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    [[nodiscard]] functional_vector sorted_descending_parallel() const
+    {
+        return sorted_parallel(std::greater_equal<T>());
+    }
+#endif
     
     // Executes the given operation for each element of the vector. The operation must not
     // change the vector's contents during execution.
