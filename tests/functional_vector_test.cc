@@ -22,6 +22,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <atomic>
 #include "functional_vector.h"
 #include "index_range.h"
 
@@ -1077,3 +1078,14 @@ TEST(FunctionalVectorTest, NoneOfTrueTest)
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_TRUE(vector_under_test.none_of([](const int& number) { return number < -2; }));
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, ForEachParallelTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_EQ(9, vector_under_test.size());
+    std::atomic<int> counter(0);
+    vector_under_test.for_each_parallel([&](const int& element) { ++counter; });
+    EXPECT_EQ(9, counter);
+}
+#endif

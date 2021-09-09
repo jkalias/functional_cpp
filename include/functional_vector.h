@@ -26,6 +26,9 @@
 #include <type_traits>
 #include "index_range.h"
 #include "optional.h"
+#ifdef CPP17_AVAILABLE
+#include <execution>
+#endif
 
 // A lightweight wrapper around std::vector, enabling fluent and functional
 // programming on the vector itself, rather than using the more procedural style
@@ -558,6 +561,20 @@ public:
         return *this;
     }
     
+    // Executes the given operation for each element of the vector in parallel. The operation must not
+    // change the vector's contents during execution.
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
+    const functional_vector& for_each_parallel(Callable && operation) const
+    {
+        std::for_each(std::execution::par,
+                      backing_vector_.cbegin(),
+                      backing_vector_.cend(),
+                      std::forward<Callable>(operation));
+        return *this;
+    }
+#endif
+        
     // Returns the first index in which the given element is found in the vector.
     // In case of multiple occurrences, only the first index is returned
     // (see find_all_indices for multiple occurences).
