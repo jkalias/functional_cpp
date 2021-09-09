@@ -43,6 +43,11 @@ struct child
 
 struct person
 {
+    person()
+    : age(0), name("")
+    {
+    }
+    
     person(int age, std::string name)
     : age(age), name(std::move(name))
     {
