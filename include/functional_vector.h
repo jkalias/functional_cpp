@@ -107,6 +107,23 @@ public:
                        std::forward<Transform>(transform));
         return functional_vector<U>(transformed_vector);
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the functional `map` algorithm in parallel.
+    // See also the sequential version for more documentation
+    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
+    functional_vector<U> map_parallel(Transform && transform) const
+    {
+        std::vector<U> transformed_vector;
+        transformed_vector.resize(backing_vector_.size());
+        std::transform(std::execution::par,
+                       backing_vector_.cbegin(),
+                       backing_vector_.cend(),
+                       transformed_vector.cbegin(),
+                       std::forward<Transform>(transform));
+        return functional_vector<U>(transformed_vector);
+    }
+#endif
     
     // Returns true if all elements match the predicate (return true)
     //
@@ -561,9 +578,9 @@ public:
         return *this;
     }
     
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Executes the given operation for each element of the vector in parallel. The operation must not
     // change the vector's contents during execution.
-#ifdef PARALLEL_ALGORITHM_AVAILABLE
     template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
     const functional_vector& for_each_parallel(Callable && operation) const
     {

@@ -28,6 +28,11 @@
 
 struct child
 {
+    child()
+    : age(0)
+    {
+    }
+    
     child(int age)
     : age(age)
     {
@@ -206,6 +211,20 @@ TEST(FunctionalVectorTest, MapTest)
     EXPECT_EQ(3, mapped_vector[1].age);
     EXPECT_EQ(4, mapped_vector[2].age);
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, MapParallelTest)
+{
+    const functional_vector<int> vector_under_test({1, 3, 4});
+    const auto mapped_vector = vector_under_test.map_parallel<child>([](const int& age) {
+        return child(age);
+    });
+    EXPECT_EQ(3, mapped_vector.size());
+    EXPECT_EQ(1, mapped_vector[0].age);
+    EXPECT_EQ(3, mapped_vector[1].age);
+    EXPECT_EQ(4, mapped_vector[2].age);
+}
+#endif
 
 TEST(FunctionalVectorTest, FilterTest)
 {
