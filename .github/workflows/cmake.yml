@@ -91,7 +91,7 @@ jobs:
         if: startsWith(matrix.config.name, 'Ubuntu Latest GCC')
         run: |
           sudo apt-get update
-          sudo apt-get install ninja-build cmake
+          sudo apt-get install ninja-build cmake libtbb-dev
           ninja --version
           cmake --version
           gcc --version
