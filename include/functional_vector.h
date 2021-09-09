@@ -543,7 +543,7 @@ public:
     
     // Executes the given operation for each element of the vector. The operation must not
     // change the vector's contents during execution.
-#ifdef INVOCABLE
+#ifdef CPP17_AVAILABLE
     template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
     const functional_vector& for_each(Callable && operation) const
     {
