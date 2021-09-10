@@ -26,6 +26,13 @@
 #include "functional_vector.h"
 #include "index_range.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4834) // discarding return value of function with 'nodiscard' attribute
+#pragma warning(disable: 4100) // unreferenced formal parameter
+#pragma warning(disable: 4018) // signed/unsigned mismatch
+#pragma warning(disable: 4389) // signed/unsigned mismatch
+#endif
+
 struct child
 {
     child()
