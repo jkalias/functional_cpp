@@ -26,7 +26,7 @@
 #include <type_traits>
 #include "index_range.h"
 #include "optional.h"
-#ifdef CPP17_AVAILABLE
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
 #include <execution>
 #endif
 
