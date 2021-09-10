@@ -119,7 +119,7 @@ public:
         std::transform(std::execution::par,
                        backing_vector_.cbegin(),
                        backing_vector_.cend(),
-                       transformed_vector.cbegin(),
+                       transformed_vector.begin(),
                        std::forward<Transform>(transform));
         return functional_vector<U>(transformed_vector);
     }
@@ -347,6 +347,12 @@ public:
     template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
     functional_vector filtered_parallel(Callable && predicate_to_keep) const
     {
+#ifdef _MSC_VER
+        // Visual Studio compiler is stricter than GCC in its use of iterators, so back_inserter wouldn't work here
+        auto copy(*this);
+        copy.filter_parallel(predicate_to_keep);
+        return copy;
+#else
         std::vector<T> filtered_vector;
         filtered_vector.reserve(backing_vector_.size());
         std::copy_if(std::execution::par,
@@ -355,6 +361,7 @@ public:
                      std::back_inserter(filtered_vector),
                      std::forward<Callable>(predicate_to_keep));
         return functional_vector(filtered_vector);
+#endif
     }
 #endif
         
