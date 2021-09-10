@@ -708,7 +708,7 @@ public:
     // Executes the given operation for each element of the vector. The operation must not
     // change the vector's contents during execution.
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, T const &>>>
     const functional_vector& for_each(Callable && operation) const
     {
 #else
@@ -725,7 +725,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Executes the given operation for each element of the vector in parallel. The operation must not
     // change the vector's contents during execution.
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, T const &>>>
     const functional_vector& for_each_parallel(Callable && operation) const
     {
         std::for_each(std::execution::par,
