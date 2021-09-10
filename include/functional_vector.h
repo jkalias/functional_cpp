@@ -90,7 +90,7 @@ public:
     //      	output_vector.insert_back(std::to_string(input_vector[i]));
     //      }
 #ifdef CPP17_AVAILABLE
-    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
+    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
     functional_vector<U> map(Transform && transform) const
     {
 #else
@@ -111,7 +111,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the functional `map` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
+    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
     functional_vector<U> map_parallel(Transform && transform) const
     {
         std::vector<U> transformed_vector;
@@ -140,7 +140,7 @@ public:
     //          return number > 2;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool all_of(Callable && unary_predicate) const
     {
 #else
@@ -156,7 +156,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `all_of` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool all_of_parallel(Callable && unary_predicate) const
     {
         return std::all_of(std::execution::par,
@@ -181,7 +181,7 @@ public:
     //          return number > 9;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool any_of(Callable && unary_predicate) const
     {
 #else
@@ -197,7 +197,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `any_of` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool any_of_parallel(Callable && unary_predicate) const
     {
         return std::any_of(std::execution::par,
@@ -222,7 +222,7 @@ public:
     //          return number > 7;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool none_of(Callable && unary_predicate) const
     {
 #else
@@ -238,7 +238,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `none_of` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool none_of_parallel(Callable && unary_predicate) const
     {
         return std::none_of(std::execution::par,
@@ -270,7 +270,7 @@ public:
     //          i--;
     //      }
 #ifdef CPP17_AVAILABLE
-    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r<bool, Filter, T>::value>>
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
     functional_vector& filter(Filter && predicate_to_keep)
     {
 #else
@@ -289,7 +289,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the functional `filter` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r<bool, Filter, T>::value>>
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
     functional_vector& filter_parallel(Filter && predicate_to_keep)
     {
         backing_vector_.erase(std::remove_if(std::execution::par,
@@ -324,7 +324,7 @@ public:
     //          }
     //      }
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     functional_vector filtered(Callable && predicate_to_keep) const
     {
 #else
@@ -344,7 +344,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `filtered` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     functional_vector filtered_parallel(Callable && predicate_to_keep) const
     {
 #ifdef _MSC_VER
@@ -537,7 +537,7 @@ public:
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     functional_vector& sort(Sortable && comparison_predicate)
     {
 #else
@@ -554,7 +554,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sort` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     functional_vector& sort_parallel(Sortable && comparison_predicate)
     {
         std::sort(std::execution::par,
@@ -631,7 +631,7 @@ public:
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     functional_vector sorted(Sortable && comparison_predicate) const
     {
 #else
@@ -649,7 +649,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sorted` algorithm in parallel.
     // See also the sequential version for more documentation.
-    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     functional_vector sorted_parallel(Sortable && comparison_predicate) const
     {
         auto sorted_vector(backing_vector_);
