@@ -25,3 +25,7 @@
 #if __cplusplus >= 201703L
 #define CPP17_AVAILABLE
 #endif
+
+#if defined(CPP17_AVAILABLE) && !defined(__clang__)
+#define PARALLEL_ALGORITHM_AVAILABLE
+#endif

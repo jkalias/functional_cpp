@@ -22,11 +22,24 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <atomic>
 #include "functional_vector.h"
 #include "index_range.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4834) // discarding return value of function with 'nodiscard' attribute
+#pragma warning(disable: 4100) // unreferenced formal parameter
+#pragma warning(disable: 4018) // signed/unsigned mismatch
+#pragma warning(disable: 4389) // signed/unsigned mismatch
+#endif
+
 struct child
 {
+    child()
+    : age(0)
+    {
+    }
+    
     child(int age)
     : age(age)
     {
@@ -37,6 +50,11 @@ struct child
 
 struct person
 {
+    person()
+    : age(0), name("")
+    {
+    }
+    
     person(int age, std::string name)
     : age(age), name(std::move(name))
     {
@@ -206,6 +224,20 @@ TEST(FunctionalVectorTest, MapTest)
     EXPECT_EQ(4, mapped_vector[2].age);
 }
 
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, MapParallelTest)
+{
+    const functional_vector<int> vector_under_test({1, 3, 4});
+    const auto mapped_vector = vector_under_test.map_parallel<child>([](const int& age) {
+        return child(age);
+    });
+    EXPECT_EQ(3, mapped_vector.size());
+    EXPECT_EQ(1, mapped_vector[0].age);
+    EXPECT_EQ(3, mapped_vector[1].age);
+    EXPECT_EQ(4, mapped_vector[2].age);
+}
+#endif
+
 TEST(FunctionalVectorTest, FilterTest)
 {
     functional_vector<child> vector_under_test({child(1), child(3), child(4)});
@@ -220,6 +252,22 @@ TEST(FunctionalVectorTest, FilterTest)
     EXPECT_EQ(0, vector_under_test.size());
 }
 
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, FilterParallelTest)
+{
+    functional_vector<child> vector_under_test({child(1), child(3), child(4)});
+    vector_under_test.filter_parallel([](const child& child) {
+        return child.age < 2;
+    });
+    EXPECT_EQ(1, vector_under_test.size());
+    EXPECT_EQ(1, vector_under_test[0].age);
+    vector_under_test.filter_parallel([](const child& child) {
+        return child.age > 7;
+    });
+    EXPECT_EQ(0, vector_under_test.size());
+}
+#endif
+
 TEST(FunctionalVectorTest, FilteredTest)
 {
     const functional_vector<child> vector_under_test({child(1), child(3), child(4)});
@@ -230,6 +278,19 @@ TEST(FunctionalVectorTest, FilteredTest)
     EXPECT_EQ(1, filtered_vector.size());
     EXPECT_EQ(1, filtered_vector[0].age);
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, FilteredParallelTest)
+{
+    const functional_vector<child> vector_under_test({child(1), child(3), child(4)});
+    const auto filtered_vector = vector_under_test.filtered_parallel([](const child& child) {
+        return child.age < 2;
+    });
+    EXPECT_EQ(3, vector_under_test.size());
+    EXPECT_EQ(1, filtered_vector.size());
+    EXPECT_EQ(1, filtered_vector[0].age);
+}
+#endif
 
 TEST(FunctionalVectorTest, ReverseTest)
 {
@@ -427,6 +488,117 @@ TEST(FunctionalVectorTest, SortedDescendingTest)
     EXPECT_EQ(1, sorted_vector[2]);
     EXPECT_EQ(-4, sorted_vector[3]);
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, SortParallelTest)
+{
+    functional_vector<person> vector_under_test({
+        person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
+    });
+    vector_under_test.sort_parallel([](const person& person1, const person& person2){
+        return person1.name < person2.name;
+    });
+    EXPECT_EQ(4, vector_under_test.size());
+    
+    EXPECT_EQ("Alice", vector_under_test[0].name);
+    EXPECT_EQ(8, vector_under_test[0].age);
+    
+    EXPECT_EQ("Bob", vector_under_test[1].name);
+    EXPECT_EQ(34, vector_under_test[1].age);
+    
+    EXPECT_EQ("Jake", vector_under_test[2].name);
+    EXPECT_EQ(45, vector_under_test[2].age);
+    
+    EXPECT_EQ("Manfred", vector_under_test[3].name);
+    EXPECT_EQ(52, vector_under_test[3].age);
+}
+
+TEST(FunctionalVectorTest, SortedParallelTest)
+{
+    const functional_vector<person> vector_under_test({
+        person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
+    });
+    const auto sorted_vector = vector_under_test.sorted_parallel([](const person& person1, const person& person2){
+        return person1.name < person2.name;
+    });
+    
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ("Jake", vector_under_test[0].name);
+    EXPECT_EQ(45, vector_under_test[0].age);
+    EXPECT_EQ("Bob", vector_under_test[1].name);
+    EXPECT_EQ(34, vector_under_test[1].age);
+    EXPECT_EQ("Manfred", vector_under_test[2].name);
+    EXPECT_EQ(52, vector_under_test[2].age);
+    EXPECT_EQ("Alice", vector_under_test[3].name);
+    EXPECT_EQ(8, vector_under_test[3].age);
+    
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ("Alice", sorted_vector[0].name);
+    EXPECT_EQ(8, sorted_vector[0].age);
+    EXPECT_EQ("Bob", sorted_vector[1].name);
+    EXPECT_EQ(34, sorted_vector[1].age);
+    EXPECT_EQ("Jake", sorted_vector[2].name);
+    EXPECT_EQ(45, sorted_vector[2].age);
+    EXPECT_EQ("Manfred", sorted_vector[3].name);
+    EXPECT_EQ(52, sorted_vector[3].age);
+}
+
+TEST(FunctionalVectorTest, SortAscendingParallelTest)
+{
+    functional_vector<int> vector_under_test({3, 1, 9, -4});
+    vector_under_test.sort_ascending_parallel();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(-4, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(3, vector_under_test[2]);
+    EXPECT_EQ(9, vector_under_test[3]);
+}
+
+TEST(FunctionalVectorTest, SortedAscendingParallelTest)
+{
+    const functional_vector<int> vector_under_test({3, 1, 9, -4});
+    const auto sorted_vector = vector_under_test.sorted_ascending_parallel();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(3, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(9, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
+    
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ(-4, sorted_vector[0]);
+    EXPECT_EQ(1, sorted_vector[1]);
+    EXPECT_EQ(3, sorted_vector[2]);
+    EXPECT_EQ(9, sorted_vector[3]);
+}
+
+TEST(FunctionalVectorTest, SortDescendingParallelTest)
+{
+    functional_vector<int> vector_under_test({3, 1, 9, -4});
+    vector_under_test.sort_descending_parallel();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(9, vector_under_test[0]);
+    EXPECT_EQ(3, vector_under_test[1]);
+    EXPECT_EQ(1, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
+}
+
+TEST(FunctionalVectorTest, SortedDescendingParallelTest)
+{
+    const functional_vector<int> vector_under_test({3, 1, 9, -4});
+    const auto sorted_vector = vector_under_test.sorted_descending_parallel();
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ(3, vector_under_test[0]);
+    EXPECT_EQ(1, vector_under_test[1]);
+    EXPECT_EQ(9, vector_under_test[2]);
+    EXPECT_EQ(-4, vector_under_test[3]);
+    
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ(9, sorted_vector[0]);
+    EXPECT_EQ(3, sorted_vector[1]);
+    EXPECT_EQ(1, sorted_vector[2]);
+    EXPECT_EQ(-4, sorted_vector[3]);
+}
+#endif
 
 TEST(FunctionalVectorTest, SubscriptOperatorNegativeDeathTest)
 {
@@ -1054,6 +1226,23 @@ TEST(FunctionalVectorTest, AllOfTrueTest)
     EXPECT_TRUE(vector_under_test.all_of([](const int& number) { return number < 10; }));
 }
 
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, AllOfParallelFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.all_of_parallel([](const int& number) { return number > 5; }));
+}
+
+TEST(FunctionalVectorTest, AllOfParallelTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector_under_test.all_of([](const int& number) {
+        return number < 10;
+    });
+    EXPECT_TRUE(vector_under_test.all_of_parallel([](const int& number) { return number < 10; }));
+}
+#endif
+
 TEST(FunctionalVectorTest, AnyOfFalseTest)
 {
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -1066,6 +1255,20 @@ TEST(FunctionalVectorTest, AnyOfTrueTest)
     EXPECT_TRUE(vector_under_test.any_of([](const int& number) { return number >= 7; }));
 }
 
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, AnyOfParallelFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.any_of_parallel([](const int& number) { return number > 20; }));
+}
+
+TEST(FunctionalVectorTest, AnyOfParallelTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_TRUE(vector_under_test.any_of_parallel([](const int& number) { return number >= 7; }));
+}
+#endif
+
 TEST(FunctionalVectorTest, NoneOfFalseTest)
 {
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -1077,3 +1280,26 @@ TEST(FunctionalVectorTest, NoneOfTrueTest)
     functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_TRUE(vector_under_test.none_of([](const int& number) { return number < -2; }));
 }
+
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+TEST(FunctionalVectorTest, NoneOfParallelFalseTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_FALSE(vector_under_test.none_of_parallel([](const int& number) { return number > 7; }));
+}
+
+TEST(FunctionalVectorTest, NoneOfParallelTrueTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_TRUE(vector_under_test.none_of_parallel([](const int& number) { return number < -2; }));
+}
+
+TEST(FunctionalVectorTest, ForEachParallelTest)
+{
+    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    EXPECT_EQ(9, vector_under_test.size());
+    std::atomic<int> counter(0);
+    vector_under_test.for_each_parallel([&](const int& element) { ++counter; });
+    EXPECT_EQ(9, counter);
+}
+#endif

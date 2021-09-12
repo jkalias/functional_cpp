@@ -229,3 +229,17 @@ numbers.none_of([](const auto &number) {
     return number > 7;
 });
 ```
+
+### Parallel algorithms
+Since C++17 several STL algorithms can be executed in parallel.
+
+clang on macOS does not yet fully support the parallel execution model, however on Windows and Linux, a `functional_vector` supports the following parallel algorithms
+```c++
+for_each_parallel
+map_parallel
+filter_parallel
+sort_parallel
+all_of_parallel
+any_of_parallel
+none_of_parallel
+```

@@ -19,6 +19,10 @@ source_group("src" FILES ${SOURCES})
 # Set Properties->General->Configuration Type to Dynamic Library (.dll/.so/.dylib)
 add_library(${LIBNAME} SHARED ${HEADERS} ${SOURCES})
 
+if(CMAKE_HOST_UNIX AND NOT CMAKE_HOST_APPLE)
+target_link_libraries(${LIBNAME} PUBLIC tbb)
+endif()
+
 # creates preprocessor definition used for library exports
 add_compile_definitions("FUNCTIONAL_VECTOR_EXPORTS")
 

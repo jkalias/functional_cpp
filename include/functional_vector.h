@@ -26,6 +26,9 @@
 #include <type_traits>
 #include "index_range.h"
 #include "optional.h"
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+#include <execution>
+#endif
 
 // A lightweight wrapper around std::vector, enabling fluent and functional
 // programming on the vector itself, rather than using the more procedural style
@@ -87,7 +90,7 @@ public:
     //      	output_vector.insert_back(std::to_string(input_vector[i]));
     //      }
 #ifdef CPP17_AVAILABLE
-    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r<U, Transform, T>::value>>
+    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
     functional_vector<U> map(Transform && transform) const
     {
 #else
@@ -104,6 +107,23 @@ public:
                        std::forward<Transform>(transform));
         return functional_vector<U>(transformed_vector);
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the functional `map` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
+    functional_vector<U> map_parallel(Transform && transform) const
+    {
+        std::vector<U> transformed_vector;
+        transformed_vector.resize(backing_vector_.size());
+        std::transform(std::execution::par,
+                       backing_vector_.cbegin(),
+                       backing_vector_.cend(),
+                       transformed_vector.begin(),
+                       std::forward<Transform>(transform));
+        return functional_vector<U>(transformed_vector);
+    }
+#endif
     
     // Returns true if all elements match the predicate (return true)
     //
@@ -120,7 +140,7 @@ public:
     //          return number > 2;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool all_of(Callable && unary_predicate) const
     {
 #else
@@ -132,6 +152,19 @@ public:
                            cend(),
                            std::forward<Callable>(unary_predicate));
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `all_of` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
+    bool all_of_parallel(Callable && unary_predicate) const
+    {
+        return std::all_of(std::execution::par,
+                           cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+#endif
     
     // Returns true if at least one of the elements matches the predicate (returns true)
     //
@@ -148,7 +181,7 @@ public:
     //          return number > 9;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool any_of(Callable && unary_predicate) const
     {
 #else
@@ -160,6 +193,19 @@ public:
                            cend(),
                            std::forward<Callable>(unary_predicate));
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `any_of` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
+    bool any_of_parallel(Callable && unary_predicate) const
+    {
+        return std::any_of(std::execution::par,
+                           cbegin(),
+                           cend(),
+                           std::forward<Callable>(unary_predicate));
+    }
+#endif
     
     // Returns true if no element matches the predicate (all return false)
     //
@@ -176,7 +222,7 @@ public:
     //          return number > 7;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     bool none_of(Callable && unary_predicate) const
     {
 #else
@@ -188,6 +234,19 @@ public:
                             cend(),
                             std::forward<Callable>(unary_predicate));
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `none_of` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
+    bool none_of_parallel(Callable && unary_predicate) const
+    {
+        return std::none_of(std::execution::par,
+                            cbegin(),
+                            cend(),
+                            std::forward<Callable>(unary_predicate));
+    }
+#endif
     
     // Performs the functional `filter` algorithm, in which all elements of this instance
     // which match the given predicate are kept (mutating)
@@ -211,7 +270,7 @@ public:
     //          i--;
     //      }
 #ifdef CPP17_AVAILABLE
-    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r<bool, Filter, T>::value>>
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
     functional_vector& filter(Filter && predicate_to_keep)
     {
 #else
@@ -226,6 +285,22 @@ public:
         }), backing_vector_.end());
         return *this;
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the functional `filter` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
+    functional_vector& filter_parallel(Filter && predicate_to_keep)
+    {
+        backing_vector_.erase(std::remove_if(std::execution::par,
+                                             backing_vector_.begin(),
+                                             backing_vector_.end(),
+                                             [predicate=std::forward<Filter>(predicate_to_keep)](const T& element) {
+            return !predicate(element);
+        }), backing_vector_.end());
+        return *this;
+    }
+#endif
     
     // Performs the functional `filter` algorithm in a copy of this instance, in which all elements of
     // the copy which match the given predicate (non-mutating)
@@ -249,7 +324,7 @@ public:
     //          }
     //      }
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<bool, Callable, T>::value>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
     functional_vector filtered(Callable && predicate_to_keep) const
     {
 #else
@@ -266,6 +341,30 @@ public:
         return functional_vector(filtered_vector);
     }
     
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `filtered` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
+    functional_vector filtered_parallel(Callable && predicate_to_keep) const
+    {
+#ifdef _MSC_VER
+        // Visual Studio compiler is stricter than GCC in its use of iterators, so back_inserter wouldn't work here
+        auto copy(*this);
+        copy.filter_parallel(predicate_to_keep);
+        return copy;
+#else
+        std::vector<T> filtered_vector;
+        filtered_vector.reserve(backing_vector_.size());
+        std::copy_if(std::execution::par,
+                     backing_vector_.begin(),
+                     backing_vector_.end(),
+                     std::back_inserter(filtered_vector),
+                     std::forward<Callable>(predicate_to_keep));
+        return functional_vector(filtered_vector);
+#endif
+    }
+#endif
+        
     // Reverses the order of the elements in place (mutating)
     //
     // example:
@@ -438,7 +537,7 @@ public:
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     functional_vector& sort(Sortable && comparison_predicate)
     {
 #else
@@ -451,6 +550,20 @@ public:
                   std::forward<Sortable>(comparison_predicate));
         return *this;
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sort` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
+    functional_vector& sort_parallel(Sortable && comparison_predicate)
+    {
+        std::sort(std::execution::par,
+                  backing_vector_.begin(),
+                  backing_vector_.end(),
+                  std::forward<Sortable>(comparison_predicate));
+        return *this;
+    }
+#endif
     
     // Sorts the vector in place in ascending order, when its elements support comparison by std::less_equal [<=] (mutating).
     //
@@ -464,6 +577,15 @@ public:
     {
         return sort(std::less_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sort_ascending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    functional_vector& sort_ascending_parallel()
+    {
+        return sort_parallel(std::less_equal<T>());
+    }
+#endif
     
     // Sorts the vector in place in descending order, when its elements support comparison by std::greater_equal [>=] (mutating).
     //
@@ -477,6 +599,15 @@ public:
     {
         return sort(std::greater_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sort_ascending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    functional_vector& sort_descending_parallel()
+    {
+        return sort_parallel(std::greater_equal<T>());
+    }
+#endif
     
     // Returns its elements copied and sorted (non-mutating). The comparison predicate takes two elements
     // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
@@ -500,7 +631,7 @@ public:
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r<bool, Sortable, T, T>::value>>
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     functional_vector sorted(Sortable && comparison_predicate) const
     {
 #else
@@ -514,6 +645,21 @@ public:
                   std::forward<Sortable>(comparison_predicate));
         return functional_vector(sorted_vector);
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sorted` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
+    functional_vector sorted_parallel(Sortable && comparison_predicate) const
+    {
+        auto sorted_vector(backing_vector_);
+        std::sort(std::execution::par,
+                  sorted_vector.begin(),
+                  sorted_vector.end(),
+                  std::forward<Sortable>(comparison_predicate));
+        return functional_vector(sorted_vector);
+    }
+#endif
     
     // Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less_equal [<=] (non-mutating).
     //
@@ -527,6 +673,15 @@ public:
     {
         return sorted(std::less_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sorted_ascending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    [[nodiscard]] functional_vector sorted_ascending_parallel() const
+    {
+        return sorted_parallel(std::less_equal<T>());
+    }
+#endif
     
     // Sorts its elements copied and sorted in descending order, when its elements support comparison by std::greater_equal [>=] (non-mutating).
     //
@@ -540,11 +695,20 @@ public:
     {
         return sorted(std::greater_equal<T>());
     }
+        
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Performs the `sorted_descending` algorithm in parallel.
+    // See also the sequential version for more documentation.
+    [[nodiscard]] functional_vector sorted_descending_parallel() const
+    {
+        return sorted_parallel(std::greater_equal<T>());
+    }
+#endif
     
     // Executes the given operation for each element of the vector. The operation must not
     // change the vector's contents during execution.
-#ifdef INVOCABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r<void, Callable, T const &>::value>>
+#ifdef CPP17_AVAILABLE
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, T const &>>>
     const functional_vector& for_each(Callable && operation) const
     {
 #else
@@ -558,6 +722,20 @@ public:
         return *this;
     }
     
+#ifdef PARALLEL_ALGORITHM_AVAILABLE
+    // Executes the given operation for each element of the vector in parallel. The operation must not
+    // change the vector's contents during execution.
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, T const &>>>
+    const functional_vector& for_each_parallel(Callable && operation) const
+    {
+        std::for_each(std::execution::par,
+                      backing_vector_.cbegin(),
+                      backing_vector_.cend(),
+                      std::forward<Callable>(operation));
+        return *this;
+    }
+#endif
+        
     // Returns the first index in which the given element is found in the vector.
     // In case of multiple occurrences, only the first index is returned
     // (see find_all_indices for multiple occurences).
