@@ -49,58 +49,51 @@ public:
     : backing_set_(set)
     {
     }
-//
-//    explicit functional_set(std::set<T>&& set)
-//    : backing_set_(std::move(vector))
-//    {
-//    }
-//
-//    explicit functional_set(std::initializer_list<T> list)
-//    : backing_set_(std::move(list))
-//    {
-//    }
     
-//    // Creates a new vector by repeating a given element.
-//    //
-//    // example:
-//    //      const functional_vector<std::string> filled_vector(3, "John");
-//    //
-//    // outcome:
-//    //      filled_vector -> functional_vector<std::string>({ "John", "John", "John" })
-//    explicit functional_vector(size_t count, const T& element)
-//    : backing_vector_(count, element)
-//    {
-//    }
-//
-//    // Performs the functional `map` algorithm, in which every element of the resulting vector is the
-//    // output of applying the transform function on every element of this instance.
-//    //
-//    // example:
-//    //      const functional_vector<int> input_vector({ 1, 3, -5 });
-//    //      const auto output_vector = input_vector.map<std::string>([](const auto& element) {
-//    //      	return std::to_string(element);
-//    //      });
-//    //
-//    // outcome:
-//    //      output_vector -> functional_vector<std::string>({ "1", "3", "-5" })
-//    //
-//    // is equivalent to:
-//    //      const functional_vector<int> input_vector({ 1, 3, -5 });
-//    //      functional_vector<std::string> output_vector;
-//    //      for (auto i = 0; i < input_vector.size(); ++i) {
-//    //      	output_vector.insert_back(std::to_string(input_vector[i]));
-//    //      }
-//#ifdef CPP17_AVAILABLE
-//    template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
-//#else
-//    template <typename U, typename Transform>
-//#endif
+    // ctor from std::vector
+    // ctor from functional_vector
+    // ctor from initializer_list
+    // difference
+    // union
+    // intersection
+    // min
+    // max
+    // map algorithm
+    // map parallel algorithm
+    // all_of
+    // all_of_parallel
+    // any_of
+    // any_of_parallel
+    // none_of
+    // none_of_parallel
+    // filter
+    // filter_parallel
+    // filtered
+    // filtered_parallel
+    // zip with functional_vector
+    // zip with functional_set
+    // zip with std::vector
+    // zip with std::set
+    // for_each -> test
+    // for_each_parallel
+    // remove
+    // removing
+    // insert
+    // inserting
+    // cleared
+    // contains
+    // find
     
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
     size_t size() const
     {
         return backing_set_.size();
     }
+    
+    // clear
+    // is_empty
+    // capacity
+    // reserve
     
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<T>::iterator begin()
@@ -125,7 +118,53 @@ public:
     {
         return backing_set_.end();
     }
+    
+    // Returns the given key in the current set, allowing subscripting.
+    // Bounds checking (assert) is enabled for debug builds.
+    // Performance is O(n), so be careful for performance critical code sections.
+    T operator[](int index)
+    {
+        assert_smaller_size(index);
+#ifdef CPP17_AVAILABLE
+        auto it = std::advance(begin(), index);
+        return *it;
+#else
+        auto count = 0;
+        auto it = begin();
+        while (count++ < index) {
+            it++;
+        }
+        return *it;
+#endif
+    }
+    
+    // Returns the given key in the current constant set, allowing subscripting.
+    // Bounds checking (assert) is enabled for debug builds.
+    // Performance is O(n), so be careful for performance critical code sections.
+    T operator[](int index) const
+    {
+        assert_smaller_size(index);
+#ifdef CPP17_AVAILABLE
+        auto it = std::advance(begin(), index);
+        return *it;
+#else
+        auto count = 0;
+        auto it = cbegin();
+        while (count++ < index) {
+            it++;
+        }
+        return *it;
+#endif
+    }
+    
+    // ==
+    // !=
 
 private:
     std::set<T> backing_set_;
+    
+    void assert_smaller_size(int index) const
+    {
+        assert(index < size() && index >= 0);
+    }
 };

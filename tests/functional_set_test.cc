@@ -44,7 +44,22 @@ TEST(FunctionalSetTest, EmptyConstructor)
 
 TEST(FunctionalSetTest, StdSetConstructor)
 {
-    functional_set<int> set_under_test(std::set<int>({1, 2, 3, 5}));
-    debug(set_under_test);
-    EXPECT_EQ(4, set_under_test.size());
+    functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
+    EXPECT_EQ(3, set_under_test.size());
+}
+
+TEST(FunctionalSetTest, Subscripting)
+{
+    functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
+    EXPECT_EQ(1, set_under_test[0]);
+    EXPECT_EQ(3, set_under_test[1]);
+    EXPECT_EQ(5, set_under_test[2]);
+}
+
+TEST(FunctionalSetTest, ConstSubscripting)
+{
+    const functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
+    EXPECT_EQ(1, set_under_test[0]);
+    EXPECT_EQ(3, set_under_test[1]);
+    EXPECT_EQ(5, set_under_test[2]);
 }
