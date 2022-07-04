@@ -23,12 +23,9 @@
 #pragma once
 #include <set>
 #include <algorithm>
-//#include <type_traits>
-//#include "index_range.h"
-//#include "optional.h"
-//#ifdef PARALLEL_ALGORITHM_AVAILABLE
-//#include <execution>
-//#endif
+
+template <typename T>
+class functional_vector;
 
 // A lightweight wrapper around std::set, enabling fluent and functional
 // programming on the set itself, rather than using the more procedural style
@@ -50,9 +47,21 @@ public:
     {
     }
     
-    // ctor from std::vector
-    // ctor from functional_vector
-    // ctor from initializer_list
+    explicit functional_set(const std::vector<T>& vector)
+    : backing_set_(vector.begin(), vector.end())
+    {
+    }
+    
+    explicit functional_set(const functional_vector<T>& vector)
+    : backing_set_(vector.cbegin(), vector.cend())
+    {
+    }
+    
+    explicit functional_set(const std::initializer_list<T>& list)
+    : backing_set_(list.begin(), list.end())
+    {
+    }
+    
     // difference
     // union
     // intersection

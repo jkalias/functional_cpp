@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include "warnings.h"
 #include "functional_set.h"
+#include "functional_vector.h"
 
 template <typename T>
 void debug(functional_set<T>& set)
@@ -36,6 +37,13 @@ void debug(functional_set<T>& set)
 //    });
 }
 
+void testContents(const functional_set<int>& set) {
+    EXPECT_EQ(3, set.size());
+    EXPECT_EQ(1, set[0]);
+    EXPECT_EQ(3, set[1]);
+    EXPECT_EQ(5, set[2]);
+}
+
 TEST(FunctionalSetTest, EmptyConstructor)
 {
     functional_set<int> set_under_test;
@@ -45,21 +53,35 @@ TEST(FunctionalSetTest, EmptyConstructor)
 TEST(FunctionalSetTest, StdSetConstructor)
 {
     functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-    EXPECT_EQ(3, set_under_test.size());
+    testContents(set_under_test);
+}
+
+TEST(FunctionalSetTest, StdVectorConstructor)
+{
+    functional_set<int> set_under_test(std::vector<int>({1, 5, 3, 3}));
+    testContents(set_under_test);
+}
+
+TEST(FunctionalSetTest, FunctionalVectorConstructor)
+{
+    functional_set<int> set_under_test(functional_vector<int>({1, 5, 3, 3}));
+    testContents(set_under_test);
+}
+
+TEST(FunctionalSetTest, StdInitializerListConstructor)
+{
+    functional_set<int> set_under_test(std::initializer_list<int>({1, 5, 3, 3}));
+    testContents(set_under_test);
 }
 
 TEST(FunctionalSetTest, Subscripting)
 {
     functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-    EXPECT_EQ(1, set_under_test[0]);
-    EXPECT_EQ(3, set_under_test[1]);
-    EXPECT_EQ(5, set_under_test[2]);
+    testContents(set_under_test);
 }
 
 TEST(FunctionalSetTest, ConstSubscripting)
 {
     const functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-    EXPECT_EQ(1, set_under_test[0]);
-    EXPECT_EQ(3, set_under_test[1]);
-    EXPECT_EQ(5, set_under_test[2]);
+    testContents(set_under_test);
 }
