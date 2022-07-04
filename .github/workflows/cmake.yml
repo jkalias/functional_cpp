@@ -27,7 +27,7 @@ jobs:
             cc: "cl",
             cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-            generators: "Visual Studio 16 2019"
+            generators: "Visual Studio 17 2022"
           }
         - {
             name: "Windows Latest MSVC (C++17)",
@@ -36,7 +36,7 @@ jobs:
             cc: "cl",
             cxx: "cl",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-            generators: "Visual Studio 16 2019"
+            generators: "Visual Studio 17 2022"
           }
         - {
             name: "Ubuntu Latest GCC (C++11)",
