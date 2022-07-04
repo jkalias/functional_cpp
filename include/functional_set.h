@@ -62,7 +62,27 @@ public:
     {
     }
     
-    // difference
+    // Returns the set of elements which belong only to the current set and not in "other".
+    // In Venn diagram notation, if A is the current set and B is the "other" set, then
+    // the difference is the operation A – B = {x : x ∈ A and x ∉ B}
+    //
+    // example:
+    //      const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    //      const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    //      const auto& diff = set1.difference(set2);
+    //
+    // outcome:
+    //      diff -> functional_set<int>(1, 3, 8)
+    functional_set difference(const functional_set<T>& other) const {
+        std::set<T> diff;
+        std::set_difference(cbegin(),
+                            cend(),
+                            other.cbegin(),
+                            other.cend(),
+                            std::inserter(diff, diff.begin()));
+        return functional_set(diff);
+    }
+    
     // union
     // intersection
     // min
