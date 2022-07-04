@@ -24,7 +24,7 @@
 #include "export_def.h"
 
 // A struct used for container safe access based on index
-struct FunctionalVectorExport index_range
+struct FunctionalCppExport index_range
 {
     // Used for returning values of invalid operations
     static index_range invalid;

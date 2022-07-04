@@ -16,7 +16,7 @@ file (GLOB TEST_SOURCES
 add_executable (${EXENAME} ${TEST_SOURCES})
 
 # Properties->Linker->Input->Additional Dependencies
-target_link_libraries(${EXENAME} PUBLIC functional_vector gtest_main)
+target_link_libraries(${EXENAME} PUBLIC functional_cpp gtest_main)
 
 # Creates a folder "executables" and adds target project under it
 set_property(TARGET ${EXENAME} PROPERTY FOLDER "executables")

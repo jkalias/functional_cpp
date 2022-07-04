@@ -20,16 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include <gtest/gtest.h>
+#include "warnings.h"
+#include "functional_set.h"
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_CPP_EXPORTS
-        #define FunctionalCppExport __declspec( dllexport )
-    #else
-        #define FunctionalCppExport __declspec( dllimport )
-    #endif
-#else
-    #define FunctionalCppExport __attribute__ ((__visibility__("default")))
-#endif
+template <typename T>
+void debug(functional_set<T>& set)
+{
+    std::cout << "bla" << std::endl;
+    for (auto &x : set) {
+        std::cout << x << std::endl;
+    }
+//    set.for_each([](const T& element) {
+//        std::cout << element << std::endl;
+//    });
+}
 
-#include "compatibility.h"
+TEST(FunctionalSetTest, EmptyConstructor)
+{
+    functional_set<int> set_under_test;
+    EXPECT_EQ(0, set_under_test.size());
+}
+
+TEST(FunctionalSetTest, StdSetConstructor)
+{
+    functional_set<int> set_under_test(std::set<int>({1, 2, 3, 5}));
+    debug(set_under_test);
+    EXPECT_EQ(4, set_under_test.size());
+}

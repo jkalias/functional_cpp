@@ -21,51 +21,14 @@
 // SOFTWARE.
 
 #include <gtest/gtest.h>
-#include <string>
 #include <atomic>
 #include "functional_vector.h"
 #include "index_range.h"
-
-#ifdef _MSC_VER
-#pragma warning(disable: 4834) // discarding return value of function with 'nodiscard' attribute
-#pragma warning(disable: 4100) // unreferenced formal parameter
-#pragma warning(disable: 4018) // signed/unsigned mismatch
-#pragma warning(disable: 4389) // signed/unsigned mismatch
-#endif
-
-struct child
-{
-    child()
-    : age(0)
-    {
-    }
-    
-    child(int age)
-    : age(age)
-    {
-    }
-    
-    int age;
-};
-
-struct person
-{
-    person()
-    : age(0), name("")
-    {
-    }
-    
-    person(int age, std::string name)
-    : age(age), name(std::move(name))
-    {
-    }
-    
-    int age;
-    std::string name;
-};
+#include "test_types.h"
+#include "warnings.h"
 
 template <typename T>
-void debug_vector(const functional_vector<T>& vec)
+void debug(const functional_vector<T>& vec)
 {
     vec.for_each([](const T& element) {
         std::cout << element << std::endl;

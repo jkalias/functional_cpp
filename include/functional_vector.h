@@ -54,6 +54,7 @@ public:
     : backing_vector_(std::move(vector))
     {
     }
+    
     explicit functional_vector(std::initializer_list<T> list)
     : backing_vector_(std::move(list))
     {

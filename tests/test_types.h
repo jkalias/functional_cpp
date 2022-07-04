@@ -21,15 +21,35 @@
 // SOFTWARE.
 
 #pragma once
+#include <string>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_CPP_EXPORTS
-        #define FunctionalCppExport __declspec( dllexport )
-    #else
-        #define FunctionalCppExport __declspec( dllimport )
-    #endif
-#else
-    #define FunctionalCppExport __attribute__ ((__visibility__("default")))
-#endif
+struct child
+{
+    child()
+    : age(0)
+    {
+    }
+    
+    child(int age)
+    : age(age)
+    {
+    }
+    
+    int age;
+};
 
-#include "compatibility.h"
+struct person
+{
+    person()
+    : age(0), name("")
+    {
+    }
+    
+    person(int age, std::string name)
+    : age(age), name(std::move(name))
+    {
+    }
+    
+    int age;
+    std::string name;
+};

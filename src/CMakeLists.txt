@@ -1,4 +1,4 @@
-set (LIBNAME functional_vector)
+set (LIBNAME functional_cpp)
 
 # Properties->C/C++->General->Additional Include Directories
 include_directories ("../include")
@@ -24,7 +24,7 @@ target_link_libraries(${LIBNAME} PUBLIC tbb)
 endif()
 
 # creates preprocessor definition used for library exports
-add_compile_definitions("FUNCTIONAL_VECTOR_EXPORTS")
+add_compile_definitions("FUNCTIONAL_CPP_EXPORTS")
 
 set_target_properties(${LIBNAME} PROPERTIES 
 	OUTPUT_NAME ${LIBNAME}
