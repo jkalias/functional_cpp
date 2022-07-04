@@ -41,7 +41,7 @@ public:
     : backing_set_()
     {
     }
-
+    
     explicit functional_set(const std::set<T>& set)
     : backing_set_(set)
     {
@@ -62,8 +62,8 @@ public:
     {
     }
     
-    // Returns the set of elements which belong only to the current set and not in "other".
-    // In Venn diagram notation, if A is the current set and B is the "other" set, then
+    // Returns the set of elements which belong to the current set but not in the other set.
+    // In Venn diagram notation, if A is the current set and B is the other set, then
     // the difference is the operation A – B = {x : x ∈ A and x ∉ B}
     //
     // example:
@@ -72,7 +72,7 @@ public:
     //      const auto& diff = set1.difference(set2);
     //
     // outcome:
-    //      diff -> functional_set<int>(1, 3, 8)
+    //      diff -> functional_set<int>({1, 3, 8})
     functional_set difference(const functional_set<T>& other) const {
         std::set<T> diff;
         std::set_difference(cbegin(),
@@ -83,8 +83,60 @@ public:
         return functional_set(diff);
     }
     
-    // union
-    // intersection
+    functional_set difference(const std::set<T>& other) const {
+        return difference(functional_set(other));
+    }
+    
+    // Returns the set of elements which belong either to the current or the other set.
+    // In Venn diagram notation, if A is the current set and B is the other set, then
+    // the union is the operation A ∪ B = {x : x ∈ A or x ∈ B}
+    //
+    // example:
+    //      const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    //      const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    //      const auto& combined = set1.set_union(set2);
+    //
+    // outcome:
+    //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
+    functional_set union_with(const functional_set<T>& other) const {
+        std::set<T> combined;
+        std::set_union(cbegin(),
+                       cend(),
+                       other.cbegin(),
+                       other.cend(),
+                       std::inserter(combined, combined.begin()));
+        return functional_set(combined);
+    }
+    
+    functional_set union_with(const std::set<T>& other) const {
+        return union_with(functional_set(other));
+    }
+    
+    // Returns the set of elements which belong to both the current and the other set.
+    // In Venn diagram notation, if A is the current set and B is the other set, then
+    // the intersection is the operation A ∩ B = {x : x ∈ A and x ∈ B}
+    //
+    // example:
+    //      const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    //      const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    //      const auto& combined = set1.set_union(set2);
+    //
+    // outcome:
+    //      combined -> functional_set<int>({2, 5, 7, 10})
+    functional_set intersect_with(const functional_set<T>& other) const {
+        std::set<T> intersection;
+        std::set_intersection(cbegin(),
+                              cend(),
+                              other.cbegin(),
+                              other.cend(),
+                              std::inserter(intersection, intersection.begin()));
+        return functional_set(intersection);
+    }
+    
+    functional_set intersect_with(const std::set<T>& other) const {
+        return intersect_with(functional_set(other));
+    }
+    
     // min
     // max
     // map algorithm
@@ -186,9 +238,35 @@ public:
 #endif
     }
     
-    // ==
+    // Returns true if both instances have equal sizes and the corresponding elements (keys) are equal
+    bool operator ==(const functional_set<T>& rhs) const
+    {
+#ifdef CPP17_AVAILABLE
+        return std::equal(cbegin(),
+                          cend(),
+                          rhs.cbegin(),
+                          rhs.cend());
+#else
+        if (size() != rhs.size()) {
+            return false;
+        }
+        
+        auto it1 = cbegin();
+        auto it2 = rhs.cbegin();
+        while (it1 != cend() && it2 != rhs.cend()) {
+            if (*it1 != *it2) {
+                return false;
+            }
+            it1++;
+            it2++;
+        }
+        
+        return true;
+#endif
+    }
+    
     // !=
-
+    
 private:
     std::set<T> backing_set_;
     
