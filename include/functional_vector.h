@@ -1451,19 +1451,21 @@ public:
     bool operator ==(const functional_vector<T>& rhs) const
     {
 #ifdef CPP17_AVAILABLE
-        return std::equal(backing_vector_.cbegin(),
-                          backing_vector_.cend(),
+        return std::equal(cbegin(),
+                          cend(),
                           rhs.cbegin(),
                           rhs.cend());
 #else
         if (size() != rhs.size()) {
             return false;
         }
+        
         for (auto i = 0; i < size(); ++i) {
             if ((*this)[i] != rhs[i]) {
                 return false;
             }
         }
+        
         return true;
 #endif
     }

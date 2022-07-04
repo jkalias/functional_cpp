@@ -91,8 +91,45 @@ TEST(FunctionalSetTest, Difference)
     const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
     const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
     const auto& diff = set1.difference(set2);
-    EXPECT_EQ(3, diff.size());
-    EXPECT_EQ(1, diff[0]);
-    EXPECT_EQ(3, diff[1]);
-    EXPECT_EQ(8, diff[2]);
+    EXPECT_EQ(functional_set<int>({1, 3, 8}), diff);
+}
+
+TEST(FunctionalSetTest, DifferenceStdSet)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    const std::set<int> set2({2, 5, 7, 10, 15, 17});
+    const auto& diff = set1.difference(set2);
+    EXPECT_EQ(functional_set<int>({1, 3, 8}), diff);
+}
+
+TEST(FunctionalSetTest, Union)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    const auto& combined = set1.union_with(set2);
+    EXPECT_EQ(functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), combined);
+}
+
+TEST(FunctionalSetTest, UnionStdSet)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    const std::set<int> set2({2, 5, 7, 10, 15, 17});
+    const auto& combined = set1.union_with(set2);
+    EXPECT_EQ(functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), combined);
+}
+
+TEST(FunctionalSetTest, Intersection)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    const auto& intersection = set1.intersect_with(set2);
+    EXPECT_EQ(functional_set<int>({2, 5, 7, 10}), intersection);
+}
+
+TEST(FunctionalSetTest, IntersectionStdSet)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    const std::set<int> set2({2, 5, 7, 10, 15, 17});
+    const auto& intersection = set1.intersect_with(set2);
+    EXPECT_EQ(functional_set<int>({2, 5, 7, 10}), intersection);
 }
