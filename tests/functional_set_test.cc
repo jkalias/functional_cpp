@@ -134,6 +134,36 @@ TEST(FunctionalSetTest, IntersectionStdSet)
     EXPECT_EQ(functional_set<int>({2, 5, 7, 10}), intersection);
 }
 
+TEST(FunctionalSetTest, Min)
+{
+    const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto minimum = numbers.min();
+    EXPECT_TRUE(minimum.has_value());
+    EXPECT_EQ(1, minimum.value());
+}
+
+TEST(FunctionalSetTest, MinEmptySet)
+{
+    const functional_set<int> numbers;
+    auto minimum = numbers.min();
+    EXPECT_FALSE(minimum.has_value());
+}
+
+TEST(FunctionalSetTest, Max)
+{
+    const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    auto maximum = numbers.max();
+    EXPECT_TRUE(maximum.has_value());
+    EXPECT_EQ(8, maximum.value());
+}
+
+TEST(FunctionalSetTest, MaxEmptySet)
+{
+    const functional_set<int> numbers;
+    auto maximum = numbers.max();
+    EXPECT_FALSE(maximum.has_value());
+}
+
 TEST(FunctionalSetTest, EqualityOperator)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3}));

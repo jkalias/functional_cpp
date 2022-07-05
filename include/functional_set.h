@@ -23,6 +23,7 @@
 #pragma once
 #include <set>
 #include <algorithm>
+#include "optional.h"
 
 template <typename T>
 class functional_vector;
@@ -137,8 +138,46 @@ public:
         return intersect_with(functional_set(other));
     }
     
-    // min
-    // max
+    // Returns the minimum key in the set, if it's not empty.
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto minimum = numbers.min();
+    //
+    //      // an empty's set minimum value
+    //      functional_set<int>().min().has_value() // false
+    //
+    // outcome:
+    //      minimum.has_value() -> true
+    //      minimum.value() -> 1
+    optional_t<T> min() const {
+        const auto& it = std::min_element(cbegin(), cend());
+        if (it != cend()) {
+            return *it;
+        }
+        return optional_t<T>();
+    }
+    
+    // Returns the maximum key in the set, if it's not empty.
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto maximum = numbers.max();
+    //
+    //      // an empty's set maximum value
+    //      functional_set<int>().maxn().has_value() // false
+    //
+    // outcome:
+    //      maximum.has_value() -> true
+    //      maximum.value() -> 8
+    optional_t<T> max() const {
+        const auto& it = std::max_element(cbegin(), cend());
+        if (it != cend()) {
+            return *it;
+        }
+        return optional_t<T>();
+    }
+    
     // map algorithm
     // map parallel algorithm
     // all_of
