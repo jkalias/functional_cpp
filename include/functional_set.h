@@ -265,7 +265,8 @@ public:
     {
         assert_smaller_size(index);
 #ifdef CPP17_AVAILABLE
-        auto it = std::advance(begin(), index);
+        auto it = cbegin();
+        std::advance(it, index);
         return *it;
 #else
         auto count = 0;
