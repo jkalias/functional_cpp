@@ -30,6 +30,9 @@
 #include <execution>
 #endif
 
+template <typename T>
+class functional_set;
+
 // A lightweight wrapper around std::vector, enabling fluent and functional
 // programming on the vector itself, rather than using the more procedural style
 // of the standard library algorithms.
@@ -1431,6 +1434,18 @@ public:
         return backing_vector_.end();
     }
     
+    // Returns a set, whose elements are the elements of the vector, removing any potential duplicates
+    //
+    // example:
+    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const auto& unique_numbers = numbers.distinct();
+    //
+    // outcome:
+    //      unique_numbers -> functional_set<int>({1, 2, 3, 4, 5, 7, 8})
+    functional_set<T> distinct() const {
+        return functional_set<T>(*this);
+    }
+    
     // Returns a reference to the element in the given index, allowing subscripting and value editing.
     // Bounds checking (assert) is enabled for debug builds.
     T& operator[](int index)
@@ -1470,7 +1485,7 @@ public:
 #endif
     }
     
-    // Returns false if either the sizes are not equal or at least corresponding element (same index) is not equal
+    // Returns false if either the sizes are not equal or at least one corresponding element (same index) is not equal
     bool operator !=(const functional_vector<T>& rhs) const
     {
         return !((*this) == rhs);

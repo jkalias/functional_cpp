@@ -133,3 +133,19 @@ TEST(FunctionalSetTest, IntersectionStdSet)
     const auto& intersection = set1.intersect_with(set2);
     EXPECT_EQ(functional_set<int>({2, 5, 7, 10}), intersection);
 }
+
+TEST(FunctionalSetTest, EqualityOperator)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3}));
+    const functional_set<int> set2(std::set<int>({1, 2, 3, 2, 3}));
+    EXPECT_TRUE(set1 == set2);
+    EXPECT_FALSE(set1 != set2);
+}
+
+TEST(FunctionalSetTest, InequalityOperator)
+{
+    const functional_set<int> set1(std::set<int>({1, 2, 3}));
+    const functional_set<int> set2(std::set<int>({1, 2, 3, 4}));
+    EXPECT_FALSE(set1 == set2);
+    EXPECT_TRUE(set1 != set2);
+}

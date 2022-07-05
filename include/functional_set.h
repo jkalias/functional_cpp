@@ -265,7 +265,11 @@ public:
 #endif
     }
     
-    // !=
+    // Returns false if either the sizes are not equal or at least one corresponding element (key) is not equal
+    bool operator !=(const functional_set<T>& rhs) const
+    {
+        return !((*this) == rhs);
+    }
     
 private:
     std::set<T> backing_set_;
