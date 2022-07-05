@@ -73,7 +73,7 @@ public:
     //
     // outcome:
     //      diff -> functional_set<int>({1, 3, 8})
-    functional_set difference(const functional_set<T>& other) const {
+    functional_set difference_with(const functional_set<T>& other) const {
         std::set<T> diff;
         std::set_difference(cbegin(),
                             cend(),
@@ -83,8 +83,8 @@ public:
         return functional_set(diff);
     }
     
-    functional_set difference(const std::set<T>& other) const {
-        return difference(functional_set(other));
+    functional_set difference_with(const std::set<T>& other) const {
+        return difference_with(functional_set(other));
     }
     
     // Returns the set of elements which belong either to the current or the other set.

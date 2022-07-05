@@ -90,7 +90,7 @@ TEST(FunctionalSetTest, Difference)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
     const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
-    const auto& diff = set1.difference(set2);
+    const auto& diff = set1.difference_with(set2);
     EXPECT_EQ(functional_set<int>({1, 3, 8}), diff);
 }
 
@@ -98,7 +98,7 @@ TEST(FunctionalSetTest, DifferenceStdSet)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
     const std::set<int> set2({2, 5, 7, 10, 15, 17});
-    const auto& diff = set1.difference(set2);
+    const auto& diff = set1.difference_with(set2);
     EXPECT_EQ(functional_set<int>({1, 3, 8}), diff);
 }
 
