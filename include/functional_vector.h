@@ -1476,7 +1476,7 @@ public:
         }
         
         for (auto i = 0; i < size(); ++i) {
-            if ((*this)[i] != rhs[i]) {
+            if (!((*this)[i] == rhs[i])) {
                 return false;
             }
         }

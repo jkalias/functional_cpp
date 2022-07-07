@@ -52,4 +52,8 @@ struct person
     
     int age;
     std::string name;
+    
+    bool operator == (const person& other) const {
+        return age == other.age && name == other.name;
+    }
 };

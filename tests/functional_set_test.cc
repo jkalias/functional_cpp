@@ -24,6 +24,7 @@
 #include "warnings.h"
 #include "functional_set.h"
 #include "functional_vector.h"
+#include "test_types.h""
 
 template <typename T>
 void debug(functional_set<T>& set)

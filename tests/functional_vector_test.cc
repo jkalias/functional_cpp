@@ -1117,6 +1117,61 @@ TEST(FunctionalVectorTest, EqualityOperatorEqualVectors)
     EXPECT_FALSE(vec1 != vec2);
 }
 
+TEST(FunctionalVectorTest, EqualityOperatorCustomTypeEqualVectors)
+{
+    const functional_vector<person> vec1({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    const functional_vector<person> vec2({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+
+    EXPECT_TRUE(vec1 == vec2);
+    EXPECT_FALSE(vec1 != vec2);
+}
+
+TEST(FunctionalVectorTest, EqualityOperatorCustomTypeUnequalSizes)
+{
+    const functional_vector<person> vec1({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    const functional_vector<person> vec2({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(50, "Barbara")
+    });
+
+    EXPECT_FALSE(vec1 == vec2);
+    EXPECT_TRUE(vec1 != vec2);
+}
+
+TEST(FunctionalVectorTest, EqualityOperatorCustomTypeUnequalVectors)
+{
+    const functional_vector<person> vec1({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    const functional_vector<person> vec2({
+        person(15, "Jake"),
+        person(53, "Bob"),
+        person(35, "Suzan")
+    });
+
+    EXPECT_FALSE(vec1 == vec2);
+    EXPECT_TRUE(vec1 != vec2);
+}
+
 TEST(FunctionalVectorTest, ClearEmptyVector)
 {
     functional_vector<int> vector_under_test;
