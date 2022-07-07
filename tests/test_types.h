@@ -58,15 +58,18 @@ struct person
         std::size_t h2 = std::hash<int>{}(age);
         return h1 ^ (h2 << 1);
     }
-
     
     bool operator == (const person& other) const {
         return age == other.age && name == other.name;
+    }
+    
+    bool operator< (const person& other) const {
+        return hash() < other.hash();
     }
 };
 
 struct person_comparator {
     bool operator() (const person& a, const person& b) const {
-        return a.hash() < b.hash();
+        return a < b;
     }
 };

@@ -103,6 +103,40 @@ TEST(FunctionalSetTest, DifferenceStdSet)
     EXPECT_EQ(functional_set<int>({1, 3, 8}), diff);
 }
 
+TEST(FunctionalSetTest, DifferenceFunctionalSet)
+{
+    const functional_set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const functional_set<int> set2({2, 5, 7, 10, 15, 17});
+    const auto& diff = set1.difference_with(set2);
+    EXPECT_EQ(functional_set<int>({1, 3, 8}), diff);
+}
+
+TEST(FunctionalSetTest, DifferenceFunctionalSetCustomType)
+{
+    const functional_set<person, person_comparator> set1({
+        person(51, "George"),
+        person(81, "Jackie"),
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    const functional_set<person, person_comparator> set2({
+        person(51, "George"),
+        person(81, "Jackie"),
+    });
+    
+    const auto& diff = set1.difference_with(set2);
+    
+    const functional_set<person, person_comparator> expected({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    EXPECT_EQ(expected, diff);
+}
+
 TEST(FunctionalSetTest, Union)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
@@ -119,6 +153,40 @@ TEST(FunctionalSetTest, UnionStdSet)
     EXPECT_EQ(functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), combined);
 }
 
+TEST(FunctionalSetTest, UnionFunctionalSet)
+{
+    const functional_set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const functional_set<int> set2({2, 5, 7, 10, 15, 17});
+    const auto& combined = set1.union_with(set2);
+    EXPECT_EQ(functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), combined);
+}
+
+TEST(FunctionalSetTest, UnionFunctionalSetCustomType)
+{
+    const functional_set<person, person_comparator> set1({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    const functional_set<person, person_comparator> set2({
+        person(51, "George"),
+        person(81, "Jackie"),
+    });
+    
+    const auto& combined = set1.union_with(set2);
+    
+    const functional_set<person, person_comparator> expected({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(51, "George"),
+        person(81, "Jackie"),
+    });
+    
+    EXPECT_EQ(expected, combined);
+}
+
 TEST(FunctionalSetTest, Intersection)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
@@ -133,6 +201,42 @@ TEST(FunctionalSetTest, IntersectionStdSet)
     const std::set<int> set2({2, 5, 7, 10, 15, 17});
     const auto& intersection = set1.intersect_with(set2);
     EXPECT_EQ(functional_set<int>({2, 5, 7, 10}), intersection);
+}
+
+TEST(FunctionalSetTest, IntersectionFunctionalSet)
+{
+    const functional_set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const functional_set<int> set2({2, 5, 7, 10, 15, 17});
+    const auto& intersection = set1.intersect_with(set2);
+    EXPECT_EQ(functional_set<int>({2, 5, 7, 10}), intersection);
+}
+
+TEST(FunctionalSetTest, IntersectionFunctionalSetCustomType)
+{
+    const functional_set<person, person_comparator> set1({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(51, "George"),
+        person(81, "Jackie"),
+    });
+    
+    const functional_set<person, person_comparator> set2({
+        person(39, "Robert"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(52, "Anna"),
+        person(63, "Simon"),
+    });
+    
+    const auto& intersection = set1.intersect_with(set2);
+    
+    const functional_set<person, person_comparator> expected({
+        person(18, "Jannet"),
+        person(25, "Kate"),
+    });
+    
+    EXPECT_EQ(expected, intersection);
 }
 
 TEST(FunctionalSetTest, Min)

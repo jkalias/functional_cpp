@@ -74,8 +74,8 @@ public:
     //
     // outcome:
     //      diff -> functional_set<int>({1, 3, 8})
-    functional_set difference_with(const functional_set<TKey>& other) const {
-        std::set<TKey> diff;
+    functional_set difference_with(const functional_set<TKey, TCompare>& other) const {
+        std::set<TKey, TCompare> diff;
         std::set_difference(cbegin(),
                             cend(),
                             other.cbegin(),
@@ -84,7 +84,7 @@ public:
         return functional_set(diff);
     }
     
-    functional_set difference_with(const std::set<TKey>& other) const {
+    functional_set difference_with(const std::set<TKey, TCompare>& other) const {
         return difference_with(functional_set(other));
     }
     
@@ -99,8 +99,8 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
-    functional_set union_with(const functional_set<TKey>& other) const {
-        std::set<TKey> combined;
+    functional_set union_with(const functional_set<TKey, TCompare>& other) const {
+        std::set<TKey, TCompare> combined;
         std::set_union(cbegin(),
                        cend(),
                        other.cbegin(),
@@ -109,7 +109,7 @@ public:
         return functional_set(combined);
     }
     
-    functional_set union_with(const std::set<TKey>& other) const {
+    functional_set union_with(const std::set<TKey, TCompare>& other) const {
         return union_with(functional_set(other));
     }
     
@@ -124,8 +124,8 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({2, 5, 7, 10})
-    functional_set intersect_with(const functional_set<TKey>& other) const {
-        std::set<TKey> intersection;
+    functional_set intersect_with(const functional_set<TKey, TCompare>& other) const {
+        std::set<TKey, TCompare> intersection;
         std::set_intersection(cbegin(),
                               cend(),
                               other.cbegin(),
@@ -134,7 +134,7 @@ public:
         return functional_set(intersection);
     }
     
-    functional_set intersect_with(const std::set<TKey>& other) const {
+    functional_set intersect_with(const std::set<TKey, TCompare>& other) const {
         return intersect_with(functional_set(other));
     }
     
