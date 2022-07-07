@@ -30,7 +30,7 @@
 #include <execution>
 #endif
 
-template <typename T>
+template <class T, class Compare>
 class functional_set;
 
 // A lightweight wrapper around std::vector, enabling fluent and functional
@@ -1442,8 +1442,9 @@ public:
     //
     // outcome:
     //      unique_numbers -> functional_set<int>({1, 2, 3, 4, 5, 7, 8})
-    functional_set<T> distinct() const {
-        return functional_set<T>(*this);
+    template <typename UCompare = std::less<T>>
+    functional_set<T, UCompare> distinct() const {
+        return functional_set<T, UCompare>(*this);
     }
     
     // Returns a reference to the element in the given index, allowing subscripting and value editing.

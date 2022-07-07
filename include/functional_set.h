@@ -34,7 +34,7 @@ class functional_vector;
 //
 // Member functions can be mutating (eg. my_set.insert()) or
 // non-mutating (eg. my_vector.inserting()) enforcing thread safety if needed
-template <typename T>
+template <class TKey, class TCompare = std::less<TKey>>
 class functional_set
 {
 public:
@@ -43,22 +43,22 @@ public:
     {
     }
     
-    explicit functional_set(const std::set<T>& set)
+    explicit functional_set(const std::set<TKey, TCompare>& set)
     : backing_set_(set)
     {
     }
     
-    explicit functional_set(const std::vector<T>& vector)
+    explicit functional_set(const std::vector<TKey>& vector)
     : backing_set_(vector.begin(), vector.end())
     {
     }
     
-    explicit functional_set(const functional_vector<T>& vector)
+    explicit functional_set(const functional_vector<TKey>& vector)
     : backing_set_(vector.cbegin(), vector.cend())
     {
     }
     
-    explicit functional_set(const std::initializer_list<T>& list)
+    explicit functional_set(const std::initializer_list<TKey>& list)
     : backing_set_(list.begin(), list.end())
     {
     }
@@ -74,8 +74,8 @@ public:
     //
     // outcome:
     //      diff -> functional_set<int>({1, 3, 8})
-    functional_set difference_with(const functional_set<T>& other) const {
-        std::set<T> diff;
+    functional_set difference_with(const functional_set<TKey>& other) const {
+        std::set<TKey> diff;
         std::set_difference(cbegin(),
                             cend(),
                             other.cbegin(),
@@ -84,7 +84,7 @@ public:
         return functional_set(diff);
     }
     
-    functional_set difference_with(const std::set<T>& other) const {
+    functional_set difference_with(const std::set<TKey>& other) const {
         return difference_with(functional_set(other));
     }
     
@@ -99,8 +99,8 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
-    functional_set union_with(const functional_set<T>& other) const {
-        std::set<T> combined;
+    functional_set union_with(const functional_set<TKey>& other) const {
+        std::set<TKey> combined;
         std::set_union(cbegin(),
                        cend(),
                        other.cbegin(),
@@ -109,7 +109,7 @@ public:
         return functional_set(combined);
     }
     
-    functional_set union_with(const std::set<T>& other) const {
+    functional_set union_with(const std::set<TKey>& other) const {
         return union_with(functional_set(other));
     }
     
@@ -124,8 +124,8 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({2, 5, 7, 10})
-    functional_set intersect_with(const functional_set<T>& other) const {
-        std::set<T> intersection;
+    functional_set intersect_with(const functional_set<TKey>& other) const {
+        std::set<TKey> intersection;
         std::set_intersection(cbegin(),
                               cend(),
                               other.cbegin(),
@@ -134,7 +134,7 @@ public:
         return functional_set(intersection);
     }
     
-    functional_set intersect_with(const std::set<T>& other) const {
+    functional_set intersect_with(const std::set<TKey>& other) const {
         return intersect_with(functional_set(other));
     }
     
@@ -150,12 +150,12 @@ public:
     // outcome:
     //      minimum.has_value() -> true
     //      minimum.value() -> 1
-    optional_t<T> min() const {
+    optional_t<TKey> min() const {
         const auto& it = std::min_element(cbegin(), cend());
         if (it != cend()) {
             return *it;
         }
-        return optional_t<T>();
+        return optional_t<TKey>();
     }
     
     // Returns the maximum key in the set, if it's not empty.
@@ -170,12 +170,12 @@ public:
     // outcome:
     //      maximum.has_value() -> true
     //      maximum.value() -> 8
-    optional_t<T> max() const {
+    optional_t<TKey> max() const {
         const auto& it = std::max_element(cbegin(), cend());
         if (it != cend()) {
             return *it;
         }
-        return optional_t<T>();
+        return optional_t<TKey>();
     }
     
     // map algorithm
@@ -216,25 +216,25 @@ public:
     // reserve
     
     // Returns the begin iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::set<T>::iterator begin()
+    [[nodiscard]] typename std::set<TKey>::iterator begin()
     {
         return backing_set_.begin();
     }
     
     // Returns the const begin iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::set<T>::const_iterator cbegin() const
+    [[nodiscard]] typename std::set<TKey>::const_iterator cbegin() const
     {
         return backing_set_.begin();
     }
     
     // Returns the end iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::set<T>::iterator end()
+    [[nodiscard]] typename std::set<TKey>::iterator end()
     {
         return backing_set_.end();
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::set<T>::const_iterator cend() const
+    [[nodiscard]] typename std::set<TKey>::const_iterator cend() const
     {
         return backing_set_.end();
     }
@@ -242,7 +242,7 @@ public:
     // Returns the given key in the current set, allowing subscripting.
     // Bounds checking (assert) is enabled for debug builds.
     // Performance is O(n), so be careful for performance critical code sections.
-    T operator[](int index)
+    TKey operator[](int index)
     {
         assert_smaller_size(index);
 #ifdef CPP17_AVAILABLE
@@ -261,7 +261,7 @@ public:
     // Returns the given key in the current constant set, allowing subscripting.
     // Bounds checking (assert) is enabled for debug builds.
     // Performance is O(n), so be careful for performance critical code sections.
-    T operator[](int index) const
+    TKey operator[](int index) const
     {
         assert_smaller_size(index);
 #ifdef CPP17_AVAILABLE
@@ -279,7 +279,7 @@ public:
     }
     
     // Returns true if both instances have equal sizes and the corresponding elements (keys) are equal
-    bool operator ==(const functional_set<T>& rhs) const
+    bool operator ==(const functional_set<TKey, TCompare>& rhs) const
     {
 #ifdef CPP17_AVAILABLE
         return std::equal(cbegin(),
@@ -294,7 +294,7 @@ public:
         auto it1 = cbegin();
         auto it2 = rhs.cbegin();
         while (it1 != cend() && it2 != rhs.cend()) {
-            if (*it1 != *it2) {
+            if (!(*it1 == *it2)) {
                 return false;
             }
             it1++;
@@ -306,13 +306,13 @@ public:
     }
     
     // Returns false if either the sizes are not equal or at least one corresponding element (key) is not equal
-    bool operator !=(const functional_set<T>& rhs) const
+    bool operator !=(const functional_set<TKey, TCompare>& rhs) const
     {
         return !((*this) == rhs);
     }
     
 private:
-    std::set<T> backing_set_;
+    std::set<TKey, TCompare> backing_set_;
     
     void assert_smaller_size(int index) const
     {

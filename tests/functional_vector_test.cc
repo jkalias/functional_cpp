@@ -1329,3 +1329,26 @@ TEST(FunctionalVectorTest, Distinct)
     const auto& unique_numbers = numbers.distinct();
     EXPECT_EQ(functional_set<int>({1, 2, 3, 4, 5, 7, 8}), unique_numbers);
 }
+
+TEST(FunctionalVectorTest, DistinctCustomType)
+{
+    const functional_vector<person> persons({
+        person(15, "Jake"),
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(25, "Kate"),
+        person(62, "Bob")
+    });
+    
+    const auto& unique_persons = persons.distinct<person_comparator>();
+    
+    const functional_set<person, person_comparator> expected({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(62, "Bob")
+    });
+    
+    EXPECT_EQ(expected, unique_persons);
+}

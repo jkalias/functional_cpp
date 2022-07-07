@@ -180,3 +180,21 @@ TEST(FunctionalSetTest, InequalityOperator)
     EXPECT_FALSE(set1 == set2);
     EXPECT_TRUE(set1 != set2);
 }
+
+TEST(FunctionalSetTest, EqualityOperatorCustomType)
+{
+    const functional_set<person, person_comparator> vec1({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+    
+    const functional_set<person, person_comparator> vec2({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate")
+    });
+
+    EXPECT_TRUE(vec1 == vec2);
+    EXPECT_FALSE(vec1 != vec2);
+}

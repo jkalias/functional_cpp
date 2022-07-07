@@ -53,7 +53,20 @@ struct person
     int age;
     std::string name;
     
+    std::size_t hash() const {
+        std::size_t h1 = std::hash<std::string>{}(name);
+        std::size_t h2 = std::hash<int>{}(age);
+        return h1 ^ (h2 << 1);
+    }
+
+    
     bool operator == (const person& other) const {
         return age == other.age && name == other.name;
+    }
+};
+
+struct person_comparator {
+    bool operator() (const person& a, const person& b) const {
+        return a.hash() < b.hash();
     }
 };
