@@ -357,6 +357,28 @@ TEST(FunctionalSetTest, InsertingExistingElement)
     EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
 }
 
+TEST(FunctionalSetTest, Clear)
+{
+    functional_set<int> numbers({1, 4, 2});
+    numbers.clear();
+    EXPECT_EQ(0, numbers.size());
+}
+
+TEST(FunctionalSetTest, Clearing)
+{
+    const functional_set<int> numbers({1, 4, 2});
+    auto cleared_numbers = numbers.clearing();
+    EXPECT_EQ(0, cleared_numbers.size());
+    EXPECT_EQ(3, numbers.size());
+}
+
+TEST(FunctionalSetTest, Contains)
+{
+    const functional_set<int> numbers({1, 4, 2});
+    EXPECT_TRUE(numbers.contains(1));
+    EXPECT_FALSE(numbers.contains(15));
+}
+
 TEST(FunctionalSetTest, EqualityOperator)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3}));
@@ -375,18 +397,18 @@ TEST(FunctionalSetTest, InequalityOperator)
 
 TEST(FunctionalSetTest, EqualityOperatorCustomType)
 {
-    const functional_set<person, person_comparator> vec1({
+    const functional_set<person, person_comparator> set1({
         person(15, "Jake"),
         person(18, "Jannet"),
         person(25, "Kate")
     });
     
-    const functional_set<person, person_comparator> vec2({
+    const functional_set<person, person_comparator> set2({
         person(15, "Jake"),
         person(18, "Jannet"),
         person(25, "Kate")
     });
 
-    EXPECT_TRUE(vec1 == vec2);
-    EXPECT_FALSE(vec1 != vec2);
+    EXPECT_TRUE(set1 == set2);
+    EXPECT_FALSE(set1 != set2);
 }

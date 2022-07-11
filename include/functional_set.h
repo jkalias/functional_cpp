@@ -211,15 +211,10 @@ public:
     }
     
     // all_of
-    // all_of_parallel
     // any_of
-    // any_of_parallel
     // none_of
-    // none_of_parallel
     // filter
-    // filter_parallel
     // filtered
-    // filtered_parallel
     // zip with functional_vector
     // zip with functional_set
     // zip with std::vector
@@ -286,9 +281,44 @@ public:
         return functional_set(copy);
     }
     
-    // cleared
-    // contains
-    // find
+    // Removes all keys from the set (mutating)
+    //
+    // example:
+    //      functional_set<int> numbers({1, 4, 2});
+    //      numbers.clear();
+    //
+    // outcome:
+    //      numbers -> functional_set<int>({})
+    functional_set& clear()
+    {
+        backing_set_.clear();
+        return *this;
+    }
+    
+    // Returns a new set by clearing all keys from the current set (non-mutating)
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2});
+    //      auto cleared_numbers = numbers.clearing();
+    //
+    // outcome:
+    //      cleared_numbers -> functional_set<int>({})
+    //      numbers -> functional_set<int> numbers({1, 4, 2})
+    [[nodiscard]] functional_set clearing() const
+    {
+        return functional_set();
+    }
+    
+    // Returns true if the key is present in the set, otherwise false
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2});
+    //      numbers.contains(1); // true
+    //      numbers.contains(15); // false
+    bool contains(const TKey& key) const
+    {
+        return backing_set_.count(key) != 0;
+    }
     
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
     size_t size() const
