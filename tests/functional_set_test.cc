@@ -247,6 +247,18 @@ TEST(FunctionalSetTest, Min)
     EXPECT_EQ(1, minimum.value());
 }
 
+TEST(FunctionalSetTest, MinCustomType)
+{
+    const functional_set<person, person_comparator> persons({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(62, "Bob")
+    });
+    auto minimum = persons.min();
+    EXPECT_EQ(person(18, "Jannet"), minimum.value());
+}
+
 TEST(FunctionalSetTest, MinEmptySet)
 {
     const functional_set<int> numbers;
@@ -260,6 +272,18 @@ TEST(FunctionalSetTest, Max)
     auto maximum = numbers.max();
     EXPECT_TRUE(maximum.has_value());
     EXPECT_EQ(8, maximum.value());
+}
+
+TEST(FunctionalSetTest, MaxCustomType)
+{
+    const functional_set<person, person_comparator> persons({
+        person(15, "Jake"),
+        person(18, "Jannet"),
+        person(25, "Kate"),
+        person(62, "Bob")
+    });
+    auto maximum = persons.max();
+    EXPECT_EQ(person(25, "Kate"), maximum.value());
 }
 
 TEST(FunctionalSetTest, MaxEmptySet)
