@@ -54,7 +54,7 @@ public:
     }
     
     explicit functional_set(const functional_vector<TKey>& vector)
-    : backing_set_(vector.cbegin(), vector.cend())
+    : backing_set_(vector.begin(), vector.end())
     {
     }
     
@@ -76,10 +76,10 @@ public:
     //      diff -> functional_set<int>({1, 3, 8})
     functional_set difference_with(const functional_set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> diff;
-        std::set_difference(cbegin(),
-                            cend(),
-                            other.cbegin(),
-                            other.cend(),
+        std::set_difference(begin(),
+                            end(),
+                            other.begin(),
+                            other.end(),
                             std::inserter(diff, diff.begin()));
         return functional_set(diff);
     }
@@ -101,10 +101,10 @@ public:
     //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
     functional_set union_with(const functional_set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> combined;
-        std::set_union(cbegin(),
-                       cend(),
-                       other.cbegin(),
-                       other.cend(),
+        std::set_union(begin(),
+                       end(),
+                       other.begin(),
+                       other.end(),
                        std::inserter(combined, combined.begin()));
         return functional_set(combined);
     }
@@ -126,10 +126,10 @@ public:
     //      combined -> functional_set<int>({2, 5, 7, 10})
     functional_set intersect_with(const functional_set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> intersection;
-        std::set_intersection(cbegin(),
-                              cend(),
-                              other.cbegin(),
-                              other.cend(),
+        std::set_intersection(begin(),
+                              end(),
+                              other.begin(),
+                              other.end(),
                               std::inserter(intersection, intersection.begin()));
         return functional_set(intersection);
     }
@@ -151,8 +151,8 @@ public:
     //      minimum.has_value() -> true
     //      minimum.value() -> 1
     optional_t<TKey> min() const {
-        const auto& it = std::min_element(cbegin(), cend());
-        if (it != cend()) {
+        const auto& it = std::min_element(begin(), end());
+        if (it != end()) {
             return *it;
         }
         return optional_t<TKey>();
@@ -171,15 +171,45 @@ public:
     //      maximum.has_value() -> true
     //      maximum.value() -> 8
     optional_t<TKey> max() const {
-        const auto& it = std::max_element(cbegin(), cend());
-        if (it != cend()) {
+        const auto& it = std::max_element(begin(), end());
+        if (it != end()) {
             return *it;
         }
         return optional_t<TKey>();
     }
     
-    // map algorithm
-    // map parallel algorithm
+    // Performs the functional `map` algorithm, in which every element of the resulting set is the
+    // output of applying the transform function on every element of this instance.
+    //
+    // example:
+    //      const functional_vector<int> input_set({ 1, 3, -5 });
+    //      const auto output_set = input_set.map<std::string>([](const int& element) {
+    //          return std::to_string(element);
+    //      });
+    //
+    // outcome:
+    //      output_set -> functional_set<std::string>({ "-5", "1", "3" })
+    //
+    // is equivalent to:
+    //      const functional_set<int> input_set({ 1, 3, -5 });
+    //      functional_set<std::string> output_set;
+    //      for (auto const& key: input_set) {
+    //          output_set.insert(std::to_string(key));
+    //      }
+#ifdef CPP17_AVAILABLE
+    template <class UKey, class UCompare = std::less<UKey>, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<UKey, Transform, TKey>>>
+#else
+    template <typename UKey, class UCompare = std::less<UKey>, typename Transform>
+#endif
+    functional_set<UKey, UCompare> map(Transform && transform) const
+    {
+        std::set<UKey, UCompare> transformed_set;
+        for (const auto& key: backing_set_) {
+            transformed_set.insert(transform(key));
+        }
+        return functional_set<UKey, UCompare>(transformed_set);
+    }
+    
     // all_of
     // all_of_parallel
     // any_of
@@ -222,7 +252,7 @@ public:
     }
     
     // Returns the const begin iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::set<TKey>::const_iterator cbegin() const
+    [[nodiscard]] typename std::set<TKey>::const_iterator begin() const
     {
         return backing_set_.begin();
     }
@@ -234,7 +264,7 @@ public:
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::set<TKey>::const_iterator cend() const
+    [[nodiscard]] typename std::set<TKey>::const_iterator end() const
     {
         return backing_set_.end();
     }
@@ -265,12 +295,12 @@ public:
     {
         assert_smaller_size(index);
 #ifdef CPP17_AVAILABLE
-        auto it = cbegin();
+        auto it = begin();
         std::advance(it, index);
         return *it;
 #else
         auto count = 0;
-        auto it = cbegin();
+        auto it = begin();
         while (count++ < index) {
             it++;
         }
@@ -282,18 +312,18 @@ public:
     bool operator ==(const functional_set<TKey, TCompare>& rhs) const
     {
 #ifdef CPP17_AVAILABLE
-        return std::equal(cbegin(),
-                          cend(),
-                          rhs.cbegin(),
-                          rhs.cend());
+        return std::equal(begin(),
+                          end(),
+                          rhs.begin(),
+                          rhs.end());
 #else
         if (size() != rhs.size()) {
             return false;
         }
         
-        auto it1 = cbegin();
-        auto it2 = rhs.cbegin();
-        while (it1 != cend() && it2 != rhs.cend()) {
+        auto it1 = begin();
+        auto it2 = rhs.begin();
+        while (it1 != end() && it2 != rhs.end()) {
             if (!(*it1 == *it2)) {
                 return false;
             }

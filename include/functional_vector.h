@@ -147,8 +147,8 @@ public:
 #endif
     bool all_of(Callable && unary_predicate) const
     {
-        return std::all_of(cbegin(),
-                           cend(),
+        return std::all_of(begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
         
@@ -186,8 +186,8 @@ public:
 #endif
     bool any_of(Callable && unary_predicate) const
     {
-        return std::any_of(cbegin(),
-                           cend(),
+        return std::any_of(begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
         
@@ -225,8 +225,8 @@ public:
 #endif
     bool none_of(Callable && unary_predicate) const
     {
-        return std::none_of(cbegin(),
-                            cend(),
+        return std::none_of(begin(),
+                            end(),
                             std::forward<Callable>(unary_predicate));
     }
         
@@ -432,9 +432,9 @@ public:
     [[nodiscard]] functional_vector<pair<U>> zip(const functional_vector<U>& vector) const
     {
 #ifdef CPP17_AVAILABLE
-        return zip_impl(vector.cbegin(), vector.cend());
+        return zip_impl(vector.begin(), vector.end());
 #else
-        return zip_impl<U>(vector.cbegin(), vector.cend());
+        return zip_impl<U>(vector.begin(), vector.end());
 #endif
     }
     
@@ -971,7 +971,7 @@ public:
     //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     functional_vector& insert_at(int index, const functional_vector<T>& vector)
     {
-        return insert_at_impl(index, vector.cbegin(), vector.cend());
+        return insert_at_impl(index, vector.begin(), vector.end());
     }
     
     // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
@@ -985,7 +985,7 @@ public:
     //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
     [[nodiscard]] functional_vector inserting_at(int index, const functional_vector<T>& vector) const
     {
-        return inserting_at_impl(index, vector.cbegin(), vector.cend());
+        return inserting_at_impl(index, vector.begin(), vector.end());
     }
     
     // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
@@ -1109,7 +1109,7 @@ public:
     //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
     functional_vector& insert_back(const functional_vector<T>& vector)
     {
-        return insert_back_range_impl(vector.cbegin(), vector.cend());
+        return insert_back_range_impl(vector.begin(), vector.end());
     }
     
     // Inserts a range of values at the beginning of the vector in place (mutating)
@@ -1122,7 +1122,7 @@ public:
     //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
     functional_vector& insert_front(const functional_vector<T>& vector)
     {
-        return insert_front_range_impl(vector.cbegin(), vector.cend());
+        return insert_front_range_impl(vector.begin(), vector.end());
     }
     
     // Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
@@ -1135,7 +1135,7 @@ public:
     //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
     [[nodiscard]] functional_vector inserting_back(const functional_vector<T>& vector) const
     {
-        return inserting_back_range_impl(vector.cbegin(), vector.cend());
+        return inserting_back_range_impl(vector.begin(), vector.end());
     }
     
     // Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
@@ -1148,7 +1148,7 @@ public:
     //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
     [[nodiscard]] functional_vector inserting_front(const functional_vector<T>& vector) const
     {
-        return inserting_front_range_impl(vector.cbegin(), vector.cend());
+        return inserting_front_range_impl(vector.begin(), vector.end());
     }
     
     // Inserts a range of values at the end of the vector in place (mutating)
@@ -1265,7 +1265,7 @@ public:
     //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
     functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
     {
-        return replace_range_at_imp(index, vector.cbegin(), vector.cend());
+        return replace_range_at_imp(index, vector.begin(), vector.end());
     }
     
     // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
@@ -1304,7 +1304,7 @@ public:
     //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
     [[nodiscard]] functional_vector replacing_range_at(int index, const functional_vector<T>& vector) const
     {
-        return replacing_range_at_imp(index, vector.cbegin(), vector.cend());
+        return replacing_range_at_imp(index, vector.begin(), vector.end());
     }
     
     // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
@@ -1417,7 +1417,7 @@ public:
     }
     
     // Returns the const begin iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::vector<T>::const_iterator cbegin() const
+    [[nodiscard]] typename std::vector<T>::const_iterator begin() const
     {
         return backing_vector_.begin();
     }
@@ -1429,7 +1429,7 @@ public:
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::vector<T>::const_iterator cend() const
+    [[nodiscard]] typename std::vector<T>::const_iterator end() const
     {
         return backing_vector_.end();
     }
@@ -1467,10 +1467,10 @@ public:
     bool operator ==(const functional_vector<T>& rhs) const
     {
 #ifdef CPP17_AVAILABLE
-        return std::equal(cbegin(),
-                          cend(),
-                          rhs.cbegin(),
-                          rhs.cend());
+        return std::equal(begin(),
+                          end(),
+                          rhs.begin(),
+                          rhs.end());
 #else
         if (size() != rhs.size()) {
             return false;

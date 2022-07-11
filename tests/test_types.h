@@ -36,6 +36,20 @@ struct child
     }
     
     int age;
+    
+    std::size_t hash() const {
+        return std::hash<int>{}(age);
+    }
+    
+    bool operator< (const child& other) const {
+        return hash() < other.hash();
+    }
+};
+
+struct child_comparator {
+    bool operator() (const child& a, const child& b) const {
+        return a < b;
+    }
 };
 
 struct person

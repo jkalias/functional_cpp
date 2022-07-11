@@ -293,6 +293,18 @@ TEST(FunctionalSetTest, MaxEmptySet)
     EXPECT_FALSE(maximum.has_value());
 }
 
+TEST(FunctionalSetTest, Map)
+{
+    const functional_set<int> numbers({4, 1, 3});
+    const auto mapped_set = numbers.map<child>([](const int& age) {
+        return child(age);
+    });
+    EXPECT_EQ(3, mapped_set.size());
+    EXPECT_EQ(1, mapped_set[0].age);
+    EXPECT_EQ(3, mapped_set[1].age);
+    EXPECT_EQ(4, mapped_set[2].age);
+}
+
 TEST(FunctionalSetTest, EqualityOperator)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3}));
