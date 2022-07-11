@@ -219,7 +219,21 @@ public:
     // zip with functional_set
     // zip with std::vector
     // zip with std::set
-    // for_each -> test
+    
+    // Executes the given operation for each key of the set. The operation must not
+    // change the set's contents during execution.
+#ifdef CPP17_AVAILABLE
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, TKey const &>>>
+#else
+    template <typename Callable>
+#endif
+    const functional_set& for_each(Callable && operation) const
+    {
+        std::for_each(begin(),
+                      end(),
+                      std::forward<Callable>(operation));
+        return *this;
+    }
     
     // Removes an element from the set, if it exists, potentially changing the set's contents (mutating)
     //

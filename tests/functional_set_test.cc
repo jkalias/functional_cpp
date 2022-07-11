@@ -29,13 +29,9 @@
 template <typename T>
 void debug(functional_set<T>& set)
 {
-    std::cout << "bla" << std::endl;
-    for (auto &x : set) {
-        std::cout << x << std::endl;
-    }
-//    set.for_each([](const T& element) {
-//        std::cout << element << std::endl;
-//    });
+    set.for_each([](const T& element) {
+        std::cout << element << std::endl;
+    });
 }
 
 void testContents(const functional_set<int>& set) {
