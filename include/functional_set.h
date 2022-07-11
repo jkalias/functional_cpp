@@ -225,9 +225,36 @@ public:
     // zip with std::vector
     // zip with std::set
     // for_each -> test
-    // for_each_parallel
-    // remove
-    // removing
+    
+    // Removes an element from the set, if it exists, potentially changing the set's contents (mutating)
+    //
+    // example:
+    //      functional_set<int> numbers({1, 4, 2});
+    //      numbers.remove(4);
+    //
+    // outcome:
+    //      numbers -> functional_set<int>({1, 2})
+    functional_set& remove(const TKey& element)
+    {
+        backing_set_.erase(element);
+        return *this;
+    }
+    
+    // Returns a copy by removing an element from the set, if it exists (non-mutating)
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2});
+    //      auto less_numbers = numbers.removing(4);
+    //
+    // outcome:
+    //      less_numbers -> functional_set<int>({1, 2})
+    //      numbers -> functional_set<int>({1, 2, 4})
+    [[nodiscard]] functional_set removing(const TKey& element) const
+    {
+        auto copy(backing_set_);
+        copy.erase(element);
+        return functional_set(copy);
+    }
     
     // Inserts an element in the set, if it does not already exist, potentially changing the set's contents (mutating)
     //
@@ -251,6 +278,7 @@ public:
     //
     // outcome:
     //      augmented_numbers -> functional_set<int>({1, 2, 4, 18})
+    //      numbers -> functional_set<int>({1, 2, 4})
     [[nodiscard]] functional_set inserting(const TKey& element) const
     {
         auto copy(backing_set_);
@@ -270,8 +298,6 @@ public:
     
     // clear
     // is_empty
-    // capacity
-    // reserve
     
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<TKey>::iterator begin()

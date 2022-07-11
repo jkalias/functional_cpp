@@ -305,6 +305,28 @@ TEST(FunctionalSetTest, Map)
     EXPECT_EQ(4, mapped_set[2].age);
 }
 
+TEST(FunctionalSetTest, RemoveExistingElement)
+{
+    functional_set<int> numbers({1, 4, 2});
+    numbers.remove(4);
+    EXPECT_EQ(functional_set<int>({1, 2}), numbers);
+}
+
+TEST(FunctionalSetTest, RemoveNonExistentElement)
+{
+    functional_set<int> numbers({1, 4, 2});
+    numbers.remove(18);
+    EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
+}
+
+TEST(FunctionalSetTest, RemovingExistingElement)
+{
+    const functional_set<int> numbers({1, 4, 2});
+    auto less_numbers = numbers.removing(4);
+    EXPECT_EQ(functional_set<int>({1, 2}), less_numbers);
+    EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
+}
+
 TEST(FunctionalSetTest, InsertNewElement)
 {
     functional_set<int> numbers({1, 4, 2});
