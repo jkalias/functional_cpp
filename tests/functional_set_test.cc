@@ -305,6 +305,36 @@ TEST(FunctionalSetTest, Map)
     EXPECT_EQ(4, mapped_set[2].age);
 }
 
+TEST(FunctionalSetTest, InsertNewElement)
+{
+    functional_set<int> numbers({1, 4, 2});
+    numbers.insert(18);
+    EXPECT_EQ(functional_set<int>({1, 2, 4, 18}), numbers);
+}
+
+TEST(FunctionalSetTest, InsertingNewElement)
+{
+    const functional_set<int> numbers({1, 4, 2});
+    auto augmented_numbers =  numbers.inserting(18);
+    EXPECT_EQ(functional_set<int>({1, 2, 4, 18}), augmented_numbers);
+    EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
+}
+
+TEST(FunctionalSetTest, InsertExistingElement)
+{
+    functional_set<int> numbers({1, 4, 2});
+    numbers.insert(2);
+    EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
+}
+
+TEST(FunctionalSetTest, InsertingExistingElement)
+{
+    const functional_set<int> numbers({1, 4, 2});
+    auto augmented_numbers =  numbers.inserting(2);
+    EXPECT_EQ(functional_set<int>({1, 2, 4}), augmented_numbers);
+    EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
+}
+
 TEST(FunctionalSetTest, EqualityOperator)
 {
     const functional_set<int> set1(std::set<int>({1, 2, 3}));

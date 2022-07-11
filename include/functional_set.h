@@ -228,8 +228,36 @@ public:
     // for_each_parallel
     // remove
     // removing
-    // insert
-    // inserting
+    
+    // Inserts an element in the set, if it does not already exist, potentially changing the set's contents (mutating)
+    //
+    // example:
+    //      functional_set<int> numbers({1, 4, 2});
+    //      numbers.insert(18);
+    //
+    // outcome:
+    //      numbers -> functional_set<int>({1, 2, 4, 18})
+    functional_set& insert(const TKey& element)
+    {
+        backing_set_.insert(element);
+        return *this;
+    }
+    
+    // Returns a copy by inserting an element in the set, if it does not already exist (non-mutating)
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2});
+    //      auto augmented_numbers =  numbers.inserting(18);
+    //
+    // outcome:
+    //      augmented_numbers -> functional_set<int>({1, 2, 4, 18})
+    [[nodiscard]] functional_set inserting(const TKey& element) const
+    {
+        auto copy(backing_set_);
+        copy.insert(element);
+        return functional_set(copy);
+    }
+    
     // cleared
     // contains
     // find
