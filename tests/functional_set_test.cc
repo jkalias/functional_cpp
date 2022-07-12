@@ -310,6 +310,13 @@ TEST(FunctionalSetTest, Map)
     EXPECT_EQ(4, mapped_set[2].age);
 }
 
+TEST(FunctionalSetTest, AllOf)
+{
+    const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    EXPECT_TRUE(numbers.all_of([](const int &number) { return number < 10; }));
+    EXPECT_FALSE(numbers.all_of([](const int &number) { return number > 2; }));
+}
+
 TEST(FunctionalSetTest, RemoveExistingElement)
 {
     functional_set<int> numbers({1, 4, 2});

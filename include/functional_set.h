@@ -210,7 +210,32 @@ public:
         return functional_set<UKey, UCompare>(transformed_set);
     }
     
-    // all_of
+    // Returns true if all elements match the predicate (return true)
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    //
+    //      // returns true
+    //      numbers.all_of([](const auto &number) {
+    //          return number < 10;
+    //      });
+    //
+    //      // returns false
+    //      numbers.all_of([](const auto &number) {
+    //          return number > 2;
+    //      });
+#ifdef CPP17_AVAILABLE
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
+#else
+    template <typename Callable>
+#endif
+    bool all_of(Callable && unary_predicate) const
+    {
+        return std::all_of(begin(),
+                           end(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
     // any_of
     // none_of
     // filter
