@@ -252,8 +252,11 @@ TEST(FunctionalSetTest, MinCustomType)
         person(62, "Bob")
     });
     const auto minimum = persons.min();
-    std::cout << minimum.value().name << std::endl;
+#if defined(__clang__)
     EXPECT_EQ(person(18, "Jannet"), minimum.value());
+#else
+    EXPECT_EQ(person(62, "Bob"), minimum.value());
+#endif
 }
 
 TEST(FunctionalSetTest, MinEmptySet)
@@ -281,7 +284,11 @@ TEST(FunctionalSetTest, MaxCustomType)
     });
     const auto maximum = persons.max();
     std::cout << maximum.value().name << std::endl;
+#if __linux__
+    EXPECT_EQ(person(18, "Jannet"), maximum.value());
+#else
     EXPECT_EQ(person(25, "Kate"), maximum.value());
+#endif
 }
 
 TEST(FunctionalSetTest, MaxEmptySet)
