@@ -252,6 +252,7 @@ TEST(FunctionalSetTest, MinCustomType)
         person(62, "Bob")
     });
     const auto minimum = persons.min();
+    std::cout << minimum.value().name << std::endl;
     EXPECT_EQ(person(18, "Jannet"), minimum.value());
 }
 
@@ -279,6 +280,7 @@ TEST(FunctionalSetTest, MaxCustomType)
         person(62, "Bob")
     });
     const auto maximum = persons.max();
+    std::cout << maximum.value().name << std::endl;
     EXPECT_EQ(person(25, "Kate"), maximum.value());
 }
 

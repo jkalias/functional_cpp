@@ -37,12 +37,8 @@ struct child
     
     int age;
     
-    std::size_t hash() const {
-        return std::hash<int>{}(age);
-    }
-    
     bool operator< (const child& other) const {
-        return hash() < other.hash();
+        return age < other.age;
     }
 };
 
