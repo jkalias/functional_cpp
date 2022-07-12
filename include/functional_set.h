@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 #pragma once
-#include <set>
 #include <algorithm>
+#include <set>
 #include "optional.h"
 
 template <typename T>
@@ -43,8 +43,8 @@ public:
     {
     }
     
-    explicit functional_set(const std::set<TKey, TCompare>& set)
-    : backing_set_(set)
+    explicit functional_set(std::set<TKey, TCompare> set)
+    : backing_set_(std::move(set))
     {
     }
     
@@ -74,7 +74,7 @@ public:
     //
     // outcome:
     //      diff -> functional_set<int>({1, 3, 8})
-    functional_set difference_with(const functional_set<TKey, TCompare>& other) const {
+    [[nodiscard]] functional_set difference_with(const functional_set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> diff;
         std::set_difference(begin(),
                             end(),
@@ -83,8 +83,8 @@ public:
                             std::inserter(diff, diff.begin()));
         return functional_set(diff);
     }
-    
-    functional_set difference_with(const std::set<TKey, TCompare>& other) const {
+
+    [[nodiscard]] functional_set difference_with(const std::set<TKey, TCompare>& other) const {
         return difference_with(functional_set(other));
     }
     
@@ -99,7 +99,7 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
-    functional_set union_with(const functional_set<TKey, TCompare>& other) const {
+    [[nodiscard]] functional_set union_with(const functional_set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> combined;
         std::set_union(begin(),
                        end(),
@@ -108,8 +108,8 @@ public:
                        std::inserter(combined, combined.begin()));
         return functional_set(combined);
     }
-    
-    functional_set union_with(const std::set<TKey, TCompare>& other) const {
+
+    [[nodiscard]] functional_set union_with(const std::set<TKey, TCompare>& other) const {
         return union_with(functional_set(other));
     }
     
@@ -124,7 +124,7 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({2, 5, 7, 10})
-    functional_set intersect_with(const functional_set<TKey, TCompare>& other) const {
+    [[nodiscard]] functional_set intersect_with(const functional_set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> intersection;
         std::set_intersection(begin(),
                               end(),
@@ -133,8 +133,8 @@ public:
                               std::inserter(intersection, intersection.begin()));
         return functional_set(intersection);
     }
-    
-    functional_set intersect_with(const std::set<TKey, TCompare>& other) const {
+
+    [[nodiscard]] functional_set intersect_with(const std::set<TKey, TCompare>& other) const {
         return intersect_with(functional_set(other));
     }
     
@@ -150,7 +150,7 @@ public:
     // outcome:
     //      minimum.has_value() -> true
     //      minimum.value() -> 1
-    optional_t<TKey> min() const {
+    [[nodiscard]] optional_t<TKey> min() const {
         const auto& it = std::min_element(begin(), end());
         if (it != end()) {
             return *it;
@@ -165,12 +165,12 @@ public:
     //      auto maximum = numbers.max();
     //
     //      // an empty's set maximum value
-    //      functional_set<int>().maxn().has_value() // false
+    //      functional_set<int>().max().has_value() // false
     //
     // outcome:
     //      maximum.has_value() -> true
     //      maximum.value() -> 8
-    optional_t<TKey> max() const {
+    [[nodiscard]] optional_t<TKey> max() const {
         const auto& it = std::max_element(begin(), end());
         if (it != end()) {
             return *it;
@@ -329,13 +329,13 @@ public:
     //      const functional_set<int> numbers({1, 4, 2});
     //      numbers.contains(1); // true
     //      numbers.contains(15); // false
-    bool contains(const TKey& key) const
+    [[nodiscard]] bool contains(const TKey& key) const
     {
-        return backing_set_.count(key) != 0;
+    	return backing_set_.count(key) != 0;
     }
     
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return backing_set_.size();
     }
@@ -370,7 +370,7 @@ public:
     // Returns the given key in the current set, allowing subscripting.
     // Bounds checking (assert) is enabled for debug builds.
     // Performance is O(n), so be careful for performance critical code sections.
-    TKey operator[](int index)
+    TKey operator[](size_t index)
     {
         assert_smaller_size(index);
 #ifdef CPP17_AVAILABLE
@@ -389,7 +389,7 @@ public:
     // Returns the given key in the current constant set, allowing subscripting.
     // Bounds checking (assert) is enabled for debug builds.
     // Performance is O(n), so be careful for performance critical code sections.
-    TKey operator[](int index) const
+    TKey operator[](size_t index) const
     {
         assert_smaller_size(index);
 #ifdef CPP17_AVAILABLE
@@ -442,8 +442,8 @@ public:
 private:
     std::set<TKey, TCompare> backing_set_;
     
-    void assert_smaller_size(int index) const
+    void assert_smaller_size(const size_t index) const
     {
-        assert(index < size() && index >= 0);
+        assert(index < size());
     }
 };

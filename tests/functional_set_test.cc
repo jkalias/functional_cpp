@@ -24,7 +24,7 @@
 #include "warnings.h"
 #include "functional_set.h"
 #include "functional_vector.h"
-#include "test_types.h""
+#include "test_types.h"
 
 template <typename T>
 void debug(functional_set<T>& set)
@@ -34,7 +34,7 @@ void debug(functional_set<T>& set)
     });
 }
 
-void testContents(const functional_set<int>& set) {
+void test_contents(const functional_set<int>& set) {
     EXPECT_EQ(3, set.size());
     EXPECT_EQ(1, set[0]);
     EXPECT_EQ(3, set[1]);
@@ -43,44 +43,44 @@ void testContents(const functional_set<int>& set) {
 
 TEST(FunctionalSetTest, EmptyConstructor)
 {
-    functional_set<int> set_under_test;
+	const functional_set<int> set_under_test;
     EXPECT_EQ(0, set_under_test.size());
 }
 
 TEST(FunctionalSetTest, StdSetConstructor)
 {
-    functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-    testContents(set_under_test);
+	const functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
+    test_contents(set_under_test);
 }
 
 TEST(FunctionalSetTest, StdVectorConstructor)
 {
-    functional_set<int> set_under_test(std::vector<int>({1, 5, 3, 3}));
-    testContents(set_under_test);
+	const functional_set<int> set_under_test(std::vector<int>({1, 5, 3, 3}));
+    test_contents(set_under_test);
 }
 
 TEST(FunctionalSetTest, FunctionalVectorConstructor)
 {
-    functional_set<int> set_under_test(functional_vector<int>({1, 5, 3, 3}));
-    testContents(set_under_test);
+	const functional_set<int> set_under_test(functional_vector<int>({1, 5, 3, 3}));
+    test_contents(set_under_test);
 }
 
 TEST(FunctionalSetTest, StdInitializerListConstructor)
 {
-    functional_set<int> set_under_test(std::initializer_list<int>({1, 5, 3, 3}));
-    testContents(set_under_test);
+	const functional_set<int> set_under_test(std::initializer_list<int>({1, 5, 3, 3}));
+    test_contents(set_under_test);
 }
 
 TEST(FunctionalSetTest, Subscripting)
 {
-    functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-    testContents(set_under_test);
+	const functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
+    test_contents(set_under_test);
 }
 
 TEST(FunctionalSetTest, ConstSubscripting)
 {
     const functional_set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-    testContents(set_under_test);
+    test_contents(set_under_test);
 }
 
 TEST(FunctionalSetTest, Difference)
@@ -238,7 +238,7 @@ TEST(FunctionalSetTest, IntersectionFunctionalSetCustomType)
 TEST(FunctionalSetTest, Min)
 {
     const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    auto minimum = numbers.min();
+    const auto minimum = numbers.min();
     EXPECT_TRUE(minimum.has_value());
     EXPECT_EQ(1, minimum.value());
 }
@@ -251,21 +251,21 @@ TEST(FunctionalSetTest, MinCustomType)
         person(25, "Kate"),
         person(62, "Bob")
     });
-    auto minimum = persons.min();
+    const auto minimum = persons.min();
     EXPECT_EQ(person(18, "Jannet"), minimum.value());
 }
 
 TEST(FunctionalSetTest, MinEmptySet)
 {
     const functional_set<int> numbers;
-    auto minimum = numbers.min();
+    const auto minimum = numbers.min();
     EXPECT_FALSE(minimum.has_value());
 }
 
 TEST(FunctionalSetTest, Max)
 {
     const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    auto maximum = numbers.max();
+    const auto maximum = numbers.max();
     EXPECT_TRUE(maximum.has_value());
     EXPECT_EQ(8, maximum.value());
 }
@@ -278,14 +278,14 @@ TEST(FunctionalSetTest, MaxCustomType)
         person(25, "Kate"),
         person(62, "Bob")
     });
-    auto maximum = persons.max();
+    const auto maximum = persons.max();
     EXPECT_EQ(person(25, "Kate"), maximum.value());
 }
 
 TEST(FunctionalSetTest, MaxEmptySet)
 {
     const functional_set<int> numbers;
-    auto maximum = numbers.max();
+    const auto maximum = numbers.max();
     EXPECT_FALSE(maximum.has_value());
 }
 
@@ -318,7 +318,7 @@ TEST(FunctionalSetTest, RemoveNonExistentElement)
 TEST(FunctionalSetTest, RemovingExistingElement)
 {
     const functional_set<int> numbers({1, 4, 2});
-    auto less_numbers = numbers.removing(4);
+    const auto less_numbers = numbers.removing(4);
     EXPECT_EQ(functional_set<int>({1, 2}), less_numbers);
     EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
 }
@@ -333,7 +333,7 @@ TEST(FunctionalSetTest, InsertNewElement)
 TEST(FunctionalSetTest, InsertingNewElement)
 {
     const functional_set<int> numbers({1, 4, 2});
-    auto augmented_numbers =  numbers.inserting(18);
+    const auto augmented_numbers =  numbers.inserting(18);
     EXPECT_EQ(functional_set<int>({1, 2, 4, 18}), augmented_numbers);
     EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
 }
@@ -348,7 +348,7 @@ TEST(FunctionalSetTest, InsertExistingElement)
 TEST(FunctionalSetTest, InsertingExistingElement)
 {
     const functional_set<int> numbers({1, 4, 2});
-    auto augmented_numbers =  numbers.inserting(2);
+    const auto augmented_numbers =  numbers.inserting(2);
     EXPECT_EQ(functional_set<int>({1, 2, 4}), augmented_numbers);
     EXPECT_EQ(functional_set<int>({1, 2, 4}), numbers);
 }
@@ -363,7 +363,7 @@ TEST(FunctionalSetTest, Clear)
 TEST(FunctionalSetTest, Clearing)
 {
     const functional_set<int> numbers({1, 4, 2});
-    auto cleared_numbers = numbers.clearing();
+    const auto cleared_numbers = numbers.clearing();
     EXPECT_EQ(0, cleared_numbers.size());
     EXPECT_EQ(3, numbers.size());
 }

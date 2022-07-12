@@ -21,9 +21,9 @@
 // SOFTWARE.
 
 #pragma once
-#include <vector>
 #include <algorithm>
 #include <type_traits>
+#include <vector>
 #include "index_range.h"
 #include "optional.h"
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
@@ -159,8 +159,8 @@ public:
     bool all_of_parallel(Callable && unary_predicate) const
     {
         return std::all_of(std::execution::par,
-                           cbegin(),
-                           cend(),
+                           begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
 #endif
@@ -198,8 +198,8 @@ public:
     bool any_of_parallel(Callable && unary_predicate) const
     {
         return std::any_of(std::execution::par,
-                           cbegin(),
-                           cend(),
+                           begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
 #endif
@@ -237,8 +237,8 @@ public:
     bool none_of_parallel(Callable && unary_predicate) const
     {
         return std::none_of(std::execution::par,
-                            cbegin(),
-                            cend(),
+                            begin(),
+                            end(),
                             std::forward<Callable>(unary_predicate));
     }
 #endif
@@ -723,7 +723,7 @@ public:
         
     // Returns the first index in which the given element is found in the vector.
     // In case of multiple occurrences, only the first index is returned
-    // (see find_all_indices for multiple occurences).
+    // (see find_all_indices for multiple occurrences).
     //
     // example:
     //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
@@ -1350,7 +1350,7 @@ public:
     }
     
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return backing_vector_.size();
     }
@@ -1363,13 +1363,13 @@ public:
     }
     
     // Returns true if the vector has no elements
-    bool is_empty() const
+    [[nodiscard]] bool is_empty() const
     {
         return backing_vector_.empty();
     }
     
     // Returns the underlying capacity of the vector, which can be larger from its size
-    size_t capacity() const
+    [[nodiscard]] size_t capacity() const
     {
         return backing_vector_.capacity();
     }
