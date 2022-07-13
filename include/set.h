@@ -28,7 +28,7 @@
 namespace fcpp {
 
 template <typename T>
-class functional_vector;
+class vector;
 
 // A lightweight wrapper around std::set, enabling fluent and functional
 // programming on the set itself, rather than using the more procedural style
@@ -37,30 +37,30 @@ class functional_vector;
 // Member functions can be mutating (eg. my_set.insert()) or
 // non-mutating (eg. my_vector.inserting()) enforcing thread safety if needed
 template <class TKey, class TCompare = std::less<TKey>>
-class functional_set
+class set
 {
 public:
-    functional_set()
+    set()
     : backing_set_()
     {
     }
     
-    explicit functional_set(std::set<TKey, TCompare> set)
+    explicit set(std::set<TKey, TCompare> set)
     : backing_set_(std::move(set))
     {
     }
     
-    explicit functional_set(const std::vector<TKey>& vector)
+    explicit set(const std::vector<TKey>& vector)
     : backing_set_(vector.begin(), vector.end())
     {
     }
     
-    explicit functional_set(const functional_vector<TKey>& vector)
+    explicit set(const vector<TKey>& vector)
     : backing_set_(vector.begin(), vector.end())
     {
     }
     
-    explicit functional_set(const std::initializer_list<TKey>& list)
+    explicit set(const std::initializer_list<TKey>& list)
     : backing_set_(list.begin(), list.end())
     {
     }
@@ -76,18 +76,18 @@ public:
     //
     // outcome:
     //      diff -> functional_set<int>({1, 3, 8})
-    [[nodiscard]] functional_set difference_with(const functional_set<TKey, TCompare>& other) const {
+    [[nodiscard]] set difference_with(const set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> diff;
         std::set_difference(begin(),
                             end(),
                             other.begin(),
                             other.end(),
                             std::inserter(diff, diff.begin()));
-        return functional_set(diff);
+        return set(diff);
     }
 
-    [[nodiscard]] functional_set difference_with(const std::set<TKey, TCompare>& other) const {
-        return difference_with(functional_set(other));
+    [[nodiscard]] set difference_with(const std::set<TKey, TCompare>& other) const {
+        return difference_with(set(other));
     }
     
     // Returns the set of elements which belong either to the current or the other set.
@@ -101,18 +101,18 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
-    [[nodiscard]] functional_set union_with(const functional_set<TKey, TCompare>& other) const {
+    [[nodiscard]] set union_with(const set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> combined;
         std::set_union(begin(),
                        end(),
                        other.begin(),
                        other.end(),
                        std::inserter(combined, combined.begin()));
-        return functional_set(combined);
+        return set(combined);
     }
 
-    [[nodiscard]] functional_set union_with(const std::set<TKey, TCompare>& other) const {
-        return union_with(functional_set(other));
+    [[nodiscard]] set union_with(const std::set<TKey, TCompare>& other) const {
+        return union_with(set(other));
     }
     
     // Returns the set of elements which belong to both the current and the other set.
@@ -126,18 +126,18 @@ public:
     //
     // outcome:
     //      combined -> functional_set<int>({2, 5, 7, 10})
-    [[nodiscard]] functional_set intersect_with(const functional_set<TKey, TCompare>& other) const {
+    [[nodiscard]] set intersect_with(const set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> intersection;
         std::set_intersection(begin(),
                               end(),
                               other.begin(),
                               other.end(),
                               std::inserter(intersection, intersection.begin()));
-        return functional_set(intersection);
+        return set(intersection);
     }
 
-    [[nodiscard]] functional_set intersect_with(const std::set<TKey, TCompare>& other) const {
-        return intersect_with(functional_set(other));
+    [[nodiscard]] set intersect_with(const std::set<TKey, TCompare>& other) const {
+        return intersect_with(set(other));
     }
     
     // Returns the minimum key in the set, if it's not empty.
@@ -203,13 +203,13 @@ public:
 #else
     template <typename UKey, class UCompare = std::less<UKey>, typename Transform>
 #endif
-    functional_set<UKey, UCompare> map(Transform && transform) const
+    set<UKey, UCompare> map(Transform && transform) const
     {
         std::set<UKey, UCompare> transformed_set;
         for (const auto& key: backing_set_) {
             transformed_set.insert(transform(key));
         }
-        return functional_set<UKey, UCompare>(transformed_set);
+        return set<UKey, UCompare>(transformed_set);
     }
     
     // Returns true if all keys match the predicate (return true)
@@ -316,7 +316,7 @@ public:
 #else
     template <typename Filter>
 #endif
-    functional_set& filter(Filter && predicate_to_keep)
+    set& filter(Filter && predicate_to_keep)
     {
         std::set<TKey, TCompare> copy;
         auto it = begin();
@@ -346,7 +346,7 @@ public:
 #else
     template <typename Filter>
 #endif
-    functional_set filtered(Filter && predicate_to_keep) const
+    set filtered(Filter && predicate_to_keep) const
     {
         std::set<TKey, TCompare> copy;
         auto it = begin();
@@ -355,7 +355,7 @@ public:
                 copy.insert(*it);
             }
         }
-        return functional_set(copy);
+        return set(copy);
     }
     
 #ifdef CPP17_AVAILABLE
@@ -385,7 +385,7 @@ public:
     //                          std::pair<int, std::string>(63, "Philipp"),
     //                       })
     template <typename UKey>
-    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const functional_set<UKey>& set) const
+    [[nodiscard]] set<std::pair<TKey, UKey>> zip(const set<UKey>& set) const
     {
 #ifdef CPP17_AVAILABLE
         return zip_impl(set.begin(), set.end());
@@ -398,16 +398,16 @@ public:
     // The number of keys must match the set's size.
     // For more details, see the zip function which accepts a functional_set as input.
     template <typename UKey>
-    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const std::set<UKey>& set) const
+    [[nodiscard]] set<std::pair<TKey, UKey>> zip(const std::set<UKey>& set) const
     {
-        return zip(functional_set<UKey>(set));
+        return zip(fcpp::set<UKey>(set));
     }
     
     // Performs the functional `zip` algorithm by using the unique values of the vector.
     // The number of uniques vector values must match the set's size.
     // For more details, see the zip function which accepts a functional_set as input.
     template <typename UKey>
-    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const functional_vector<UKey>& vector) const
+    [[nodiscard]] set<std::pair<TKey, UKey>> zip(const vector<UKey>& vector) const
     {
         const auto distinct_values = vector.distinct();
         return zip(distinct_values);
@@ -417,9 +417,9 @@ public:
     // The number of uniques vector values must match the set's size.
     // For more details, see the zip function which accepts a functional_set as input.
     template <typename UKey>
-    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const std::vector<UKey>& vector) const
+    [[nodiscard]] set<std::pair<TKey, UKey>> zip(const std::vector<UKey>& vector) const
     {
-        return zip(functional_vector<UKey>(vector));
+        return zip(fcpp::vector<UKey>(vector));
     }
     
     // Executes the given operation for each key of the set.
@@ -429,7 +429,7 @@ public:
 #else
     template <typename Callable>
 #endif
-    const functional_set& for_each(Callable && operation) const
+    const set& for_each(Callable && operation) const
     {
         std::for_each(begin(),
                       end(),
@@ -445,7 +445,7 @@ public:
     //
     // outcome:
     //      numbers -> functional_set<int>({1, 2})
-    functional_set& remove(const TKey& element)
+    set& remove(const TKey& element)
     {
         backing_set_.erase(element);
         return *this;
@@ -460,11 +460,11 @@ public:
     // outcome:
     //      less_numbers -> functional_set<int>({1, 2})
     //      numbers -> functional_set<int>({1, 2, 4})
-    [[nodiscard]] functional_set removing(const TKey& element) const
+    [[nodiscard]] set removing(const TKey& element) const
     {
         auto copy(backing_set_);
         copy.erase(element);
-        return functional_set(copy);
+        return set(copy);
     }
     
     // Inserts an element in the set, if it does not already exist, potentially changing the set's contents (mutating)
@@ -475,7 +475,7 @@ public:
     //
     // outcome:
     //      numbers -> functional_set<int>({1, 2, 4, 18})
-    functional_set& insert(const TKey& element)
+    set& insert(const TKey& element)
     {
         backing_set_.insert(element);
         return *this;
@@ -490,11 +490,11 @@ public:
     // outcome:
     //      augmented_numbers -> functional_set<int>({1, 2, 4, 18})
     //      numbers -> functional_set<int>({1, 2, 4})
-    [[nodiscard]] functional_set inserting(const TKey& element) const
+    [[nodiscard]] set inserting(const TKey& element) const
     {
         auto copy(backing_set_);
         copy.insert(element);
-        return functional_set(copy);
+        return set(copy);
     }
     
     // Removes all keys from the set (mutating)
@@ -505,7 +505,7 @@ public:
     //
     // outcome:
     //      numbers -> functional_set<int>({})
-    functional_set& clear()
+    set& clear()
     {
         backing_set_.clear();
         return *this;
@@ -520,9 +520,9 @@ public:
     // outcome:
     //      cleared_numbers -> functional_set<int>({})
     //      numbers -> functional_set<int> numbers({1, 4, 2})
-    [[nodiscard]] functional_set clearing() const
+    [[nodiscard]] set clearing() const
     {
-        return functional_set();
+        return set();
     }
     
     // Returns true if the key is present in the set, otherwise false
@@ -609,7 +609,7 @@ public:
     }
     
     // Returns true if both instances have equal sizes and the corresponding elements (keys) are equal
-    bool operator ==(const functional_set<TKey, TCompare>& rhs) const
+    bool operator ==(const set<TKey, TCompare>& rhs) const
     {
 #ifdef CPP17_AVAILABLE
         return std::equal(begin(),
@@ -636,7 +636,7 @@ public:
     }
     
     // Returns false if either the sizes are not equal or at least one corresponding element (key) is not equal
-    bool operator !=(const functional_set<TKey, TCompare>& rhs) const
+    bool operator !=(const set<TKey, TCompare>& rhs) const
     {
         return !((*this) == rhs);
     }
@@ -657,7 +657,7 @@ private:
         using UKey = deref_type<Iterator>;
 #else
     template <typename UKey>
-    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip_impl(const typename std::set<UKey>::const_iterator& set_begin,
+    [[nodiscard]] set<std::pair<TKey, UKey>> zip_impl(const typename std::set<UKey>::const_iterator& set_begin,
                                                       const typename std::set<UKey>::const_iterator& set_end) const
     {
 #endif
@@ -669,7 +669,7 @@ private:
         for (; it1 != end() && it2 != set_end; it1++, it2++) {
             combined_set.insert({*it1, *it2});
         }
-        return functional_set<std::pair<TKey, UKey>>(combined_set);
+        return set<std::pair<TKey, UKey>>(combined_set);
     }
 };
 
