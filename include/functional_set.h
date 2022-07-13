@@ -210,18 +210,18 @@ public:
         return functional_set<UKey, UCompare>(transformed_set);
     }
     
-    // Returns true if all elements match the predicate (return true)
+    // Returns true if all keys match the predicate (return true)
     //
     // example:
     //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
     //
     //      // returns true
-    //      numbers.all_of([](const auto &number) {
+    //      numbers.all_of([](const int &number) {
     //          return number < 10;
     //      });
     //
     //      // returns false
-    //      numbers.all_of([](const auto &number) {
+    //      numbers.all_of([](const int &number) {
     //          return number > 2;
     //      });
 #ifdef CPP17_AVAILABLE
@@ -236,7 +236,32 @@ public:
                            std::forward<Callable>(unary_predicate));
     }
     
-    // any_of
+    // Returns true if at least one key match the predicate (returns true)
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    //
+    //      // returns true
+    //      numbers.any_of([](const int &number) {
+    //          return number < 5;
+    //      });
+    //
+    //      // returns false
+    //      numbers.any_of([](const int &number) {
+    //          return number > 10;
+    //      });
+#ifdef CPP17_AVAILABLE
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, TKey>>>
+#else
+    template <typename Callable>
+#endif
+    bool any_of(Callable && unary_predicate) const
+    {
+        return std::any_of(begin(),
+                           end(),
+                           std::forward<Callable>(unary_predicate));
+    }
+    
     // none_of
     // filter
     // filtered

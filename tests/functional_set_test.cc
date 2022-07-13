@@ -317,6 +317,13 @@ TEST(FunctionalSetTest, AllOf)
     EXPECT_FALSE(numbers.all_of([](const int &number) { return number > 2; }));
 }
 
+TEST(FunctionalSetTest, AnyOf)
+{
+    const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    EXPECT_TRUE(numbers.any_of([](const int &number) { return number < 5; }));
+    EXPECT_FALSE(numbers.any_of([](const int &number) { return number > 10; }));
+}
+
 TEST(FunctionalSetTest, RemoveExistingElement)
 {
     functional_set<int> numbers({1, 4, 2});
