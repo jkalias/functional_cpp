@@ -331,6 +331,25 @@ TEST(FunctionalSetTest, NoneOf)
     EXPECT_FALSE(numbers.none_of([](const int &number) { return number < 6; }));
 }
 
+TEST(FunctionalSetTest, Filter)
+{
+    functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    numbers.filter([](const int& element) {
+        return element >= 1.5;
+    });
+    EXPECT_EQ(functional_set<int>({2, 3, 9}), numbers);
+}
+
+TEST(FunctionalSetTest, Filtered)
+{
+    const functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    auto filtered_numbers = numbers.filtered([](const int& element) {
+        return element >= 1.5;
+    });
+    EXPECT_EQ(functional_set<int>({2, 3, 9}), filtered_numbers);
+    EXPECT_EQ(functional_set<int>({ 1, 3, -5, 2, -1, 9, -4 }), numbers);
+}
+
 TEST(FunctionalSetTest, RemoveExistingElement)
 {
     functional_set<int> numbers({1, 4, 2});

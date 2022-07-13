@@ -296,7 +296,7 @@ public:
 #endif
     
     // Performs the functional `filter` algorithm in a copy of this instance, in which all elements of
-    // the copy which match the given predicate (non-mutating)
+    // the copy which match the given predicate are kept (non-mutating)
     //
     // example:
     //      const functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });

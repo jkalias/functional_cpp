@@ -288,8 +288,74 @@ public:
                             std::forward<Callable>(unary_predicate));
     }
     
-    // filter
-    // filtered
+    // Performs the functional `filter` algorithm, in which all keys of this instance
+    // which match the given predicate are kept (mutating)
+    //
+    // example:
+    //      functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      numbers.filter([](const int& element) {
+    //          return element >= 1.5;
+    //      });
+    //
+    // outcome:
+    //      numbers -> functional_set<int>({ 2, 3, 9 });
+    //
+    // is equivalent to:
+    //      functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      for (auto i = 0; i < numbers.size(); ++i) {
+    //          if (numbers[i] >= 1.5) {
+    //              continue;
+    //          }
+    //          numbers.remove(i);
+    //          i--;
+    //      }
+#ifdef CPP17_AVAILABLE
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, TKey>>>
+#else
+    template <typename Filter>
+#endif
+    functional_set& filter(Filter && predicate_to_keep)
+    {
+        std::set<TKey, TCompare> copy;
+        auto it = begin();
+        for (; it != end(); it++) {
+            if (predicate_to_keep(*it)) {
+                copy.insert(*it);
+            }
+        }
+        backing_set_ = std::move(copy);
+        return *this;
+    }
+    
+    // Performs the functional `filter` algorithm in a copy of this instance, in which all keys
+    // of the copy which match the given predicate are kept (non-mutating)
+    //
+    // example:
+    //      const functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      auto filtered_numbers = numbers.filtered([](const int& element) {
+    //          return element >= 1.5;
+    //      });
+    //
+    // outcome:
+    //      filtered_numbers -> functional_set<int>({ 2, 3, 9 });
+    //      numbers -> functional_set<int>({ 1, 3, -5, 2, -1, 9, -4 });
+#ifdef CPP17_AVAILABLE
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, TKey>>>
+#else
+    template <typename Filter>
+#endif
+    functional_set filtered(Filter && predicate_to_keep) const
+    {
+        std::set<TKey, TCompare> copy;
+        auto it = begin();
+        for (; it != end(); it++) {
+            if (predicate_to_keep(*it)) {
+                copy.insert(*it);
+            }
+        }
+        return functional_set(copy);
+    }
+    
     // zip with functional_vector
     // zip with functional_set
     // zip with std::vector
