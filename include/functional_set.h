@@ -262,7 +262,32 @@ public:
                            std::forward<Callable>(unary_predicate));
     }
     
-    // none_of
+    // Returns true if none of the keys match the predicate (all return false)
+    //
+    // example:
+    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    //
+    //      // returns true
+    //      numbers.none_of([](const int &number) {
+    //          return number > 10;
+    //      });
+    //
+    //      // returns false
+    //      numbers.none_of([](const int &number) {
+    //          return number < 6;
+    //      });
+#ifdef CPP17_AVAILABLE
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, TKey>>>
+#else
+    template <typename Callable>
+#endif
+    bool none_of(Callable && unary_predicate) const
+    {
+        return std::none_of(begin(),
+                            end(),
+                            std::forward<Callable>(unary_predicate));
+    }
+    
     // filter
     // filtered
     // zip with functional_vector
