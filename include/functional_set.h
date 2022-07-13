@@ -225,7 +225,7 @@ public:
     //          return number > 2;
     //      });
 #ifdef CPP17_AVAILABLE
-    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
+    template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, TKey>>>
 #else
     template <typename Callable>
 #endif
