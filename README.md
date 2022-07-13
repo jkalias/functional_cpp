@@ -1,13 +1,14 @@
 [![CMake Build Matrix](https://github.com/jkalias/functional_vector/actions/workflows/cmake.yml/badge.svg)](https://github.com/jkalias/functional_vector/actions/workflows/cmake.yml)
 [![GitHub license](https://img.shields.io/github/license/jkalias/functional_vector)](https://github.com/jkalias/functional_vector/blob/main/LICENSE)
 # Say hello to functional C++
-A wrapper for C++ std::vector and std::set, geared towards functional programming and fluent APIs.
+A wrapper for C++ std::vector and std::set geared towards functional programming and fluent APIs. This project is heavily influenced and inspired by C# and Swift.
+
 The primary focus of this library is
-* readability at the call site ("make it work, make it right, make it fast", in that order)
+* readability at the call site ("make it work, make it right, make it fast")
+* surfacing existing algorithms from the standard library, and lowering the barrier for their extended usage
 * elimination of vector index operations
 * encapsulation of the iterator madness
 * removal of manual for-loops
-This project is heavily influenced and inspired by C# and Swift.
 
 ## Compilation (Cmake)
 ### Dependencies
