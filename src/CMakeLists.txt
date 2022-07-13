@@ -1,4 +1,4 @@
-set (LIBNAME functional_cpp)
+set (LIBNAME fcpp)
 
 # Properties->C/C++->General->Additional Include Directories
 include_directories ("../include")

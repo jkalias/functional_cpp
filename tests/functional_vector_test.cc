@@ -28,6 +28,8 @@
 #include "test_types.h"
 #include "warnings.h"
 
+using namespace fcpp;
+
 template <typename T>
 void debug(const functional_vector<T>& vec)
 {

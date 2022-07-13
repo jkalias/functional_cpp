@@ -32,6 +32,8 @@ using optional_t = std::optional<T>;
 #include <cstddef>
 #include <utility>
 
+namespace fcpp {
+
 // A replacement for std::optional when C++17 is not available
 template<typename T>
 class optional {
@@ -97,4 +99,5 @@ private:
 template<typename T>
 using optional_t = optional<T>;
 
+}
 #endif

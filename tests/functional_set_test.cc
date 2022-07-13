@@ -26,6 +26,8 @@
 #include "functional_vector.h"
 #include "test_types.h"
 
+using namespace fcpp;
+
 template <typename T>
 void debug(functional_set<T>& set)
 {

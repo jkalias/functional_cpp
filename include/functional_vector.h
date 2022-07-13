@@ -30,6 +30,8 @@
 #include <execution>
 #endif
 
+namespace fcpp {
+
 template <class T, class Compare>
 class functional_set;
 
@@ -727,7 +729,7 @@ public:
     //      index_of_one.value() -> 0
     //      index_of_one.has_value() -> true
     //      index_of_nine.has_value() -> false
-    [[nodiscard]] optional_t<size_t> find_first_index(const T& element) const
+    [[nodiscard]] fcpp::optional_t<size_t> find_first_index(const T& element) const
     {
         auto const it = std::find(backing_vector_.cbegin(),
                                   backing_vector_.cend(),
@@ -736,7 +738,7 @@ public:
             auto index = std::distance(backing_vector_.cbegin(), it);
             return index;
         }
-        return optional_t<size_t>();
+        return fcpp::optional_t<size_t>();
     }
     
     // Returns the last index in which the given element is found in the vector.
@@ -752,7 +754,7 @@ public:
     //      index_of_one.value() -> 8
     //      index_of_one.has_value() -> true
     //      index_of_nine.has_value() -> false
-    [[nodiscard]] optional_t<size_t> find_last_index(const T& element) const
+    [[nodiscard]]  fcpp::optional_t<size_t> find_last_index(const T& element) const
     {
         auto const it = std::find(backing_vector_.crbegin(),
                                   backing_vector_.crend(),
@@ -761,7 +763,7 @@ public:
             auto index = std::distance(it, backing_vector_.crend()) - 1;
             return index;
         }
-        return optional_t<size_t>();
+        return  fcpp::optional_t<size_t>();
     }
     
     // Returns all indices in which the given element is found in the vector.
@@ -1653,3 +1655,5 @@ private:
         assert(index <= size() && index >= 0);
     }
 };
+    
+}

@@ -25,6 +25,8 @@
 #include <set>
 #include "optional.h"
 
+namespace fcpp {
+
 template <typename T>
 class functional_vector;
 
@@ -150,12 +152,12 @@ public:
     // outcome:
     //      minimum.has_value() -> true
     //      minimum.value() -> 1
-    [[nodiscard]] optional_t<TKey> min() const {
+    [[nodiscard]] fcpp::optional_t<TKey> min() const {
         const auto& it = std::min_element(begin(), end());
         if (it != end()) {
             return *it;
         }
-        return optional_t<TKey>();
+        return fcpp::optional_t<TKey>();
     }
     
     // Returns the maximum key in the set, if it's not empty.
@@ -170,12 +172,12 @@ public:
     // outcome:
     //      maximum.has_value() -> true
     //      maximum.value() -> 8
-    [[nodiscard]] optional_t<TKey> max() const {
+    [[nodiscard]] fcpp::optional_t<TKey> max() const {
         const auto& it = std::max_element(begin(), end());
         if (it != end()) {
             return *it;
         }
-        return optional_t<TKey>();
+        return fcpp::optional_t<TKey>();
     }
     
     // Performs the functional `map` algorithm, in which every element of the resulting set is the
@@ -670,3 +672,5 @@ private:
         return functional_set<std::pair<TKey, UKey>>(combined_set);
     }
 };
+
+}

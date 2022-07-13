@@ -23,6 +23,8 @@
 #include <gtest/gtest.h>
 #include "optional.h"
 
+using namespace fcpp;
+
 TEST(OptionalTest, InvalidTest) {
     const optional_t<int> index;
     EXPECT_FALSE(index.has_value());
