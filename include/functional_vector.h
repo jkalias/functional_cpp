@@ -385,13 +385,6 @@ public:
         return functional_vector(std::move(reversed_vector));
     }
     
-    template <typename U>
-    struct pair
-    {
-        T first;
-        U second;
-    };
-    
 #ifdef CPP17_AVAILABLE
     template<typename Iterator>
     using deref_type = typename std::iterator_traits<Iterator>::value_type;
@@ -429,7 +422,7 @@ public:
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip(const functional_vector<U>& vector) const
+    [[nodiscard]] functional_vector<std::pair<T, U>> zip(const functional_vector<U>& vector) const
     {
 #ifdef CPP17_AVAILABLE
         return zip_impl(vector.begin(), vector.end());
@@ -465,7 +458,7 @@ public:
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip(const std::vector<U>& vector) const
+    [[nodiscard]] functional_vector<std::pair<T, U>> zip(const std::vector<U>& vector) const
     {
 #ifdef CPP17_AVAILABLE
         return zip_impl(vector.cbegin(), vector.cend());
@@ -497,7 +490,7 @@ public:
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip(const std::initializer_list<U>& list) const
+    [[nodiscard]] functional_vector<std::pair<T, U>> zip(const std::initializer_list<U>& list) const
     {
 #ifdef CPP17_AVAILABLE
         return zip_impl(list.begin(), list.end());
@@ -1554,24 +1547,24 @@ private:
 #ifdef CPP17_AVAILABLE
     template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& vec_begin, const Iterator& vec_end) const ->
-    functional_vector<pair<deref_type<Iterator>>>
+    functional_vector<std::pair<T, deref_type<Iterator>>>
     {
         using U = deref_type<Iterator>;
 #else
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
+    [[nodiscard]] functional_vector<std::pair<T, U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
                                                       const typename std::vector<U>::const_iterator& vec_end) const
     {
 #endif
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(backing_vector_.size() == vec_size);
-        std::vector<pair<U>> combined_vector;
+        std::vector<std::pair<T, U>> combined_vector;
         combined_vector.reserve(vec_size);
         for (size_t i = 0; i < vec_size; ++i)
         {
             combined_vector.push_back({backing_vector_[i], *(vec_begin + i)});
         }
-        return functional_vector<pair<U>>(std::move(combined_vector));
+        return functional_vector<std::pair<T, U>>(std::move(combined_vector));
     }
     
 #ifdef CPP17_AVAILABLE
