@@ -284,7 +284,7 @@ TEST(FunctionalSetTest, MaxCustomType)
     });
     const auto maximum = persons.max();
     std::cout << maximum.value().name << std::endl;
-#if __linux__
+#if __linux__  // NOLINT(clang-diagnostic-undef)
     EXPECT_EQ(person(18, "Jannet"), maximum.value());
 #else
     EXPECT_EQ(person(25, "Kate"), maximum.value());
