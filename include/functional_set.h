@@ -356,13 +356,72 @@ public:
         return functional_set(copy);
     }
     
-    // zip with functional_vector
-    // zip with functional_set
-    // zip with std::vector
-    // zip with std::set
+#ifdef CPP17_AVAILABLE
+    template<typename Iterator>
+    using deref_type = typename std::iterator_traits<Iterator>::value_type;
     
-    // Executes the given operation for each key of the set. The operation must not
-    // change the set's contents during execution.
+    template<typename Iterator>
+    struct is_valid_iterator {
+        static bool const value = std::is_constructible_v<deref_type<Iterator>>;
+    };
+#endif
+    
+    // Performs the functional `zip` algorithm, in which every key of the resulting set is a
+    // tuple of this instance's key (first) and the second set's key (second).
+    // The sizes of the two sets must be equal.
+    //
+    // example:
+    //      const functional_set<int> ages({ 25, 45, 30, 63 });
+    //      const functional_set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
+    //      const auto zipped = ages.zip(persons);
+    //
+    // outcome:
+    //      zipped -> functional_set<std::pair<int, std::string>>({
+    //                          std::pair<int, std::string>(25, "Bob"),
+    //                          std::pair<int, std::string>(30, "Jake"),
+    //                          std::pair<int, std::string>(45, "Michael"),
+    //                          std::pair<int, std::string>(63, "Philipp"),
+    //                       })
+    template <typename UKey>
+    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const functional_set<UKey>& set) const
+    {
+#ifdef CPP17_AVAILABLE
+        return zip_impl(set.begin(), set.end());
+#else
+        return zip_impl<UKey>(set.begin(), set.end());
+#endif
+    }
+    
+    // Performs the functional `zip` algorithm.
+    // The number of keys must match the set's size.
+    // For more details, see the zip function which accepts a functional_set as input.
+    template <typename UKey>
+    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const std::set<UKey>& set) const
+    {
+        return zip(functional_set<UKey>(set));
+    }
+    
+    // Performs the functional `zip` algorithm by using the unique values of the vector.
+    // The number of uniques vector values must match the set's size.
+    // For more details, see the zip function which accepts a functional_set as input.
+    template <typename UKey>
+    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const functional_vector<UKey>& vector) const
+    {
+        const auto distinct_values = vector.distinct();
+        return zip(distinct_values);
+    }
+    
+    // Performs the functional `zip` algorithm by using the unique values of the vector.
+    // The number of uniques vector values must match the set's size.
+    // For more details, see the zip function which accepts a functional_set as input.
+    template <typename UKey>
+    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip(const std::vector<UKey>& vector) const
+    {
+        return zip(functional_vector<UKey>(vector));
+    }
+    
+    // Executes the given operation for each key of the set.
+    // The operation must not change the set's contents during execution.
 #ifdef CPP17_AVAILABLE
     template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, TKey const &>>>
 #else
@@ -586,5 +645,28 @@ private:
     void assert_smaller_size(const size_t index) const
     {
         assert(index < size());
+    }
+    
+#ifdef CPP17_AVAILABLE
+    template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
+    [[nodiscard]] auto zip_impl( const Iterator& set_begin, const Iterator& set_end) const ->
+    functional_set<std::pair<TKey, deref_type<Iterator>>>
+    {
+        using UKey = deref_type<Iterator>;
+#else
+    template <typename UKey>
+    [[nodiscard]] functional_set<std::pair<TKey, UKey>> zip_impl(const typename std::set<UKey>::const_iterator& set_begin,
+                                                      const typename std::set<UKey>::const_iterator& set_end) const
+    {
+#endif
+        const auto vec_size = std::distance(set_begin, set_end);
+        assert(size() == vec_size);
+        std::set<std::pair<TKey, UKey>> combined_set;
+        auto it1 = begin();
+        auto it2 = set_begin;
+        for (; it1 != end() && it2 != set_end; it1++, it2++) {
+            combined_set.insert({*it1, *it2});
+        }
+        return functional_set<std::pair<TKey, UKey>>(combined_set);
     }
 };

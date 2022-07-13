@@ -405,7 +405,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
+    //      zipped_vector -> functional_vector<std::pair<int, std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -414,7 +414,7 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
+    //      functional_vector<std::pair<int, std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
     //          functional_vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
@@ -441,7 +441,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
+    //      zipped_vector -> functional_vector<std::pair<int, std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -450,7 +450,7 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
+    //      functional_vector<std::pair<int, std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
     //          functional_vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
@@ -473,7 +473,7 @@ public:
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
+    //      zipped_vector -> functional_vector<std::pair<int, std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
@@ -482,7 +482,7 @@ public:
     // is equivalent to:
     //      const functional_vector ages_vector({32, 25, 53});
     //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
+    //      functional_vector<std::pair<int, std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
     //          functional_vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];

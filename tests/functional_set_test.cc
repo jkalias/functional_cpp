@@ -350,6 +350,90 @@ TEST(FunctionalSetTest, Filtered)
     EXPECT_EQ(functional_set<int>({ 1, 3, -5, 2, -1, 9, -4 }), numbers);
 }
 
+TEST(FunctionalSetTest, ZipWithFunctionalSet)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const functional_set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
+    const auto zipped = ages.zip(persons);
+    const auto expected = functional_set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(FunctionalSetTest, ZipWithFunctionalSetDifferentSizes)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const functional_set<std::string> persons({ "Jake" });
+    EXPECT_DEATH(ages.zip(persons), "");
+}
+
+TEST(FunctionalSetTest, ZipWithStdSet)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const std::set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
+    const auto zipped = ages.zip(persons);
+    const auto expected = functional_set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(FunctionalSetTest, ZipWithStdSetDifferentSizes)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const std::set<std::string> persons({ "Jake" });
+    EXPECT_DEATH(ages.zip(persons), "");
+}
+
+TEST(FunctionalSetTest, ZipWithFunctionalVector)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const functional_vector<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
+    const auto zipped = ages.zip(persons);
+    const auto expected = functional_set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(FunctionalSetTest, ZipWithFunctionalVectorDifferentSizes)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const functional_vector<std::string> persons({ "Jake" });
+    EXPECT_DEATH(ages.zip(persons), "");
+}
+
+TEST(FunctionalSetTest, ZipWithStdVector)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const std::vector<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
+    const auto zipped = ages.zip(persons);
+    const auto expected = functional_set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(FunctionalSetTest, ZipWithStdVectorDifferentSizes)
+{
+    const functional_set<int> ages({ 25, 45, 30, 63 });
+    const std::vector<std::string> persons({ "Jake" });
+    EXPECT_DEATH(ages.zip(persons), "");
+}
+
 TEST(FunctionalSetTest, RemoveExistingElement)
 {
     functional_set<int> numbers({1, 4, 2});
