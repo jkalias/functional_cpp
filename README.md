@@ -1,9 +1,13 @@
 [![CMake Build Matrix](https://github.com/jkalias/functional_vector/actions/workflows/cmake.yml/badge.svg)](https://github.com/jkalias/functional_vector/actions/workflows/cmake.yml)
 [![GitHub license](https://img.shields.io/github/license/jkalias/functional_vector)](https://github.com/jkalias/functional_vector/blob/main/LICENSE)
-# Say hello to functional C++ vectors
-A wrapper for C++ std::vector geared towards functional programming and fluent APIs.
-The primary focus is readability at the call site (not performance) and eliminating manual management of vector indices.
-This is heavily influenced and inspired by C# and Swift.
+# Say hello to functional C++
+A wrapper for C++ std::vector and std::set, geared towards functional programming and fluent APIs.
+The primary focus of this library is
+* readability at the call site ("make it work, make it right, make it fast", in that order)
+* elimination of vector index operations
+* encapsulation of the iterator madness
+* removal of manual for-loops
+This project is heavily influenced and inspired by C# and Swift.
 
 ## Compilation (Cmake)
 ### Dependencies
@@ -29,7 +33,7 @@ build/tests/unit_tests
 ```
 
 ### macOS (Makefiles/g++)
-Assuming you have installed Homebrew, then you can use the gcc and g++ compilers by doing the following (this example uses version gcc 11)
+Assuming you have installed Homebrew, you can then use the gcc and g++ compilers by doing the following (this example uses version gcc 11)
 ```console
 cd functional_vector
 cmake \
@@ -56,7 +60,7 @@ cmake -S . -B build
 ```
 Then open the generated ```functional_vector.sln``` in the ```build``` folder.
 
-## Usage
+## Usage (functional_vector)
 ### zip, map, filter, sort
 ```c++
 #include "functional_vector.h" // instead of <vector>
