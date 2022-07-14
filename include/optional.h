@@ -24,6 +24,8 @@
 #pragma once
 #include "compatibility.h"
 
+namespace fcpp {
+
 #ifdef CPP17_AVAILABLE
 #include <optional>
 template<typename T>
@@ -31,8 +33,6 @@ using optional_t = std::optional<T>;
 #else
 #include <cstddef>
 #include <utility>
-
-namespace fcpp {
 
 // A replacement for std::optional when C++17 is not available
 template<typename T>
@@ -99,5 +99,6 @@ private:
 template<typename T>
 using optional_t = optional<T>;
 
-}
 #endif
+
+}

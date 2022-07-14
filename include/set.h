@@ -70,12 +70,12 @@ public:
     // the difference is the operation A – B = {x : x ∈ A and x ∉ B}
     //
     // example:
-    //      const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
-    //      const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    //      const fcpp::set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    //      const fcpp::set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
     //      const auto& diff = set1.difference(set2);
     //
     // outcome:
-    //      diff -> functional_set<int>({1, 3, 8})
+    //      diff -> fcpp::set<int>({1, 3, 8})
     [[nodiscard]] set difference_with(const set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> diff;
         std::set_difference(begin(),
@@ -95,12 +95,12 @@ public:
     // the union is the operation A ∪ B = {x : x ∈ A or x ∈ B}
     //
     // example:
-    //      const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
-    //      const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    //      const fcpp::set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    //      const fcpp::set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
     //      const auto& combined = set1.set_union(set2);
     //
     // outcome:
-    //      combined -> functional_set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
+    //      combined -> fcpp::set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
     [[nodiscard]] set union_with(const set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> combined;
         std::set_union(begin(),
@@ -120,12 +120,12 @@ public:
     // the intersection is the operation A ∩ B = {x : x ∈ A and x ∈ B}
     //
     // example:
-    //      const functional_set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
-    //      const functional_set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
+    //      const fcpp::set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
+    //      const fcpp::set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
     //      const auto& combined = set1.set_union(set2);
     //
     // outcome:
-    //      combined -> functional_set<int>({2, 5, 7, 10})
+    //      combined -> fcpp::set<int>({2, 5, 7, 10})
     [[nodiscard]] set intersect_with(const set<TKey, TCompare>& other) const {
         std::set<TKey, TCompare> intersection;
         std::set_intersection(begin(),
@@ -143,11 +143,11 @@ public:
     // Returns the minimum key in the set, if it's not empty.
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto minimum = numbers.min();
     //
     //      // an empty's set minimum value
-    //      functional_set<int>().min().has_value() // false
+    //      fcpp::set<int>().min().has_value() // false
     //
     // outcome:
     //      minimum.has_value() -> true
@@ -163,11 +163,11 @@ public:
     // Returns the maximum key in the set, if it's not empty.
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto maximum = numbers.max();
     //
     //      // an empty's set maximum value
-    //      functional_set<int>().max().has_value() // false
+    //      fcpp::set<int>().max().has_value() // false
     //
     // outcome:
     //      maximum.has_value() -> true
@@ -190,11 +190,11 @@ public:
     //      });
     //
     // outcome:
-    //      output_set -> functional_set<std::string>({ "-5", "1", "3" })
+    //      output_set -> fcpp::set<std::string>({ "-5", "1", "3" })
     //
     // is equivalent to:
-    //      const functional_set<int> input_set({ 1, 3, -5 });
-    //      functional_set<std::string> output_set;
+    //      const fcpp::set<int> input_set({ 1, 3, -5 });
+    //      fcpp::set<std::string> output_set;
     //      for (auto const& key: input_set) {
     //          output_set.insert(std::to_string(key));
     //      }
@@ -215,7 +215,7 @@ public:
     // Returns true if all keys match the predicate (return true)
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3});
     //
     //      // returns true
     //      numbers.all_of([](const int &number) {
@@ -241,7 +241,7 @@ public:
     // Returns true if at least one key match the predicate (returns true)
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3});
     //
     //      // returns true
     //      numbers.any_of([](const int &number) {
@@ -267,7 +267,7 @@ public:
     // Returns true if none of the keys match the predicate (all return false)
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2, 5, 8, 3});
+    //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3});
     //
     //      // returns true
     //      numbers.none_of([](const int &number) {
@@ -294,16 +294,16 @@ public:
     // which match the given predicate are kept (mutating)
     //
     // example:
-    //      functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      fcpp::set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
     //      numbers.filter([](const int& element) {
     //          return element >= 1.5;
     //      });
     //
     // outcome:
-    //      numbers -> functional_set<int>({ 2, 3, 9 });
+    //      numbers -> fcpp::set<int>({ 2, 3, 9 });
     //
     // is equivalent to:
-    //      functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      fcpp::set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
     //      for (auto i = 0; i < numbers.size(); ++i) {
     //          if (numbers[i] >= 1.5) {
     //              continue;
@@ -333,14 +333,14 @@ public:
     // of the copy which match the given predicate are kept (non-mutating)
     //
     // example:
-    //      const functional_set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      const fcpp::set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
     //      auto filtered_numbers = numbers.filtered([](const int& element) {
     //          return element >= 1.5;
     //      });
     //
     // outcome:
-    //      filtered_numbers -> functional_set<int>({ 2, 3, 9 });
-    //      numbers -> functional_set<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      filtered_numbers -> fcpp::set<int>({ 2, 3, 9 });
+    //      numbers -> fcpp::set<int>({ 1, 3, -5, 2, -1, 9, -4 });
 #ifdef CPP17_AVAILABLE
     template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, TKey>>>
 #else
@@ -373,12 +373,12 @@ public:
     // The sizes of the two sets must be equal.
     //
     // example:
-    //      const functional_set<int> ages({ 25, 45, 30, 63 });
-    //      const functional_set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
+    //      const fcpp::set<int> ages({ 25, 45, 30, 63 });
+    //      const fcpp::set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
     //      const auto zipped = ages.zip(persons);
     //
     // outcome:
-    //      zipped -> functional_set<std::pair<int, std::string>>({
+    //      zipped -> fcpp::set<std::pair<int, std::string>>({
     //                          std::pair<int, std::string>(25, "Bob"),
     //                          std::pair<int, std::string>(30, "Jake"),
     //                          std::pair<int, std::string>(45, "Michael"),
@@ -396,7 +396,7 @@ public:
     
     // Performs the functional `zip` algorithm.
     // The number of keys must match the set's size.
-    // For more details, see the zip function which accepts a functional_set as input.
+    // For more details, see the zip function which accepts a fcpp::set as input.
     template <typename UKey>
     [[nodiscard]] set<std::pair<TKey, UKey>> zip(const std::set<UKey>& set) const
     {
@@ -405,7 +405,7 @@ public:
     
     // Performs the functional `zip` algorithm by using the unique values of the vector.
     // The number of uniques vector values must match the set's size.
-    // For more details, see the zip function which accepts a functional_set as input.
+    // For more details, see the zip function which accepts a fcpp::set as input.
     template <typename UKey>
     [[nodiscard]] set<std::pair<TKey, UKey>> zip(const vector<UKey>& vector) const
     {
@@ -415,7 +415,7 @@ public:
     
     // Performs the functional `zip` algorithm by using the unique values of the vector.
     // The number of uniques vector values must match the set's size.
-    // For more details, see the zip function which accepts a functional_set as input.
+    // For more details, see the zip function which accepts a fcpp::set as input.
     template <typename UKey>
     [[nodiscard]] set<std::pair<TKey, UKey>> zip(const std::vector<UKey>& vector) const
     {
@@ -440,11 +440,11 @@ public:
     // Removes an element from the set, if it exists, potentially changing the set's contents (mutating)
     //
     // example:
-    //      functional_set<int> numbers({1, 4, 2});
+    //      fcpp::set<int> numbers({1, 4, 2});
     //      numbers.remove(4);
     //
     // outcome:
-    //      numbers -> functional_set<int>({1, 2})
+    //      numbers -> fcpp::set<int>({1, 2})
     set& remove(const TKey& element)
     {
         backing_set_.erase(element);
@@ -454,12 +454,12 @@ public:
     // Returns a copy by removing an element from the set, if it exists (non-mutating)
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2});
+    //      const fcpp::set<int> numbers({1, 4, 2});
     //      auto less_numbers = numbers.removing(4);
     //
     // outcome:
-    //      less_numbers -> functional_set<int>({1, 2})
-    //      numbers -> functional_set<int>({1, 2, 4})
+    //      less_numbers -> fcpp::set<int>({1, 2})
+    //      numbers -> fcpp::set<int>({1, 2, 4})
     [[nodiscard]] set removing(const TKey& element) const
     {
         auto copy(backing_set_);
@@ -470,11 +470,11 @@ public:
     // Inserts an element in the set, if it does not already exist, potentially changing the set's contents (mutating)
     //
     // example:
-    //      functional_set<int> numbers({1, 4, 2});
+    //      fcpp::set<int> numbers({1, 4, 2});
     //      numbers.insert(18);
     //
     // outcome:
-    //      numbers -> functional_set<int>({1, 2, 4, 18})
+    //      numbers -> fcpp::set<int>({1, 2, 4, 18})
     set& insert(const TKey& element)
     {
         backing_set_.insert(element);
@@ -484,12 +484,12 @@ public:
     // Returns a copy by inserting an element in the set, if it does not already exist (non-mutating)
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2});
+    //      const fcpp::set<int> numbers({1, 4, 2});
     //      auto augmented_numbers =  numbers.inserting(18);
     //
     // outcome:
-    //      augmented_numbers -> functional_set<int>({1, 2, 4, 18})
-    //      numbers -> functional_set<int>({1, 2, 4})
+    //      augmented_numbers -> fcpp::set<int>({1, 2, 4, 18})
+    //      numbers -> fcpp::set<int>({1, 2, 4})
     [[nodiscard]] set inserting(const TKey& element) const
     {
         auto copy(backing_set_);
@@ -500,11 +500,11 @@ public:
     // Removes all keys from the set (mutating)
     //
     // example:
-    //      functional_set<int> numbers({1, 4, 2});
+    //      fcpp::set<int> numbers({1, 4, 2});
     //      numbers.clear();
     //
     // outcome:
-    //      numbers -> functional_set<int>({})
+    //      numbers -> fcpp::set<int>({})
     set& clear()
     {
         backing_set_.clear();
@@ -514,12 +514,12 @@ public:
     // Returns a new set by clearing all keys from the current set (non-mutating)
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2});
+    //      const fcpp::set<int> numbers({1, 4, 2});
     //      auto cleared_numbers = numbers.clearing();
     //
     // outcome:
-    //      cleared_numbers -> functional_set<int>({})
-    //      numbers -> functional_set<int> numbers({1, 4, 2})
+    //      cleared_numbers -> fcpp::set<int>({})
+    //      numbers -> fcpp::set<int> numbers({1, 4, 2})
     [[nodiscard]] set clearing() const
     {
         return set();
@@ -528,7 +528,7 @@ public:
     // Returns true if the key is present in the set, otherwise false
     //
     // example:
-    //      const functional_set<int> numbers({1, 4, 2});
+    //      const fcpp::set<int> numbers({1, 4, 2});
     //      numbers.contains(1); // true
     //      numbers.contains(15); // false
     [[nodiscard]] bool contains(const TKey& key) const
@@ -652,7 +652,7 @@ private:
 #ifdef CPP17_AVAILABLE
     template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& set_begin, const Iterator& set_end) const ->
-    functional_set<std::pair<TKey, deref_type<Iterator>>>
+    set<std::pair<TKey, deref_type<Iterator>>>
     {
         using UKey = deref_type<Iterator>;
 #else
