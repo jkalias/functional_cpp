@@ -329,7 +329,7 @@ const fcpp::set<int> ages({ 25, 45, 30, 63 });
 const fcpp::set<std::string> names({ "Jake", "Bob", "Michael", "Philipp" });
 
 const auto employees_below_40 = ages
-    // zip two vectors for simultaneous processing
+    // zip two sets for simultaneous processing
     .zip(names)
 
     // apply the functional map algorithm (transform from one type to another)
