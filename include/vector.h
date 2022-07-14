@@ -46,22 +46,22 @@ class vector
 {
 public:
     vector()
-    : backing_vector_()
+    : m_vector()
     {
     }
     
     explicit vector(const std::vector<T>& vector)
-    : backing_vector_(vector)
+    : m_vector(vector)
     {
     }
     
     explicit vector(std::vector<T>&& vector)
-    : backing_vector_(std::move(vector))
+    : m_vector(std::move(vector))
     {
     }
     
     explicit vector(std::initializer_list<T> list)
-    : backing_vector_(std::move(list))
+    : m_vector(std::move(list))
     {
     }
     
@@ -73,7 +73,7 @@ public:
     // outcome:
     //      filled_vector -> fcpp::vector<std::string>({ "John", "John", "John" })
     explicit vector(size_t count, const T& element)
-    : backing_vector_(count, element)
+    : m_vector(count, element)
     {
     }
     
@@ -103,9 +103,9 @@ public:
     vector<U> map(Transform && transform) const
     {
         std::vector<U> transformed_vector;
-        transformed_vector.reserve(backing_vector_.size());
-        std::transform(backing_vector_.begin(),
-                       backing_vector_.end(),
+        transformed_vector.reserve(m_vector.size());
+        std::transform(m_vector.begin(),
+                       m_vector.end(),
                        std::back_inserter(transformed_vector),
                        std::forward<Transform>(transform));
         return vector<U>(transformed_vector);
@@ -118,10 +118,10 @@ public:
     vector<U> map_parallel(Transform && transform) const
     {
         std::vector<U> transformed_vector;
-        transformed_vector.resize(backing_vector_.size());
+        transformed_vector.resize(m_vector.size());
         std::transform(std::execution::par,
-                       backing_vector_.cbegin(),
-                       backing_vector_.cend(),
+                       m_vector.cbegin(),
+                       m_vector.cend(),
                        transformed_vector.begin(),
                        std::forward<Transform>(transform));
         return vector<U>(transformed_vector);
@@ -273,11 +273,11 @@ public:
 #endif
     vector& filter(Filter && predicate_to_keep)
     {
-        backing_vector_.erase(std::remove_if(backing_vector_.begin(),
-                                             backing_vector_.end(),
+        m_vector.erase(std::remove_if(m_vector.begin(),
+                                             m_vector.end(),
                                              [predicate=std::forward<Filter>(predicate_to_keep)](const T& element) {
             return !predicate(element);
-        }), backing_vector_.end());
+        }), m_vector.end());
         return *this;
     }
         
@@ -287,12 +287,12 @@ public:
     template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
     vector& filter_parallel(Filter && predicate_to_keep)
     {
-        backing_vector_.erase(std::remove_if(std::execution::par,
-                                             backing_vector_.begin(),
-                                             backing_vector_.end(),
+        m_vector.erase(std::remove_if(std::execution::par,
+                                             m_vector.begin(),
+                                             m_vector.end(),
                                              [predicate=std::forward<Filter>(predicate_to_keep)](const T& element) {
             return !predicate(element);
-        }), backing_vector_.end());
+        }), m_vector.end());
         return *this;
     }
 #endif
@@ -326,9 +326,9 @@ public:
     vector filtered(Callable && predicate_to_keep) const
     {
         std::vector<T> filtered_vector;
-        filtered_vector.reserve(backing_vector_.size());
-        std::copy_if(backing_vector_.begin(),
-                     backing_vector_.end(),
+        filtered_vector.reserve(m_vector.size());
+        std::copy_if(m_vector.begin(),
+                     m_vector.end(),
                      std::back_inserter(filtered_vector),
                      std::forward<Callable>(predicate_to_keep));
         return vector(filtered_vector);
@@ -347,10 +347,10 @@ public:
         return copy;
 #else
         std::vector<T> filtered_vector;
-        filtered_vector.reserve(backing_vector_.size());
+        filtered_vector.reserve(m_vector.size());
         std::copy_if(std::execution::par,
-                     backing_vector_.begin(),
-                     backing_vector_.end(),
+                     m_vector.begin(),
+                     m_vector.end(),
                      std::back_inserter(filtered_vector),
                      std::forward<Callable>(predicate_to_keep));
         return vector(filtered_vector);
@@ -368,7 +368,7 @@ public:
     //      numbers_vector -> fcpp::vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
     vector& reverse()
     {
-        std::reverse(backing_vector_.begin(), backing_vector_.end());
+        std::reverse(m_vector.begin(), m_vector.end());
         return *this;
     }
     
@@ -383,7 +383,7 @@ public:
     //      reversed_vector -> fcpp::vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
     [[nodiscard]] vector reversed() const
     {
-        std::vector<T> reversed_vector(backing_vector_.crbegin(), backing_vector_.crend());
+        std::vector<T> reversed_vector(m_vector.crbegin(), m_vector.crend());
         return vector(std::move(reversed_vector));
     }
     
@@ -529,8 +529,8 @@ public:
 #endif
     vector& sort(Sortable && comparison_predicate)
     {
-        std::sort(backing_vector_.begin(),
-                  backing_vector_.end(),
+        std::sort(m_vector.begin(),
+                  m_vector.end(),
                   std::forward<Sortable>(comparison_predicate));
         return *this;
     }
@@ -542,8 +542,8 @@ public:
     vector& sort_parallel(Sortable && comparison_predicate)
     {
         std::sort(std::execution::par,
-                  backing_vector_.begin(),
-                  backing_vector_.end(),
+                  m_vector.begin(),
+                  m_vector.end(),
                   std::forward<Sortable>(comparison_predicate));
         return *this;
     }
@@ -621,7 +621,7 @@ public:
 #endif
     vector sorted(Sortable && comparison_predicate) const
     {
-        auto sorted_vector(backing_vector_);
+        auto sorted_vector(m_vector);
         std::sort(sorted_vector.begin(),
                   sorted_vector.end(),
                   std::forward<Sortable>(comparison_predicate));
@@ -634,7 +634,7 @@ public:
     template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
     vector sorted_parallel(Sortable && comparison_predicate) const
     {
-        auto sorted_vector(backing_vector_);
+        auto sorted_vector(m_vector);
         std::sort(std::execution::par,
                   sorted_vector.begin(),
                   sorted_vector.end(),
@@ -696,8 +696,8 @@ public:
 #endif
     const vector& for_each(Callable && operation) const
     {
-        std::for_each(backing_vector_.cbegin(),
-                      backing_vector_.cend(),
+        std::for_each(m_vector.cbegin(),
+                      m_vector.cend(),
                       std::forward<Callable>(operation));
         return *this;
     }
@@ -709,8 +709,8 @@ public:
     const vector& for_each_parallel(Callable && operation) const
     {
         std::for_each(std::execution::par,
-                      backing_vector_.cbegin(),
-                      backing_vector_.cend(),
+                      m_vector.cbegin(),
+                      m_vector.cend(),
                       std::forward<Callable>(operation));
         return *this;
     }
@@ -731,11 +731,11 @@ public:
     //      index_of_nine.has_value() -> false
     [[nodiscard]] fcpp::optional_t<size_t> find_first_index(const T& element) const
     {
-        auto const it = std::find(backing_vector_.cbegin(),
-                                  backing_vector_.cend(),
+        auto const it = std::find(m_vector.cbegin(),
+                                  m_vector.cend(),
                                   element);
-        if (it != backing_vector_.cend()) {
-            auto index = std::distance(backing_vector_.cbegin(), it);
+        if (it != m_vector.cend()) {
+            auto index = std::distance(m_vector.cbegin(), it);
             return index;
         }
         return fcpp::optional_t<size_t>();
@@ -756,11 +756,11 @@ public:
     //      index_of_nine.has_value() -> false
     [[nodiscard]]  fcpp::optional_t<size_t> find_last_index(const T& element) const
     {
-        auto const it = std::find(backing_vector_.crbegin(),
-                                  backing_vector_.crend(),
+        auto const it = std::find(m_vector.crbegin(),
+                                  m_vector.crend(),
                                   element);
-        if (it != backing_vector_.crend()) {
-            auto index = std::distance(it, backing_vector_.crend()) - 1;
+        if (it != m_vector.crend()) {
+            auto index = std::distance(it, m_vector.crend()) - 1;
             return index;
         }
         return  fcpp::optional_t<size_t>();
@@ -779,14 +779,14 @@ public:
     [[nodiscard]] std::vector<size_t> find_all_indices(const T& element) const
     {
         std::vector<size_t> indices;
-        auto it = std::find(backing_vector_.cbegin(),
-                            backing_vector_.cend(),
+        auto it = std::find(m_vector.cbegin(),
+                            m_vector.cend(),
                             element);
-        while (it != backing_vector_.cend())
+        while (it != m_vector.cend())
         {
-            indices.push_back(std::distance(backing_vector_.cbegin(), it));
+            indices.push_back(std::distance(m_vector.cbegin(), it));
             ++it;
-            it = std::find(it, backing_vector_.cend(), element);
+            it = std::find(it, m_vector.cend(), element);
         }
         return indices;
     }
@@ -802,7 +802,7 @@ public:
     vector& remove_at(int index)
     {
         assert_smaller_size(index);
-        backing_vector_.erase(begin() + index);
+        m_vector.erase(begin() + index);
         return *this;
     }
     
@@ -817,7 +817,7 @@ public:
     [[nodiscard]] vector removing_at(int index) const
     {
         assert_smaller_size(index);
-        auto copy(backing_vector_);
+        auto copy(m_vector);
         copy.erase(copy.begin() + index);
         return vector(copy);
     }
@@ -832,7 +832,7 @@ public:
     //      numbers -> fcpp::vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
     vector& remove_back()
     {
-        backing_vector_.pop_back();
+        m_vector.pop_back();
         return *this;
     }
     
@@ -846,7 +846,7 @@ public:
     //      shorter_vector -> fcpp::vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
     [[nodiscard]] vector removing_back() const
     {
-        auto copy(backing_vector_);
+        auto copy(m_vector);
         copy.pop_back();
         return vector(copy);
     }
@@ -899,7 +899,7 @@ public:
         {
             return *this;
         }
-        backing_vector_.erase(begin() + range.start,
+        m_vector.erase(begin() + range.start,
                               begin() + range.start + range.count);
         return *this;
     }
@@ -918,7 +918,7 @@ public:
         {
             return *this;
         }
-        auto shorter_vector(backing_vector_);
+        auto shorter_vector(m_vector);
         shorter_vector.erase(shorter_vector.begin() + range.start,
                              shorter_vector.begin() + range.start + range.count);
         return vector(shorter_vector);
@@ -935,7 +935,7 @@ public:
     vector& insert_at(int index, const T& element)
     {
         assert_smaller_or_equal_size(index);
-        backing_vector_.insert(begin() + index, element);
+        m_vector.insert(begin() + index, element);
         return *this;
     }
     
@@ -950,7 +950,7 @@ public:
     [[nodiscard]] vector inserting_at(int index, const T& element) const
     {
         assert_smaller_or_equal_size(index);
-        auto copy(backing_vector_);
+        auto copy(m_vector);
         copy.insert(copy.begin() + index, element);
         return vector(copy);
     }
@@ -1049,7 +1049,7 @@ public:
     //      numbers -> fcpp::vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
     vector& insert_back(T value)
     {
-        backing_vector_.push_back(value);
+        m_vector.push_back(value);
         return *this;
     }
     
@@ -1076,7 +1076,7 @@ public:
     //      augmented_numbers -> fcpp::vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
     [[nodiscard]] vector inserting_back(T value) const
     {
-        auto augmented_vector(backing_vector_);
+        auto augmented_vector(m_vector);
         augmented_vector.push_back(value);
         return vector(augmented_vector);
     }
@@ -1338,8 +1338,8 @@ public:
     //      numbers -> fcpp::vector({ 7, 7, 7, 7, 7 })
     vector& fill(const T& element)
     {
-        std::fill(backing_vector_.begin(),
-                  backing_vector_.end(),
+        std::fill(m_vector.begin(),
+                  m_vector.end(),
                   element);
         return *this;
     }
@@ -1347,33 +1347,33 @@ public:
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
     [[nodiscard]] size_t size() const
     {
-        return backing_vector_.size();
+        return m_vector.size();
     }
     
     // Clears the vector by removing all elements (mutating)
     vector& clear()
     {
-        backing_vector_.clear();
+        m_vector.clear();
         return *this;
     }
     
     // Returns true if the vector has no elements
     [[nodiscard]] bool is_empty() const
     {
-        return backing_vector_.empty();
+        return m_vector.empty();
     }
     
     // Returns the underlying capacity of the vector, which can be larger from its size
     [[nodiscard]] size_t capacity() const
     {
-        return backing_vector_.capacity();
+        return m_vector.capacity();
     }
     
     // Reserves the necessary memory for `count` elements, so that subsequent changes in the
     // vector's size due to addition/removal of elements is more performant
     vector& reserve(size_t count)
     {
-        backing_vector_.reserve(count);
+        m_vector.reserve(count);
         return *this;
     }
     
@@ -1401,32 +1401,32 @@ public:
     //      empty_numbers.resize(5);
     vector& resize(size_t count)
     {
-        backing_vector_.resize(count);
+        m_vector.resize(count);
         return *this;
     }
     
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator begin()
     {
-        return backing_vector_.begin();
+        return m_vector.begin();
     }
     
     // Returns the const begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::const_iterator begin() const
     {
-        return backing_vector_.begin();
+        return m_vector.begin();
     }
     
     // Returns the end iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::iterator end()
     {
-        return backing_vector_.end();
+        return m_vector.end();
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::vector<T>::const_iterator end() const
     {
-        return backing_vector_.end();
+        return m_vector.end();
     }
     
     // Returns a set, whose elements are the elements of the vector, removing any potential duplicates
@@ -1447,7 +1447,7 @@ public:
     T& operator[](int index)
     {
         assert_smaller_size(index);
-        return backing_vector_[index];
+        return m_vector[index];
     }
     
     // Returns a constant reference to the element in the given index, allowing subscripting.
@@ -1455,7 +1455,7 @@ public:
     const T& operator[](int index) const
     {
         assert_smaller_size(index);
-        return backing_vector_[index];
+        return m_vector[index];
     }
     
     // Returns true if both instances have equal sizes and the corresponding elements (same index) are equal
@@ -1488,7 +1488,7 @@ public:
     }
     
 private:
-    std::vector<T> backing_vector_;
+    std::vector<T> m_vector;
     // The iterator passed here may not necessarily be from std::vector as long as it's a valid iterable range
 #ifdef CPP17_AVAILABLE
     template<typename Iterator, typename = std::enable_if_t<std::is_constructible_v<T, typename std::iterator_traits<Iterator>::value_type>>>
@@ -1497,7 +1497,7 @@ private:
 #endif
     vector& insert_back_range_impl(const Iterator& vec_begin, const Iterator& vec_end)
     {
-        backing_vector_.insert(backing_vector_.end(),
+        m_vector.insert(m_vector.end(),
                                vec_begin,
                                vec_end);
         return *this;
@@ -1510,7 +1510,7 @@ private:
 #endif
     vector& insert_front_range_impl(const Iterator& vec_begin, const Iterator& vec_end)
     {
-        backing_vector_.insert(backing_vector_.begin(),
+        m_vector.insert(m_vector.begin(),
                                vec_begin,
                                vec_end);
         return *this;
@@ -1523,7 +1523,7 @@ private:
 #endif
     [[nodiscard]] vector inserting_back_range_impl(const Iterator& vec_begin, const Iterator& vec_end) const
     {
-        auto augmented_vector(backing_vector_);
+        auto augmented_vector(m_vector);
         augmented_vector.reserve(augmented_vector.size() + std::distance(vec_begin, vec_end));
         augmented_vector.insert(augmented_vector.end(),
                                 vec_begin,
@@ -1538,7 +1538,7 @@ private:
 #endif
     [[nodiscard]] vector inserting_front_range_impl(const Iterator& vec_begin, const Iterator& vec_end) const
     {
-        auto augmented_vector(backing_vector_);
+        auto augmented_vector(m_vector);
         augmented_vector.reserve(augmented_vector.size() + std::distance(vec_begin, vec_end));
         augmented_vector.insert(augmented_vector.begin(),
                                 vec_begin,
@@ -1559,12 +1559,12 @@ private:
     {
 #endif
         const auto vec_size = std::distance(vec_begin, vec_end);
-        assert(backing_vector_.size() == vec_size);
+        assert(m_vector.size() == vec_size);
         std::vector<std::pair<T, U>> combined_vector;
         combined_vector.reserve(vec_size);
         for (size_t i = 0; i < vec_size; ++i)
         {
-            combined_vector.push_back({backing_vector_[i], *(vec_begin + i)});
+            combined_vector.push_back({m_vector[i], *(vec_begin + i)});
         }
         return vector<std::pair<T, U>>(std::move(combined_vector));
     }
@@ -1582,7 +1582,7 @@ private:
         if (vec_begin != vec_end)
         {
             assert_smaller_or_equal_size(index);
-            backing_vector_.insert(begin() + index,
+            m_vector.insert(begin() + index,
                                    vec_begin,
                                    vec_end);
         }
@@ -1603,7 +1603,7 @@ private:
             return *this;
         }
         assert_smaller_or_equal_size(index);
-        auto augmented_vector(backing_vector_);
+        auto augmented_vector(m_vector);
         augmented_vector.insert(augmented_vector.begin() + index,
                                 vec_begin,
                                 vec_end);
@@ -1623,7 +1623,7 @@ private:
         assert(index + vec_size >= vec_size && index + vec_size <= size());
         std::copy(vec_begin,
                   vec_end,
-                  backing_vector_.begin() + index);
+                  m_vector.begin() + index);
         return *this;
     }
     
@@ -1638,7 +1638,7 @@ private:
     {
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(index + vec_size >= vec_size && index + vec_size <= size());
-        auto replaced_vector(backing_vector_);
+        auto replaced_vector(m_vector);
         std::copy(vec_begin,
                   vec_end,
                   replaced_vector.begin() + index);

@@ -41,27 +41,27 @@ class set
 {
 public:
     set()
-    : backing_set_()
+    : m_set()
     {
     }
     
     explicit set(std::set<TKey, TCompare> set)
-    : backing_set_(std::move(set))
+    : m_set(std::move(set))
     {
     }
     
     explicit set(const std::vector<TKey>& vector)
-    : backing_set_(vector.begin(), vector.end())
+    : m_set(vector.begin(), vector.end())
     {
     }
     
     explicit set(const vector<TKey>& vector)
-    : backing_set_(vector.begin(), vector.end())
+    : m_set(vector.begin(), vector.end())
     {
     }
     
     explicit set(const std::initializer_list<TKey>& list)
-    : backing_set_(list.begin(), list.end())
+    : m_set(list.begin(), list.end())
     {
     }
     
@@ -206,7 +206,7 @@ public:
     set<UKey, UCompare> map(Transform && transform) const
     {
         std::set<UKey, UCompare> transformed_set;
-        for (const auto& key: backing_set_) {
+        for (const auto& key: m_set) {
             transformed_set.insert(transform(key));
         }
         return set<UKey, UCompare>(transformed_set);
@@ -325,7 +325,7 @@ public:
                 copy.insert(*it);
             }
         }
-        backing_set_ = std::move(copy);
+        m_set = std::move(copy);
         return *this;
     }
     
@@ -447,7 +447,7 @@ public:
     //      numbers -> fcpp::set<int>({1, 2})
     set& remove(const TKey& element)
     {
-        backing_set_.erase(element);
+        m_set.erase(element);
         return *this;
     }
     
@@ -462,7 +462,7 @@ public:
     //      numbers -> fcpp::set<int>({1, 2, 4})
     [[nodiscard]] set removing(const TKey& element) const
     {
-        auto copy(backing_set_);
+        auto copy(m_set);
         copy.erase(element);
         return set(copy);
     }
@@ -477,7 +477,7 @@ public:
     //      numbers -> fcpp::set<int>({1, 2, 4, 18})
     set& insert(const TKey& element)
     {
-        backing_set_.insert(element);
+        m_set.insert(element);
         return *this;
     }
     
@@ -492,7 +492,7 @@ public:
     //      numbers -> fcpp::set<int>({1, 2, 4})
     [[nodiscard]] set inserting(const TKey& element) const
     {
-        auto copy(backing_set_);
+        auto copy(m_set);
         copy.insert(element);
         return set(copy);
     }
@@ -507,7 +507,7 @@ public:
     //      numbers -> fcpp::set<int>({})
     set& clear()
     {
-        backing_set_.clear();
+        m_set.clear();
         return *this;
     }
     
@@ -533,13 +533,13 @@ public:
     //      numbers.contains(15); // false
     [[nodiscard]] bool contains(const TKey& key) const
     {
-    	return backing_set_.count(key) != 0;
+    	return m_set.count(key) != 0;
     }
     
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
     [[nodiscard]] size_t size() const
     {
-        return backing_set_.size();
+        return m_set.size();
     }
     
     // clear
@@ -548,25 +548,25 @@ public:
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<TKey>::iterator begin()
     {
-        return backing_set_.begin();
+        return m_set.begin();
     }
     
     // Returns the const begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<TKey>::const_iterator begin() const
     {
-        return backing_set_.begin();
+        return m_set.begin();
     }
     
     // Returns the end iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<TKey>::iterator end()
     {
-        return backing_set_.end();
+        return m_set.end();
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<TKey>::const_iterator end() const
     {
-        return backing_set_.end();
+        return m_set.end();
     }
     
     // Returns the given key in the current set, allowing subscripting.
@@ -642,7 +642,7 @@ public:
     }
     
 private:
-    std::set<TKey, TCompare> backing_set_;
+    std::set<TKey, TCompare> m_set;
     
     void assert_smaller_size(const size_t index) const
     {
