@@ -193,7 +193,7 @@ TEST(VectorTest, Map)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, MapParallel)
 {
-    const functional_vector<int> vector_under_test({1, 3, 4});
+    const vector<int> vector_under_test({1, 3, 4});
     const auto mapped_vector = vector_under_test.map_parallel<child>([](const int& age) {
         return child(age);
     });
@@ -221,7 +221,7 @@ TEST(VectorTest, Filter)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, FilterParallel)
 {
-    functional_vector<child> vector_under_test({child(1), child(3), child(4)});
+    vector<child> vector_under_test({child(1), child(3), child(4)});
     vector_under_test.filter_parallel([](const child& child) {
         return child.age < 2;
     });
@@ -248,7 +248,7 @@ TEST(VectorTest, Filtered)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, FilteredParallel)
 {
-    const functional_vector<child> vector_under_test({child(1), child(3), child(4)});
+    const vector<child> vector_under_test({child(1), child(3), child(4)});
     const auto filtered_vector = vector_under_test.filtered_parallel([](const child& child) {
         return child.age < 2;
     });
@@ -458,7 +458,7 @@ TEST(VectorTest, SortedDescending)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, SortParallel)
 {
-    functional_vector<person> vector_under_test({
+    vector<person> vector_under_test({
         person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
     });
     vector_under_test.sort_parallel([](const person& person1, const person& person2){
@@ -481,7 +481,7 @@ TEST(VectorTest, SortParallel)
 
 TEST(VectorTest, SortedParallel)
 {
-    const functional_vector<person> vector_under_test({
+    const vector<person> vector_under_test({
         person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
     });
     const auto sorted_vector = vector_under_test.sorted_parallel([](const person& person1, const person& person2){
@@ -511,7 +511,7 @@ TEST(VectorTest, SortedParallel)
 
 TEST(VectorTest, SortAscendingParallel)
 {
-    functional_vector<int> vector_under_test({3, 1, 9, -4});
+    vector<int> vector_under_test({3, 1, 9, -4});
     vector_under_test.sort_ascending_parallel();
     EXPECT_EQ(4, vector_under_test.size());
     EXPECT_EQ(-4, vector_under_test[0]);
@@ -522,7 +522,7 @@ TEST(VectorTest, SortAscendingParallel)
 
 TEST(VectorTest, SortedAscendingParallel)
 {
-    const functional_vector<int> vector_under_test({3, 1, 9, -4});
+    const vector<int> vector_under_test({3, 1, 9, -4});
     const auto sorted_vector = vector_under_test.sorted_ascending_parallel();
     EXPECT_EQ(4, vector_under_test.size());
     EXPECT_EQ(3, vector_under_test[0]);
@@ -539,7 +539,7 @@ TEST(VectorTest, SortedAscendingParallel)
 
 TEST(VectorTest, SortDescendingParallel)
 {
-    functional_vector<int> vector_under_test({3, 1, 9, -4});
+    vector<int> vector_under_test({3, 1, 9, -4});
     vector_under_test.sort_descending_parallel();
     EXPECT_EQ(4, vector_under_test.size());
     EXPECT_EQ(9, vector_under_test[0]);
@@ -550,7 +550,7 @@ TEST(VectorTest, SortDescendingParallel)
 
 TEST(VectorTest, SortedDescendingParallel)
 {
-    const functional_vector<int> vector_under_test({3, 1, 9, -4});
+    const vector<int> vector_under_test({3, 1, 9, -4});
     const auto sorted_vector = vector_under_test.sorted_descending_parallel();
     EXPECT_EQ(4, vector_under_test.size());
     EXPECT_EQ(3, vector_under_test[0]);
@@ -1250,13 +1250,13 @@ TEST(VectorTest, AllOfTrue)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, AllOfParallelFalse)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_FALSE(vector_under_test.all_of_parallel([](const int& number) { return number > 5; }));
 }
 
 TEST(VectorTest, AllOfParallelTrue)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     vector_under_test.all_of([](const int& number) {
         return number < 10;
     });
@@ -1279,13 +1279,13 @@ TEST(VectorTest, AnyOfTrue)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, AnyOfParallelFalse)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_FALSE(vector_under_test.any_of_parallel([](const int& number) { return number > 20; }));
 }
 
 TEST(VectorTest, AnyOfParallelTrue)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_TRUE(vector_under_test.any_of_parallel([](const int& number) { return number >= 7; }));
 }
 #endif
@@ -1305,19 +1305,19 @@ TEST(VectorTest, NoneOfTrue)
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 TEST(VectorTest, NoneOfParallelFalse)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_FALSE(vector_under_test.none_of_parallel([](const int& number) { return number > 7; }));
 }
 
 TEST(VectorTest, NoneOfParallelTrue)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_TRUE(vector_under_test.none_of_parallel([](const int& number) { return number < -2; }));
 }
 
 TEST(VectorTest, ForEachParallel)
 {
-    functional_vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector<int> vector_under_test({1, 4, 2, 5, 8, 3, 1, 7, 1});
     EXPECT_EQ(9, vector_under_test.size());
     std::atomic<int> counter(0);
     vector_under_test.for_each_parallel([&](const int& element) { ++counter; });
