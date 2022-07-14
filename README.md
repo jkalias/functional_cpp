@@ -282,6 +282,7 @@ struct person_comparator {
 
 // ...
 
+// a set containing all colleagues
 const fcpp::set<person, person_comparator> colleagues({
     person(51, "George"),
     person(15, "Jake"),
@@ -290,23 +291,29 @@ const fcpp::set<person, person_comparator> colleagues({
     person(25, "Kate")
 });
 
+// a set containing all friends
 const fcpp::set<person, person_comparator> friends({
     person(51, "George"),
     person(41, "Jackie"),
     person(42, "Crystal"),
 });
 
+// find which colleagues are not friends
 // contains person(15, "Jake"), person(18, "Jannet") and person(25, "Kate")
 const auto colleagues_but_not_friends = colleagues.difference_with(friends);
 
+// find which friends are colleagues
+// same as colleagues.intersect_with(friends)
 // contains person(51, "George"), person(41, "Jackie")
-const auto good_colleagues = colleagues.intersection_with(friends);
+const auto good_colleagues = friends.intersection_with(colleagues);
 
+// a set of close family members
 const fcpp::set<person, person_comparator> family({
     person(51, "Paul"),
     person(81, "Barbara"),
 });
 
+// all of our friends and family for the next party invitation
 // contains person(51, "George"), person(41, "Jackie"), person(42, "Crystal"), person(51, "Paul"), person(81, "Barbara") 
 const auto friends_and_family = friends.union_with(family);
 ```
