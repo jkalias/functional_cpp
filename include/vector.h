@@ -1436,7 +1436,7 @@ public:
     //      const auto& unique_numbers = numbers.distinct();
     //
     // outcome:
-    //      unique_numbers -> functional_set<int>({1, 2, 3, 4, 5, 7, 8})
+    //      unique_numbers -> fcpp::set<int>({1, 2, 3, 4, 5, 7, 8})
     template <typename UCompare = std::less<T>>
     set<T, UCompare> distinct() const {
         return set<T, UCompare>(*this);

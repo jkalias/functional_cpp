@@ -184,7 +184,7 @@ public:
     // output of applying the transform function on every element of this instance.
     //
     // example:
-    //      const functional_vector<int> input_set({ 1, 3, -5 });
+    //      const fcpp::vector<int> input_set({ 1, 3, -5 });
     //      const auto output_set = input_set.map<std::string>([](const int& element) {
     //          return std::to_string(element);
     //      });
