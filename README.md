@@ -82,6 +82,15 @@ struct person {
     {}
     int age;
     std::string name;
+    
+    std::size_t hash() const {
+        // a clever implementation of hash    
+        // ...
+    }
+    
+    bool operator< (const person& other) const {
+        return hash() < other.hash();
+    }
 };
 
 // ...
@@ -264,29 +273,7 @@ none_of_parallel
 ```c++
 #include "set.h" // instead of <set>
 
-struct person
-{
-    person(int age, std::string name)
-    : age(age), name(std::move(name))
-    {
-    }
-    
-    int age;
-    std::string name;
-    
-    // ...
-    // ...
-    
-    std::size_t hash() const {
-        // a clever implementation of hash    
-        // ...
-    }
-    
-    bool operator< (const person& other) const {
-        return hash() < other.hash();
-    }
-};
-
+// struct person as defined previously
 struct person_comparator {
     bool operator() (const person& a, const person& b) const {
         return a < b;
