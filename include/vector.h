@@ -21,14 +21,19 @@
 // SOFTWARE.
 
 #pragma once
-#include <vector>
 #include <algorithm>
 #include <type_traits>
+#include <vector>
 #include "index_range.h"
 #include "optional.h"
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 #include <execution>
 #endif
+
+namespace fcpp {
+
+template <class T, class Compare>
+class set;
 
 // A lightweight wrapper around std::vector, enabling fluent and functional
 // programming on the vector itself, rather than using the more procedural style
@@ -37,24 +42,25 @@
 // Member functions can be mutating (eg. my_vector.reverse()) or
 // non-mutating (eg. my_vector.reversed()) enforcing thread safety if needed
 template <typename T>
-class functional_vector
+class vector
 {
 public:
-    functional_vector()
+    vector()
     : backing_vector_()
     {
     }
     
-    explicit functional_vector(const std::vector<T>& vector)
+    explicit vector(const std::vector<T>& vector)
     : backing_vector_(vector)
     {
     }
     
-    explicit functional_vector(std::vector<T>&& vector)
+    explicit vector(std::vector<T>&& vector)
     : backing_vector_(std::move(vector))
     {
     }
-    explicit functional_vector(std::initializer_list<T> list)
+    
+    explicit vector(std::initializer_list<T> list)
     : backing_vector_(std::move(list))
     {
     }
@@ -62,11 +68,11 @@ public:
     // Creates a new vector by repeating a given element.
     //
     // example:
-    //      const functional_vector<std::string> filled_vector(3, "John");
+    //      const fcpp::vector<std::string> filled_vector(3, "John");
     //
     // outcome:
-    //      filled_vector -> functional_vector<std::string>({ "John", "John", "John" })
-    explicit functional_vector(size_t count, const T& element)
+    //      filled_vector -> fcpp::vector<std::string>({ "John", "John", "John" })
+    explicit vector(size_t count, const T& element)
     : backing_vector_(count, element)
     {
     }
@@ -75,17 +81,17 @@ public:
     // output of applying the transform function on every element of this instance.
     //
     // example:
-    //      const functional_vector<int> input_vector({ 1, 3, -5 });
+    //      const fcpp::vector<int> input_vector({ 1, 3, -5 });
     //      const auto output_vector = input_vector.map<std::string>([](const auto& element) {
     //      	return std::to_string(element);
     //      });
     //
     // outcome:
-    //      output_vector -> functional_vector<std::string>({ "1", "3", "-5" })
+    //      output_vector -> fcpp::vector<std::string>({ "1", "3", "-5" })
     //
     // is equivalent to:
-    //      const functional_vector<int> input_vector({ 1, 3, -5 });
-    //      functional_vector<std::string> output_vector;
+    //      const fcpp::vector<int> input_vector({ 1, 3, -5 });
+    //      fcpp::vector<std::string> output_vector;
     //      for (auto i = 0; i < input_vector.size(); ++i) {
     //      	output_vector.insert_back(std::to_string(input_vector[i]));
     //      }
@@ -94,7 +100,7 @@ public:
 #else
     template <typename U, typename Transform>
 #endif
-    functional_vector<U> map(Transform && transform) const
+    vector<U> map(Transform && transform) const
     {
         std::vector<U> transformed_vector;
         transformed_vector.reserve(backing_vector_.size());
@@ -102,14 +108,14 @@ public:
                        backing_vector_.end(),
                        std::back_inserter(transformed_vector),
                        std::forward<Transform>(transform));
-        return functional_vector<U>(transformed_vector);
+        return vector<U>(transformed_vector);
     }
         
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the functional `map` algorithm in parallel.
     // See also the sequential version for more documentation.
     template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
-    functional_vector<U> map_parallel(Transform && transform) const
+    vector<U> map_parallel(Transform && transform) const
     {
         std::vector<U> transformed_vector;
         transformed_vector.resize(backing_vector_.size());
@@ -118,14 +124,14 @@ public:
                        backing_vector_.cend(),
                        transformed_vector.begin(),
                        std::forward<Transform>(transform));
-        return functional_vector<U>(transformed_vector);
+        return vector<U>(transformed_vector);
     }
 #endif
     
     // Returns true if all elements match the predicate (return true)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //
     //      // returns true
     //      numbers.all_of([](const auto &number) {
@@ -143,8 +149,8 @@ public:
 #endif
     bool all_of(Callable && unary_predicate) const
     {
-        return std::all_of(cbegin(),
-                           cend(),
+        return std::all_of(begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
         
@@ -155,8 +161,8 @@ public:
     bool all_of_parallel(Callable && unary_predicate) const
     {
         return std::all_of(std::execution::par,
-                           cbegin(),
-                           cend(),
+                           begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
 #endif
@@ -164,7 +170,7 @@ public:
     // Returns true if at least one of the elements matches the predicate (returns true)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //
     //      // returns true
     //      numbers.any_of([](const auto &number) {
@@ -182,8 +188,8 @@ public:
 #endif
     bool any_of(Callable && unary_predicate) const
     {
-        return std::any_of(cbegin(),
-                           cend(),
+        return std::any_of(begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
         
@@ -194,8 +200,8 @@ public:
     bool any_of_parallel(Callable && unary_predicate) const
     {
         return std::any_of(std::execution::par,
-                           cbegin(),
-                           cend(),
+                           begin(),
+                           end(),
                            std::forward<Callable>(unary_predicate));
     }
 #endif
@@ -203,7 +209,7 @@ public:
     // Returns true if no element matches the predicate (all return false)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //
     //      // returns true
     //      numbers.none_of([](const auto &number) {
@@ -221,8 +227,8 @@ public:
 #endif
     bool none_of(Callable && unary_predicate) const
     {
-        return std::none_of(cbegin(),
-                            cend(),
+        return std::none_of(begin(),
+                            end(),
                             std::forward<Callable>(unary_predicate));
     }
         
@@ -233,8 +239,8 @@ public:
     bool none_of_parallel(Callable && unary_predicate) const
     {
         return std::none_of(std::execution::par,
-                            cbegin(),
-                            cend(),
+                            begin(),
+                            end(),
                             std::forward<Callable>(unary_predicate));
     }
 #endif
@@ -243,16 +249,16 @@ public:
     // which match the given predicate are kept (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      fcpp::vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
     //      numbers.filter([](const auto& element) {
     //          return element >= 1.5;
     //      });
     //
     // outcome:
-    //      numbers -> functional_vector<int>({ 3, 2, 9 });
+    //      numbers -> fcpp::vector<int>({ 3, 2, 9 });
     //
     // is equivalent to:
-    //      functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      fcpp::vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
     //      for (auto i = 0; i < numbers.size(); ++i) {
     //          if (numbers[i] >= 1.5) {
     //              continue;
@@ -265,7 +271,7 @@ public:
 #else
     template <typename Filter>
 #endif
-    functional_vector& filter(Filter && predicate_to_keep)
+    vector& filter(Filter && predicate_to_keep)
     {
         backing_vector_.erase(std::remove_if(backing_vector_.begin(),
                                              backing_vector_.end(),
@@ -279,7 +285,7 @@ public:
     // Performs the functional `filter` algorithm in parallel.
     // See also the sequential version for more documentation.
     template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
-    functional_vector& filter_parallel(Filter && predicate_to_keep)
+    vector& filter_parallel(Filter && predicate_to_keep)
     {
         backing_vector_.erase(std::remove_if(std::execution::par,
                                              backing_vector_.begin(),
@@ -292,21 +298,21 @@ public:
 #endif
     
     // Performs the functional `filter` algorithm in a copy of this instance, in which all elements of
-    // the copy which match the given predicate (non-mutating)
+    // the copy which match the given predicate are kept (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      const fcpp::vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
     //      const auto filtered_numbers = numbers.filtered([](const auto& element) {
     //          return element >= 1.5;
     //      });
     //
     // outcome:
-    //      numbers -> functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 })
-    //      filtered_numbers -> functional_vector<int>({ 3, 2, 9 })
+    //      numbers -> fcpp::vector<int>({ 1, 3, -5, 2, -1, 9, -4 })
+    //      filtered_numbers -> fcpp::vector<int>({ 3, 2, 9 })
     //
     // is equivalent to:
-    //      const functional_vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
-    //      functional_vector<int> filtered_numbers;
+    //      const fcpp::vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+    //      fcpp::vector<int> filtered_numbers;
     //      for (auto i = 0; i < numbers.size(); ++i) {
     //          if (numbers[i] >= 1.5) {
     //              filtered_numbers.insert_back(numbers[i]);
@@ -317,7 +323,7 @@ public:
 #else
     template <typename Callable>
 #endif
-    functional_vector filtered(Callable && predicate_to_keep) const
+    vector filtered(Callable && predicate_to_keep) const
     {
         std::vector<T> filtered_vector;
         filtered_vector.reserve(backing_vector_.size());
@@ -325,14 +331,14 @@ public:
                      backing_vector_.end(),
                      std::back_inserter(filtered_vector),
                      std::forward<Callable>(predicate_to_keep));
-        return functional_vector(filtered_vector);
+        return vector(filtered_vector);
     }
     
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `filtered` algorithm in parallel.
     // See also the sequential version for more documentation.
     template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Callable, T>>>
-    functional_vector filtered_parallel(Callable && predicate_to_keep) const
+    vector filtered_parallel(Callable && predicate_to_keep) const
     {
 #ifdef _MSC_VER
         // Visual Studio compiler is stricter than GCC in its use of iterators, so back_inserter wouldn't work here
@@ -347,7 +353,7 @@ public:
                      backing_vector_.end(),
                      std::back_inserter(filtered_vector),
                      std::forward<Callable>(predicate_to_keep));
-        return functional_vector(filtered_vector);
+        return vector(filtered_vector);
 #endif
     }
 #endif
@@ -355,12 +361,12 @@ public:
     // Reverses the order of the elements in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers_vector({ 1, 3, -5, 2, -1, 9, -4 });
+    //      fcpp::vector<int> numbers_vector({ 1, 3, -5, 2, -1, 9, -4 });
     //      numbers_vector.reverse();
     //
     // outcome:
-    //      numbers_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
-    functional_vector& reverse()
+    //      numbers_vector -> fcpp::vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
+    vector& reverse()
     {
         std::reverse(backing_vector_.begin(), backing_vector_.end());
         return *this;
@@ -369,24 +375,17 @@ public:
     // Returns a copy of this instance, whose elements are in reverse order (non-mutating)
     //
     // example:
-    //      const functional_vector<int> input_vector({ 1, 3, -5, 2, -1, 9, -4 });
+    //      const fcpp::vector<int> input_vector({ 1, 3, -5, 2, -1, 9, -4 });
     //      const auto reversed_vector = input_vector.reversed();
     //
     // outcome:
-    //      input_vector -> functional_vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
-    //      reversed_vector -> functional_vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
-    [[nodiscard]] functional_vector reversed() const
+    //      input_vector -> fcpp::vector<int>({ 1, 3, -5, 2, -1, 9, -4 });
+    //      reversed_vector -> fcpp::vector<int>({ -4, 9, -1, 2, -5, 3, 1 })
+    [[nodiscard]] vector reversed() const
     {
         std::vector<T> reversed_vector(backing_vector_.crbegin(), backing_vector_.crend());
-        return functional_vector(std::move(reversed_vector));
+        return vector(std::move(reversed_vector));
     }
-    
-    template <typename U>
-    struct pair
-    {
-        T first;
-        U second;
-    };
     
 #ifdef CPP17_AVAILABLE
     template<typename Iterator>
@@ -403,34 +402,34 @@ public:
     // index. The sizes of the two vectors must be equal.
     //
     // example:
-    //      const functional_vector ages_vector({32, 25, 53});
-    //      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
+    //      const fcpp::vector ages_vector({32, 25, 53});
+    //      const fcpp::vector<std::string> names_vector({"Jake", "Mary", "John"});
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
+    //      zipped_vector -> fcpp::vector<std::pair<int, std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
     //                       })
     //
     // is equivalent to:
-    //      const functional_vector ages_vector({32, 25, 53});
-    //      const functional_vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
+    //      const fcpp::vector ages_vector({32, 25, 53});
+    //      const fcpp::vector<std::string> names_vector({"Jake", "Mary", "John"});
+    //      fcpp::vector<std::pair<int, std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::pair<std::string> tuple;
+    //          fcpp::vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip(const functional_vector<U>& vector) const
+    [[nodiscard]] vector<std::pair<T, U>> zip(const vector<U>& vector) const
     {
 #ifdef CPP17_AVAILABLE
-        return zip_impl(vector.cbegin(), vector.cend());
+        return zip_impl(vector.begin(), vector.end());
 #else
-        return zip_impl<U>(vector.cbegin(), vector.cend());
+        return zip_impl<U>(vector.begin(), vector.end());
 #endif
     }
     
@@ -439,29 +438,29 @@ public:
     // index. The sizes of the two vectors must be equal.
     //
     // example:
-    //      const functional_vector ages_vector({32, 25, 53});
+    //      const fcpp::vector ages_vector({32, 25, 53});
     //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
+    //      zipped_vector -> fcpp::vector<std::pair<int, std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
     //                       })
     //
     // is equivalent to:
-    //      const functional_vector ages_vector({32, 25, 53});
+    //      const fcpp::vector ages_vector({32, 25, 53});
     //      const std::vector<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
+    //      fcpp::vector<std::pair<int, std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::pair<std::string> tuple;
+    //          fcpp::vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip(const std::vector<U>& vector) const
+    [[nodiscard]] vector<std::pair<T, U>> zip(const std::vector<U>& vector) const
     {
 #ifdef CPP17_AVAILABLE
         return zip_impl(vector.cbegin(), vector.cend());
@@ -471,29 +470,29 @@ public:
     }
     
     // example:
-    //      const functional_vector ages_vector({32, 25, 53});
+    //      const fcpp::vector ages_vector({32, 25, 53});
     //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
     //      const auto zipped_vector = ages_vector.zip(names_vector);
     //
     // outcome:
-    //      zipped_vector -> functional_vector<functional_vector<int>::pair<std::string>>({
+    //      zipped_vector -> fcpp::vector<std::pair<int, std::string>>({
     //                          (32, "Jake"),
     //                          (25, "Mary"),
     //                          (53, "John"),
     //                       })
     //
     // is equivalent to:
-    //      const functional_vector ages_vector({32, 25, 53});
+    //      const fcpp::vector ages_vector({32, 25, 53});
     //      const std::initializer_list<std::string> names_vector({"Jake", "Mary", "John"});
-    //      functional_vector<functional_vector<int>::pair<std::string>> zipped_vector;
+    //      fcpp::vector<std::pair<int, std::string>> zipped_vector;
     //      for (auto i = 0; i < ages_vector.size(); ++i) {
-    //          functional_vector<int>::pair<std::string> tuple;
+    //          fcpp::vector<int>::pair<std::string> tuple;
     //          tuple.first = ages_vector[i];
     //          tuple.second = names_vector[i];
     //          zipped_vector.insert_back(tuple);
     //      }
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip(const std::initializer_list<U>& list) const
+    [[nodiscard]] vector<std::pair<T, U>> zip(const std::initializer_list<U>& list) const
     {
 #ifdef CPP17_AVAILABLE
         return zip_impl(list.begin(), list.end());
@@ -512,7 +511,7 @@ public:
     //          std::string name;
     //      };
     //      ...
-    //      functional_vector persons_vector({
+    //      fcpp::vector persons_vector({
     //          person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
     //      });
     //      persons_vector.sort([](const auto& person1, const auto& person2) {
@@ -520,7 +519,7 @@ public:
     //      });
     //
     // outcome:
-    //      person_vector -> functional_vector({
+    //      person_vector -> fcpp::vector({
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
 #ifdef CPP17_AVAILABLE
@@ -528,7 +527,7 @@ public:
 #else
     template <typename Sortable>
 #endif
-    functional_vector& sort(Sortable && comparison_predicate)
+    vector& sort(Sortable && comparison_predicate)
     {
         std::sort(backing_vector_.begin(),
                   backing_vector_.end(),
@@ -540,7 +539,7 @@ public:
     // Performs the `sort` algorithm in parallel.
     // See also the sequential version for more documentation.
     template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
-    functional_vector& sort_parallel(Sortable && comparison_predicate)
+    vector& sort_parallel(Sortable && comparison_predicate)
     {
         std::sort(std::execution::par,
                   backing_vector_.begin(),
@@ -553,12 +552,12 @@ public:
     // Sorts the vector in place in ascending order, when its elements support comparison by std::less_equal [<=] (mutating).
     //
     // example:
-    //      functional_vector numbers({3, 1, 9, -4});
+    //      fcpp::vector numbers({3, 1, 9, -4});
     //      numbers.sort_ascending();
     //
     // outcome:
-    //      numbers -> functional_vector({-4, 1, 3, 9});
-    functional_vector& sort_ascending()
+    //      numbers -> fcpp::vector({-4, 1, 3, 9});
+    vector& sort_ascending()
     {
         return sort(std::less_equal<T>());
     }
@@ -566,7 +565,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sort_ascending` algorithm in parallel.
     // See also the sequential version for more documentation.
-    functional_vector& sort_ascending_parallel()
+    vector& sort_ascending_parallel()
     {
         return sort_parallel(std::less_equal<T>());
     }
@@ -575,12 +574,12 @@ public:
     // Sorts the vector in place in descending order, when its elements support comparison by std::greater_equal [>=] (mutating).
     //
     // example:
-    //      functional_vector numbers({3, 1, 9, -4});
+    //      fcpp::vector numbers({3, 1, 9, -4});
     //      numbers.sort_ascending();
     //
     // outcome:
-    //      numbers -> functional_vector({9, 3, 1, -4});
-    functional_vector& sort_descending()
+    //      numbers -> fcpp::vector({9, 3, 1, -4});
+    vector& sort_descending()
     {
         return sort(std::greater_equal<T>());
     }
@@ -588,7 +587,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sort_ascending` algorithm in parallel.
     // See also the sequential version for more documentation.
-    functional_vector& sort_descending_parallel()
+    vector& sort_descending_parallel()
     {
         return sort_parallel(std::greater_equal<T>());
     }
@@ -604,7 +603,7 @@ public:
     //          std::string name;
     //      };
     //      ...
-    //      const functional_vector persons_vector({
+    //      const fcpp::vector persons_vector({
     //          person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
     //      });
     //      auto sorted_persons_vector = persons_vector.sorted([](const auto& person1, const auto& person2) {
@@ -612,7 +611,7 @@ public:
     //      });
     //
     // outcome:
-    //      sorted_persons_vector -> functional_vector({
+    //      sorted_persons_vector -> fcpp::vector({
     //          person(8, "Alice"), person(34, "Bob"), person(45, "Jake"), person(52, "Manfred")
     //      });
 #ifdef CPP17_AVAILABLE
@@ -620,39 +619,39 @@ public:
 #else
     template <typename Sortable>
 #endif
-    functional_vector sorted(Sortable && comparison_predicate) const
+    vector sorted(Sortable && comparison_predicate) const
     {
         auto sorted_vector(backing_vector_);
         std::sort(sorted_vector.begin(),
                   sorted_vector.end(),
                   std::forward<Sortable>(comparison_predicate));
-        return functional_vector(sorted_vector);
+        return vector(sorted_vector);
     }
         
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sorted` algorithm in parallel.
     // See also the sequential version for more documentation.
     template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
-    functional_vector sorted_parallel(Sortable && comparison_predicate) const
+    vector sorted_parallel(Sortable && comparison_predicate) const
     {
         auto sorted_vector(backing_vector_);
         std::sort(std::execution::par,
                   sorted_vector.begin(),
                   sorted_vector.end(),
                   std::forward<Sortable>(comparison_predicate));
-        return functional_vector(sorted_vector);
+        return fcpp::vector(sorted_vector);
     }
 #endif
     
     // Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less_equal [<=] (non-mutating).
     //
     // example:
-    //      const functional_vector numbers({3, 1, 9, -4});
+    //      const fcpp::vector numbers({3, 1, 9, -4});
     //      auto sorted_numbers = numbers.sorted_ascending();
     //
     // outcome:
-    //      sorted_numbers -> functional_vector({-4, 1, 3, 9});
-    [[nodiscard]] functional_vector sorted_ascending() const
+    //      sorted_numbers -> fcpp::vector({-4, 1, 3, 9});
+    [[nodiscard]] vector sorted_ascending() const
     {
         return sorted(std::less_equal<T>());
     }
@@ -660,7 +659,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sorted_ascending` algorithm in parallel.
     // See also the sequential version for more documentation.
-    [[nodiscard]] functional_vector sorted_ascending_parallel() const
+    [[nodiscard]] vector sorted_ascending_parallel() const
     {
         return sorted_parallel(std::less_equal<T>());
     }
@@ -669,12 +668,12 @@ public:
     // Sorts its elements copied and sorted in descending order, when its elements support comparison by std::greater_equal [>=] (non-mutating).
     //
     // example:
-    //      const functional_vector numbers({3, 1, 9, -4});
+    //      const fcpp::vector numbers({3, 1, 9, -4});
     //      auto sorted_numbers = numbers.sorted_descending();
     //
     // outcome:
-    //      sorted_numbers -> functional_vector({9, 3, 1, -4});
-    [[nodiscard]] functional_vector sorted_descending() const
+    //      sorted_numbers -> fcpp::vector({9, 3, 1, -4});
+    [[nodiscard]] vector sorted_descending() const
     {
         return sorted(std::greater_equal<T>());
     }
@@ -682,7 +681,7 @@ public:
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
     // Performs the `sorted_descending` algorithm in parallel.
     // See also the sequential version for more documentation.
-    [[nodiscard]] functional_vector sorted_descending_parallel() const
+    [[nodiscard]] vector sorted_descending_parallel() const
     {
         return sorted_parallel(std::greater_equal<T>());
     }
@@ -695,7 +694,7 @@ public:
 #else
     template <typename Callable>
 #endif
-    const functional_vector& for_each(Callable && operation) const
+    const vector& for_each(Callable && operation) const
     {
         std::for_each(backing_vector_.cbegin(),
                       backing_vector_.cend(),
@@ -707,7 +706,7 @@ public:
     // Executes the given operation for each element of the vector in parallel. The operation must not
     // change the vector's contents during execution.
     template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<void, Callable, T const &>>>
-    const functional_vector& for_each_parallel(Callable && operation) const
+    const vector& for_each_parallel(Callable && operation) const
     {
         std::for_each(std::execution::par,
                       backing_vector_.cbegin(),
@@ -719,10 +718,10 @@ public:
         
     // Returns the first index in which the given element is found in the vector.
     // In case of multiple occurrences, only the first index is returned
-    // (see find_all_indices for multiple occurences).
+    // (see find_all_indices for multiple occurrences).
     //
     // example:
-    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      const auto index_of_one = numbers.find_first_index(1);
     //      const auto index_of_nine = numbers.find_first_index(9);
     //
@@ -730,7 +729,7 @@ public:
     //      index_of_one.value() -> 0
     //      index_of_one.has_value() -> true
     //      index_of_nine.has_value() -> false
-    [[nodiscard]] optional_t<size_t> find_first_index(const T& element) const
+    [[nodiscard]] fcpp::optional_t<size_t> find_first_index(const T& element) const
     {
         auto const it = std::find(backing_vector_.cbegin(),
                                   backing_vector_.cend(),
@@ -739,7 +738,7 @@ public:
             auto index = std::distance(backing_vector_.cbegin(), it);
             return index;
         }
-        return optional_t<size_t>();
+        return fcpp::optional_t<size_t>();
     }
     
     // Returns the last index in which the given element is found in the vector.
@@ -747,7 +746,7 @@ public:
     // (see find_all_indices for multiple occurrences).
     //
     // example:
-    //      const functional_vector numbers({1, 4, 2, 5, -6, 3, 1, 7, 1});
+    //      const fcpp::vector numbers({1, 4, 2, 5, -6, 3, 1, 7, 1});
     //      const auto index_of_one = numbers.find_last_index(1);
     //      const auto index_of_nine = numbers.find_last_index(9);
     //
@@ -755,7 +754,7 @@ public:
     //      index_of_one.value() -> 8
     //      index_of_one.has_value() -> true
     //      index_of_nine.has_value() -> false
-    [[nodiscard]] optional_t<size_t> find_last_index(const T& element) const
+    [[nodiscard]]  fcpp::optional_t<size_t> find_last_index(const T& element) const
     {
         auto const it = std::find(backing_vector_.crbegin(),
                                   backing_vector_.crend(),
@@ -764,13 +763,13 @@ public:
             auto index = std::distance(it, backing_vector_.crend()) - 1;
             return index;
         }
-        return optional_t<size_t>();
+        return  fcpp::optional_t<size_t>();
     }
     
     // Returns all indices in which the given element is found in the vector.
     //
     // example:
-    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 9, 1});
+    //      const fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 9, 1});
     //      const auto indices_of_one = numbers.find_all_indices(1);
     //      const auto indices_of_ten = numbers.find_all_indices(10);
     //
@@ -795,12 +794,12 @@ public:
     // Removes the element at `index` (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.remove_at(4);
     //
     // outcome:
-    //      numbers -> functional_vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
-    functional_vector& remove_at(int index)
+    //      numbers -> fcpp::vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
+    vector& remove_at(int index)
     {
         assert_smaller_size(index);
         backing_vector_.erase(begin() + index);
@@ -810,28 +809,28 @@ public:
     // Returns a copy of itself in which the element at `index` is removed (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto shorter_vector = numbers.removing_at(4);
     //
     // outcome:
-    //      shorter_vector -> functional_vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector removing_at(int index) const
+    //      shorter_vector -> fcpp::vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
+    [[nodiscard]] vector removing_at(int index) const
     {
         assert_smaller_size(index);
         auto copy(backing_vector_);
         copy.erase(copy.begin() + index);
-        return functional_vector(copy);
+        return vector(copy);
     }
     
     // Removes the last element, if present (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.remove_back();
     //
     // outcome:
-    //      numbers -> functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
-    functional_vector& remove_back()
+    //      numbers -> fcpp::vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
+    vector& remove_back()
     {
         backing_vector_.pop_back();
         return *this;
@@ -840,27 +839,27 @@ public:
     // Returns a copy of itself in which the last element is removed (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto shorter_vector = numbers.removing_back();
     //
     // outcome:
-    //      shorter_vector -> functional_vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
-    [[nodiscard]] functional_vector removing_back() const
+    //      shorter_vector -> fcpp::vector<int>({1, 4, 2, 5, 8, 3, 1, 7});
+    [[nodiscard]] vector removing_back() const
     {
         auto copy(backing_vector_);
         copy.pop_back();
-        return functional_vector(copy);
+        return vector(copy);
     }
     
     // Removes the first element, if present (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.remove_front();
     //
     // outcome:
-    //      numbers -> functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
-    functional_vector& remove_front()
+    //      numbers -> fcpp::vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
+    vector& remove_front()
     {
         if (size() == 0)
         {
@@ -872,12 +871,12 @@ public:
     // Returns a copy of itself in which the first element is removed (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto shorter_numbers = numbers.removing_front();
     //
     // outcome:
-    //      shorter_numbers -> functional_vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector removing_front() const
+    //      shorter_numbers -> fcpp::vector<int>({4, 2, 5, 8, 3, 1, 7, 1});
+    [[nodiscard]] vector removing_front() const
     {
         if (size() == 0)
         {
@@ -889,12 +888,12 @@ public:
     // Removes the elements whose index is contained in the given index range (mutating)
     //
     // example:
-    //		functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //		fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //		numbers.remove_range(index_range::start_count(2, 3));
     //
     // outcome:
-    //		numbers -> functional_vector<int>({ 1, 4, 2, 7, 1 })
-    functional_vector& remove_range(index_range range)
+    //		numbers -> fcpp::vector<int>({ 1, 4, 2, 7, 1 })
+    vector& remove_range(index_range range)
     {
         if (!range.is_valid || size() < range.end + 1)
         {
@@ -908,12 +907,12 @@ public:
     // Returns a copy by removing the elements whose index is contained in the given index range (non-mutating)
     //
     // example:
-    //		const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //		const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //		const auto shorter_vector = numbers.removing_range(index_range::start_count(2, 3));
     //
     // outcome:
-    //		shorter_vector -> functional_vector<int>({ 1, 4, 3, 1, 7, 1 })
-    [[nodiscard]] functional_vector removing_range(index_range range) const
+    //		shorter_vector -> fcpp::vector<int>({ 1, 4, 3, 1, 7, 1 })
+    [[nodiscard]] vector removing_range(index_range range) const
     {
         if (!range.is_valid || size() < range.end + 1)
         {
@@ -922,18 +921,18 @@ public:
         auto shorter_vector(backing_vector_);
         shorter_vector.erase(shorter_vector.begin() + range.start,
                              shorter_vector.begin() + range.start + range.count);
-        return functional_vector(shorter_vector);
+        return vector(shorter_vector);
     }
     
     // Inserts an element at the given index, therefore changing the vector's contents (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.insert_at(3, 18);
     //
     // outcome:
-    //      numbers -> functional_vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
-    functional_vector& insert_at(int index, const T& element)
+    //      numbers -> fcpp::vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
+    vector& insert_at(int index, const T& element)
     {
         assert_smaller_or_equal_size(index);
         backing_vector_.insert(begin() + index, element);
@@ -943,29 +942,57 @@ public:
     // Returns a copy by inserting an element at the given index (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto augmented_numbers = numbers.inserting_at(3, 18);
     //
     // outcome:
-    //      augmented_numbers -> functional_vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector inserting_at(int index, const T& element) const
+    //      augmented_numbers -> fcpp::vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
+    [[nodiscard]] vector inserting_at(int index, const T& element) const
     {
         assert_smaller_or_equal_size(index);
         auto copy(backing_vector_);
         copy.insert(copy.begin() + index, element);
-        return functional_vector(copy);
+        return vector(copy);
     }
     
     // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      const functional_vector vector_to_insert({9, -5, 6});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector vector_to_insert({9, -5, 6});
     //      numbers.insert_at(3, vector_to_insert);
     //
     // outcome:
-    //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    functional_vector& insert_at(int index, const functional_vector<T>& vector)
+    //      numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
+    vector& insert_at(int index, const vector<T>& vector)
+    {
+        return insert_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
+    //
+    // example:
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector vector_to_insert({9, -5, 6});
+    //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      augmented_numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
+    [[nodiscard]] vector inserting_at(int index, const vector<T>& vector) const
+    {
+        return inserting_at_impl(index, vector.begin(), vector.end());
+    }
+    
+    // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
+    //
+    // example:
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const std::vector vector_to_insert({9, -5, 6});
+    //      numbers.insert_at(3, vector_to_insert);
+    //
+    // outcome:
+    //      numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
+    vector& insert_at(int index, const std::vector<T>& vector)
     {
         return insert_at_impl(index, vector.cbegin(), vector.cend());
     }
@@ -973,13 +1000,13 @@ public:
     // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      const functional_vector vector_to_insert({9, -5, 6});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const std::vector vector_to_insert({9, -5, 6});
     //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
     //
     // outcome:
-    //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector inserting_at(int index, const functional_vector<T>& vector) const
+    //      augmented_numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
+    [[nodiscard]] vector inserting_at(int index, const std::vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.cbegin(), vector.cend());
     }
@@ -987,41 +1014,13 @@ public:
     // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      const std::vector vector_to_insert({9, -5, 6});
-    //      numbers.insert_at(3, vector_to_insert);
-    //
-    // outcome:
-    //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    functional_vector& insert_at(int index, const std::vector<T>& vector)
-    {
-        return insert_at_impl(index, vector.cbegin(), vector.cend());
-    }
-    
-    // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
-    //
-    // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      const std::vector vector_to_insert({9, -5, 6});
-    //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
-    //
-    // outcome:
-    //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector inserting_at(int index, const std::vector<T>& vector) const
-    {
-        return inserting_at_impl(index, vector.cbegin(), vector.cend());
-    }
-    
-    // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
-    //
-    // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      const std::initializer_list vector_to_insert({9, -5, 6});
     //      numbers.insert_at(3, vector_to_insert);
     //
     // outcome:
-    //      numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    functional_vector& insert_at(int index, std::initializer_list<T> list)
+    //      numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
+    vector& insert_at(int index, std::initializer_list<T> list)
     {
         return insert_at(index, std::vector<T>(std::move(list)));
     }
@@ -1029,13 +1028,13 @@ public:
     // Returns a copy by inserting a range of elements starting at the given index (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      const std::initializer_list vector_to_insert({9, -5, 6});
     //      auto augmented_numbers = numbers.inserting_at(3, vector_to_insert);
     //
     // outcome:
-    //      augmented_numbers -> functional_vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector inserting_at(int index, std::initializer_list<T> list) const
+    //      augmented_numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
+    [[nodiscard]] vector inserting_at(int index, std::initializer_list<T> list) const
     {
         return inserting_at(index, std::vector<T>(std::move(list)));
     }
@@ -1043,12 +1042,12 @@ public:
     // Inserts a value at the end of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.insert_back(18);
     //
     // outcome:
-    //      numbers -> functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
-    functional_vector& insert_back(T value)
+    //      numbers -> fcpp::vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
+    vector& insert_back(T value)
     {
         backing_vector_.push_back(value);
         return *this;
@@ -1057,12 +1056,12 @@ public:
     // Inserts a value at the beginning of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.insert_front(18);
     //
     // outcome:
-    //      numbers -> functional_vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
-    functional_vector& insert_front(T value)
+    //      numbers -> fcpp::vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
+    vector& insert_front(T value)
     {
         return insert_at(0, value);
     }
@@ -1070,27 +1069,27 @@ public:
     // Makes a copy of the vector, inserts value at the end of the copy and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto augmented_numbers = numbers.inserting_back(18);
     //
     // outcome:
-    //      augmented_numbers -> functional_vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
-    [[nodiscard]] functional_vector inserting_back(T value) const
+    //      augmented_numbers -> fcpp::vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
+    [[nodiscard]] vector inserting_back(T value) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.push_back(value);
-        return functional_vector(augmented_vector);
+        return vector(augmented_vector);
     }
     
     // Makes a copy of the vector, inserts value at the beginning of the copy and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto augmented_numbers = numbers.inserting_front(18);
     //
     // outcome:
-    //      augmented_numbers -> functional_vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] functional_vector inserting_front(T value) const
+    //      augmented_numbers -> fcpp::vector({18, 1, 4, 2, 5, 8, 3, 1, 7, 1});
+    [[nodiscard]] vector inserting_front(T value) const
     {
         return inserting_at(0, value);
     }
@@ -1098,64 +1097,64 @@ public:
     // Inserts a range of values at the end of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_back(functional_vector({1, 2, 3}));
+    //      fcpp::vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_back(fcpp::vector({1, 2, 3}));
     //
     // outcome:
-    //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-    functional_vector& insert_back(const functional_vector<T>& vector)
+    //      numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+    vector& insert_back(const vector<T>& vector)
     {
-        return insert_back_range_impl(vector.cbegin(), vector.cend());
+        return insert_back_range_impl(vector.begin(), vector.end());
     }
     
     // Inserts a range of values at the beginning of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 4, 5, 6 });
-    //      numbers.insert_front(functional_vector({1, 2, 3}));
+    //      fcpp::vector<int> numbers({ 4, 5, 6 });
+    //      numbers.insert_front(fcpp::vector({1, 2, 3}));
     //
     // outcome:
-    //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-    functional_vector& insert_front(const functional_vector<T>& vector)
+    //      numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+    vector& insert_front(const vector<T>& vector)
     {
-        return insert_front_range_impl(vector.cbegin(), vector.cend());
+        return insert_front_range_impl(vector.begin(), vector.end());
     }
     
     // Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_back(functional_vector({1, 2, 3}));
+    //      const fcpp::vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_back(fcpp::vector({1, 2, 3}));
     //
     // outcome:
-    //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-    [[nodiscard]] functional_vector inserting_back(const functional_vector<T>& vector) const
+    //      augmented_numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+    [[nodiscard]] vector inserting_back(const vector<T>& vector) const
     {
-        return inserting_back_range_impl(vector.cbegin(), vector.cend());
+        return inserting_back_range_impl(vector.begin(), vector.end());
     }
     
     // Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 4, 5, 6 });
-    //      auto augmented_numbers = numbers.inserting_front(functional_vector({1, 2, 3}));
+    //      const fcpp::vector<int> numbers({ 4, 5, 6 });
+    //      auto augmented_numbers = numbers.inserting_front(fcpp::vector({1, 2, 3}));
     //
     // outcome:
-    //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-    [[nodiscard]] functional_vector inserting_front(const functional_vector<T>& vector) const
+    //      augmented_numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+    [[nodiscard]] vector inserting_front(const vector<T>& vector) const
     {
-        return inserting_front_range_impl(vector.cbegin(), vector.cend());
+        return inserting_front_range_impl(vector.begin(), vector.end());
     }
     
     // Inserts a range of values at the end of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      fcpp::vector<int> numbers({ 4, 5, 6 });
     //      numbers.insert_back(std::vector({1, 2, 3}));
     //
     // outcome:
-    //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-    functional_vector& insert_back(const std::vector<T>& vector)
+    //      numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+    vector& insert_back(const std::vector<T>& vector)
     {
         return insert_back_range_impl(vector.cbegin(), vector.cend());
     }
@@ -1163,12 +1162,12 @@ public:
     // Inserts a range of values at the beginning of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      fcpp::vector<int> numbers({ 4, 5, 6 });
     //      numbers.insert_front(std::vector({1, 2, 3}));
     //
     // outcome:
-    //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-    functional_vector& insert_front(const std::vector<T>& vector)
+    //      numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+    vector& insert_front(const std::vector<T>& vector)
     {
         return insert_front_range_impl(vector.cbegin(), vector.cend());
     }
@@ -1176,12 +1175,12 @@ public:
     // Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      const fcpp::vector<int> numbers({ 4, 5, 6 });
     //      auto augmented_numbers = numbers.inserting_back(std::vector({1, 2, 3}));
     //
     // outcome:
-    //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-    [[nodiscard]] functional_vector inserting_back(const std::vector<T>& vector) const
+    //      augmented_numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+    [[nodiscard]] vector inserting_back(const std::vector<T>& vector) const
     {
         return inserting_back_range_impl(vector.cbegin(), vector.cend());
     }
@@ -1189,12 +1188,12 @@ public:
     // Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      const fcpp::vector<int> numbers({ 4, 5, 6 });
     //      auto augmented_numbers = numbers.inserting_front(std::vector({1, 2, 3}));
     //
     // outcome:
-    //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-    [[nodiscard]] functional_vector inserting_front(const std::vector<T>& vector) const
+    //      augmented_numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+    [[nodiscard]] vector inserting_front(const std::vector<T>& vector) const
     {
         return inserting_front_range_impl(vector.cbegin(), vector.cend());
     }
@@ -1202,12 +1201,12 @@ public:
     // Inserts a range of values at the end of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      fcpp::vector<int> numbers({ 4, 5, 6 });
     //      numbers.insert_back(std::initializer_list({1, 2, 3}));
     //
     // outcome:
-    //      numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-    functional_vector& insert_back(const std::initializer_list<T>& list)
+    //      numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+    vector& insert_back(const std::initializer_list<T>& list)
     {
         return insert_back(std::vector<T>(list));
     }
@@ -1215,12 +1214,12 @@ public:
     // Inserts a range of values at the beginning of the vector in place (mutating)
     //
     // example:
-    //      functional_vector<int> numbers({ 4, 5, 6 });
+    //      fcpp::vector<int> numbers({ 4, 5, 6 });
     //      numbers.insert_front(std::initializer_list({1, 2, 3}));
     //
     // outcome:
-    //      numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-    functional_vector& insert_front(const std::initializer_list<T>& list)
+    //      numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+    vector& insert_front(const std::initializer_list<T>& list)
     {
         return insert_front(std::vector<T>(list));
     }
@@ -1228,12 +1227,12 @@ public:
     // Makes a copy of the vector, inserts a range of values at the end of the copy, and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      const fcpp::vector<int> numbers({ 4, 5, 6 });
     //      auto augmented_numbers = numbers.inserting_back(std::initializer_list({1, 2, 3}));
     //
     // outcome:
-    //      augmented_numbers -> functional_vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
-    [[nodiscard]] functional_vector inserting_back(const std::initializer_list<T>& list) const
+    //      augmented_numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+    [[nodiscard]] vector inserting_back(const std::initializer_list<T>& list) const
     {
         return inserting_back(std::vector<T>(list));
     }
@@ -1241,12 +1240,12 @@ public:
     // Makes a copy of the vector, inserts a range of values at the beginning of the copy, and returns the copy (non-mutating)
     //
     // example:
-    //      const functional_vector<int> numbers({ 4, 5, 6 });
+    //      const fcpp::vector<int> numbers({ 4, 5, 6 });
     //      auto augmented_numbers = numbers.inserting_front(std::initializer_list({1, 2, 3}));
     //
     // outcome:
-    //      augmented_numbers -> functional_vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
-    [[nodiscard]] functional_vector inserting_front(const std::initializer_list<T>& list) const
+    //      augmented_numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+    [[nodiscard]] vector inserting_front(const std::initializer_list<T>& list) const
     {
         return inserting_front(std::vector<T>(list));
     }
@@ -1254,25 +1253,25 @@ public:
     // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
     //
     // example:
-    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      numbers.replace_range_at(4, functional_vector({9, -10, 8}));
+    //      fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      numbers.replace_range_at(4, fcpp::vector({9, -10, 8}));
     //
     // outcome:
-    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    functional_vector& replace_range_at(int index, const functional_vector<T>& vector)
+    //      numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
+    vector& replace_range_at(int index, const vector<T>& vector)
     {
-        return replace_range_at_imp(index, vector.cbegin(), vector.cend());
+        return replace_range_at_imp(index, vector.begin(), vector.end());
     }
     
     // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
     //
     // example:
-    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.replace_range_at(4, std::vector({9, -10, 8}));
     //
     // outcome:
-    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    functional_vector& replace_range_at(int index, const std::vector<T>& vector)
+    //      numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
+    vector& replace_range_at(int index, const std::vector<T>& vector)
     {
         return replace_range_at_imp(index, vector.cbegin(), vector.cend());
     }
@@ -1280,12 +1279,12 @@ public:
     // Replaces the existing contents starting at `index` with the contents of the given vector (mutating)
     //
     // example:
-    //      functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      numbers.replace_range_at(4, std::initializer_list({9, -10, 8}));
     //
     // outcome:
-    //      numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    functional_vector& replace_range_at(int index, const std::initializer_list<T>& list)
+    //      numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
+    vector& replace_range_at(int index, const std::initializer_list<T>& list)
     {
         return replace_range_at(index, std::vector<T>(list));
     }
@@ -1293,25 +1292,25 @@ public:
     // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
     //
     // example:
-    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-    //      auto replaced_numbers = numbers.replacing_range_at(4, functional_vector({9, -10, 8}));
+    //      const fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      auto replaced_numbers = numbers.replacing_range_at(4, fcpp::vector({9, -10, 8}));
     //
     // outcome:
-    //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    [[nodiscard]] functional_vector replacing_range_at(int index, const functional_vector<T>& vector) const
+    //      replaced_numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
+    [[nodiscard]] vector replacing_range_at(int index, const vector<T>& vector) const
     {
-        return replacing_range_at_imp(index, vector.cbegin(), vector.cend());
+        return replacing_range_at_imp(index, vector.begin(), vector.end());
     }
     
     // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
     //
     // example:
-    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto replaced_numbers = numbers.replacing_range_at(4, std::vector({9, -10, 8}));
     //
     // outcome:
-    //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    [[nodiscard]] functional_vector replacing_range_at(int index, const std::vector<T>& vector) const
+    //      replaced_numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
+    [[nodiscard]] vector replacing_range_at(int index, const std::vector<T>& vector) const
     {
         return replacing_range_at_imp(index, vector.cbegin(), vector.cend());
     }
@@ -1319,12 +1318,12 @@ public:
     // Returns a copy whose elements starting at `index` are replaced with the contents of the given vector (non-mutating)
     //
     // example:
-    //      const functional_vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const fcpp::vector numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     //      auto replaced_numbers = numbers.replacing_range_at(4, std::initializer_list({9, -10, 8}));
     //
     // outcome:
-    //      replaced_numbers -> functional_vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    [[nodiscard]] functional_vector replacing_range_at(int index, const std::initializer_list<T>& list) const
+    //      replaced_numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
+    [[nodiscard]] vector replacing_range_at(int index, const std::initializer_list<T>& list) const
     {
         return replacing_range_at(index, std::vector<T>(list));
     }
@@ -1332,12 +1331,12 @@ public:
     // Replaces all existing elements with a constant element (mutating)
     //
     // example:
-    //      functional_vector numbers({1, 3, -6, 4, -9});
+    //      fcpp::vector numbers({1, 3, -6, 4, -9});
     //      numbers.fill(7);
     //
     // outcome:
-    //      numbers -> functional_vector({ 7, 7, 7, 7, 7 })
-    functional_vector& fill(const T& element)
+    //      numbers -> fcpp::vector({ 7, 7, 7, 7, 7 })
+    vector& fill(const T& element)
     {
         std::fill(backing_vector_.begin(),
                   backing_vector_.end(),
@@ -1346,33 +1345,33 @@ public:
     }
     
     // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return backing_vector_.size();
     }
     
     // Clears the vector by removing all elements (mutating)
-    functional_vector& clear()
+    vector& clear()
     {
         backing_vector_.clear();
         return *this;
     }
     
     // Returns true if the vector has no elements
-    bool is_empty() const
+    [[nodiscard]] bool is_empty() const
     {
         return backing_vector_.empty();
     }
     
     // Returns the underlying capacity of the vector, which can be larger from its size
-    size_t capacity() const
+    [[nodiscard]] size_t capacity() const
     {
         return backing_vector_.capacity();
     }
     
     // Reserves the necessary memory for `count` elements, so that subsequent changes in the
     // vector's size due to addition/removal of elements is more performant
-    functional_vector& reserve(size_t count)
+    vector& reserve(size_t count)
     {
         backing_vector_.reserve(count);
         return *this;
@@ -1385,22 +1384,22 @@ public:
     // example:
     //      // numbers.capacity() = 9
     //      // numbers.size() = 9
-    //      functional_vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
     
     //      // numbers.capacity() = 9
     //      // numbers.size() = 5
-    //      // numbers -> functional_vector<int>({1, 4, 2, 5, 8});
+    //      // numbers -> fcpp::vector<int>({1, 4, 2, 5, 8});
     //      numbers.resize(5);
     //
     //      // empty_numbers.capacity() = 0
     //      // empty_numbers.size() = 0
-    //      functional_vector<int> empty_numbers;
+    //      fcpp::vector<int> empty_numbers;
     //
     //      // empty_numbers.capacity() = 5
     //      // empty_numbers.size() = 5
-    //      // empty_numbers -> functional_vector<int>({0, 0, 0, 0, 0});
+    //      // empty_numbers -> fcpp::vector<int>({0, 0, 0, 0, 0});
     //      empty_numbers.resize(5);
-    functional_vector& resize(size_t count)
+    vector& resize(size_t count)
     {
         backing_vector_.resize(count);
         return *this;
@@ -1413,7 +1412,7 @@ public:
     }
     
     // Returns the const begin iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::vector<T>::const_iterator cbegin() const
+    [[nodiscard]] typename std::vector<T>::const_iterator begin() const
     {
         return backing_vector_.begin();
     }
@@ -1425,9 +1424,22 @@ public:
     }
     
     // Returns the const end iterator, useful for other standard library algorithms
-    [[nodiscard]] typename std::vector<T>::const_iterator cend() const
+    [[nodiscard]] typename std::vector<T>::const_iterator end() const
     {
         return backing_vector_.end();
+    }
+    
+    // Returns a set, whose elements are the elements of the vector, removing any potential duplicates
+    //
+    // example:
+    //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
+    //      const auto& unique_numbers = numbers.distinct();
+    //
+    // outcome:
+    //      unique_numbers -> fcpp::set<int>({1, 2, 3, 4, 5, 7, 8})
+    template <typename UCompare = std::less<T>>
+    set<T, UCompare> distinct() const {
+        return set<T, UCompare>(*this);
     }
     
     // Returns a reference to the element in the given index, allowing subscripting and value editing.
@@ -1447,28 +1459,30 @@ public:
     }
     
     // Returns true if both instances have equal sizes and the corresponding elements (same index) are equal
-    bool operator ==(const functional_vector<T>& rhs) const
+    bool operator ==(const vector<T>& rhs) const
     {
 #ifdef CPP17_AVAILABLE
-        return std::equal(backing_vector_.cbegin(),
-                          backing_vector_.cend(),
-                          rhs.cbegin(),
-                          rhs.cend());
+        return std::equal(begin(),
+                          end(),
+                          rhs.begin(),
+                          rhs.end());
 #else
         if (size() != rhs.size()) {
             return false;
         }
+        
         for (auto i = 0; i < size(); ++i) {
-            if ((*this)[i] != rhs[i]) {
+            if (!((*this)[i] == rhs[i])) {
                 return false;
             }
         }
+        
         return true;
 #endif
     }
     
-    // Returns false if either the sizes are not equal or at least corresponding element (same index) is not equal
-    bool operator !=(const functional_vector<T>& rhs) const
+    // Returns false if either the sizes are not equal or at least one corresponding element (same index) is not equal
+    bool operator !=(const vector<T>& rhs) const
     {
         return !((*this) == rhs);
     }
@@ -1481,7 +1495,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    functional_vector& insert_back_range_impl(const Iterator& vec_begin, const Iterator& vec_end)
+    vector& insert_back_range_impl(const Iterator& vec_begin, const Iterator& vec_end)
     {
         backing_vector_.insert(backing_vector_.end(),
                                vec_begin,
@@ -1494,7 +1508,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    functional_vector& insert_front_range_impl(const Iterator& vec_begin, const Iterator& vec_end)
+    vector& insert_front_range_impl(const Iterator& vec_begin, const Iterator& vec_end)
     {
         backing_vector_.insert(backing_vector_.begin(),
                                vec_begin,
@@ -1507,14 +1521,14 @@ private:
 #else
     template<typename Iterator>
 #endif
-    [[nodiscard]] functional_vector inserting_back_range_impl(const Iterator& vec_begin, const Iterator& vec_end) const
+    [[nodiscard]] vector inserting_back_range_impl(const Iterator& vec_begin, const Iterator& vec_end) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.reserve(augmented_vector.size() + std::distance(vec_begin, vec_end));
         augmented_vector.insert(augmented_vector.end(),
                                 vec_begin,
                                 vec_end);
-        return functional_vector(augmented_vector);
+        return vector(augmented_vector);
     }
     
 #ifdef CPP17_AVAILABLE
@@ -1522,37 +1536,37 @@ private:
 #else
     template<typename Iterator>
 #endif
-    [[nodiscard]] functional_vector inserting_front_range_impl(const Iterator& vec_begin, const Iterator& vec_end) const
+    [[nodiscard]] vector inserting_front_range_impl(const Iterator& vec_begin, const Iterator& vec_end) const
     {
         auto augmented_vector(backing_vector_);
         augmented_vector.reserve(augmented_vector.size() + std::distance(vec_begin, vec_end));
         augmented_vector.insert(augmented_vector.begin(),
                                 vec_begin,
                                 vec_end);
-        return functional_vector(augmented_vector);
+        return vector(augmented_vector);
     }
     
 #ifdef CPP17_AVAILABLE
     template<typename Iterator, typename = std::enable_if_t<is_valid_iterator<Iterator>::value>>
     [[nodiscard]] auto zip_impl( const Iterator& vec_begin, const Iterator& vec_end) const ->
-    functional_vector<pair<deref_type<Iterator>>>
+    vector<std::pair<T, deref_type<Iterator>>>
     {
         using U = deref_type<Iterator>;
 #else
     template <typename U>
-    [[nodiscard]] functional_vector<pair<U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
+    [[nodiscard]] vector<std::pair<T, U>> zip_impl(const typename std::vector<U>::const_iterator& vec_begin,
                                                       const typename std::vector<U>::const_iterator& vec_end) const
     {
 #endif
         const auto vec_size = std::distance(vec_begin, vec_end);
         assert(backing_vector_.size() == vec_size);
-        std::vector<pair<U>> combined_vector;
+        std::vector<std::pair<T, U>> combined_vector;
         combined_vector.reserve(vec_size);
         for (size_t i = 0; i < vec_size; ++i)
         {
             combined_vector.push_back({backing_vector_[i], *(vec_begin + i)});
         }
-        return functional_vector<pair<U>>(std::move(combined_vector));
+        return vector<std::pair<T, U>>(std::move(combined_vector));
     }
     
 #ifdef CPP17_AVAILABLE
@@ -1561,7 +1575,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    functional_vector& insert_at_impl(int index,
+    vector& insert_at_impl(int index,
                                       const Iterator& vec_begin,
                                       const Iterator& vec_end)
     {
@@ -1580,7 +1594,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    [[nodiscard]] functional_vector inserting_at_impl(int index,
+    [[nodiscard]] vector inserting_at_impl(int index,
                                                       const Iterator& vec_begin,
                                                       const Iterator& vec_end) const
     {
@@ -1593,7 +1607,7 @@ private:
         augmented_vector.insert(augmented_vector.begin() + index,
                                 vec_begin,
                                 vec_end);
-        return functional_vector(std::move(augmented_vector));
+        return vector(std::move(augmented_vector));
     }
     
 #ifdef CPP17_AVAILABLE
@@ -1601,7 +1615,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    functional_vector& replace_range_at_imp(int index,
+    vector& replace_range_at_imp(int index,
                                             const Iterator& vec_begin,
                                             const Iterator& vec_end)
     {
@@ -1618,7 +1632,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    [[nodiscard]] functional_vector replacing_range_at_imp(int index,
+    [[nodiscard]] vector replacing_range_at_imp(int index,
                                                            const Iterator& vec_begin,
                                                            const Iterator& vec_end) const
     {
@@ -1628,7 +1642,7 @@ private:
         std::copy(vec_begin,
                   vec_end,
                   replaced_vector.begin() + index);
-        return functional_vector(replaced_vector);
+        return vector(replaced_vector);
     }
     
     void assert_smaller_size(int index) const
@@ -1641,3 +1655,5 @@ private:
         assert(index <= size() && index >= 0);
     }
 };
+    
+}

@@ -20,25 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <gtest/gtest.h>
-#include "optional.h"
+#pragma once
 
-using namespace fcpp;
-
-TEST(OptionalTest, InvalidTest) {
-    const optional_t<int> index;
-    EXPECT_FALSE(index.has_value());
-}
-
-TEST(OptionalTest, ValidTest) {
-    const optional_t<int> index(5);
-    EXPECT_TRUE(index.has_value());
-    EXPECT_EQ(5, index.value());
-}
-
-TEST(OptionalTest, AssignmentTest) {
-    optional_t<int> index(5);
-    index = 3;
-    EXPECT_TRUE(index.has_value());
-    EXPECT_EQ(3, index.value());
-}
+#ifdef _MSC_VER
+#pragma warning(disable: 4834) // discarding return value of function with 'nodiscard' attribute
+#pragma warning(disable: 4100) // unreferenced formal parameter
+#pragma warning(disable: 4018) // signed/unsigned mismatch
+#pragma warning(disable: 4389) // signed/unsigned mismatch
+#endif

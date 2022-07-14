@@ -1,6 +1,5 @@
 // MIT License
 //
-// Created by iamOgunyinka on 08 Sep 2021 (@iamOgunyinka, https://github.com/iamOgunyinka)
 // Copyright (c) 2022 Ioannis Kaliakatsos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,83 +21,65 @@
 // SOFTWARE.
 
 #pragma once
-#include "compatibility.h"
+#include <string>
 
-namespace fcpp {
-
-#ifdef CPP17_AVAILABLE
-#include <optional>
-template<typename T>
-using optional_t = std::optional<T>;
-#else
-#include <cstddef>
-#include <utility>
-
-// A replacement for std::optional when C++17 is not available
-template<typename T>
-class optional {
-public:
-    optional()
-    : _value{nullptr}
+struct child
+{
+    child()
+    : age(0)
     {
     }
     
-    ~optional()
-    {
-        reset();
-    }
-    
-    optional(T const& val)
-    : _value(new T{val})
+    child(int age)
+    : age(age)
     {
     }
     
-    bool has_value() const
-    {
-        return _value != nullptr;
-    }
+    int age;
     
-    T* operator->() const
-    {
-        assert(has_value());
-        return _value;
+    bool operator< (const child& other) const {
+        return age < other.age;
     }
-    
-    T& operator*() const
-    {
-        assert(has_value());
-        return *_value;
-    }
-    
-    const T& value() const
-    {
-        assert(has_value());
-        return *_value;
-    }
-    
-    optional<T>& operator= (T const& value)
-    {
-        reset();
-        _value = new T(value);
-        return *this;
-    }
-    
-private:
-    void reset()
-    {
-        if (_value)
-        {
-            delete _value;
-            _value = nullptr;
-        }
-    }
-    
-    T* _value;
 };
 
-template<typename T>
-using optional_t = optional<T>;
+struct child_comparator {
+    bool operator() (const child& a, const child& b) const {
+        return a < b;
+    }
+};
 
-#endif
+struct person
+{
+    person()
+    : age(0), name("")
+    {
+    }
+    
+    person(int age, std::string name)
+    : age(age), name(std::move(name))
+    {
+    }
+    
+    int age;
+    std::string name;
+    
+    std::size_t hash() const {
+        std::size_t h1 = std::hash<std::string>{}(name);
+        std::size_t h2 = std::hash<int>{}(age);
+        return h1 ^ (h2 << 1);
+    }
+    
+    bool operator == (const person& other) const {
+        return age == other.age && name == other.name;
+    }
+    
+    bool operator< (const person& other) const {
+        return hash() < other.hash();
+    }
+};
 
-}
+struct person_comparator {
+    bool operator() (const person& a, const person& b) const {
+        return a < b;
+    }
+};

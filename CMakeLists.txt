@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(functional_vector VERSION 0.9)
+project(functional_cpp VERSION 1.0)
 
 # GoogleTest requires at least C++11
 if(NOT "${CMAKE_CXX_STANDARD}")

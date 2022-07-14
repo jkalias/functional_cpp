@@ -23,13 +23,13 @@
 #pragma once
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef FUNCTIONAL_VECTOR_EXPORTS
-        #define FunctionalVectorExport __declspec( dllexport )
+    #ifdef FUNCTIONAL_CPP_EXPORTS
+        #define FunctionalCppExport __declspec( dllexport )
     #else
-        #define FunctionalVectorExport __declspec( dllimport )
+        #define FunctionalCppExport __declspec( dllimport )
     #endif
 #else
-    #define FunctionalVectorExport __attribute__ ((__visibility__("default")))
+    #define FunctionalCppExport __attribute__ ((__visibility__("default")))
 #endif
 
 #include "compatibility.h"
