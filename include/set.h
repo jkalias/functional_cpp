@@ -437,6 +437,15 @@ public:
         return *this;
     }
     
+    vector<TKey> keys() const {
+        vector<TKey> vec;
+        vec.reserve(size());
+        for_each([&vec](const TKey& key) {
+            vec.insert_back(key);
+        });
+        return std::move(vec);
+    }
+    
     // Removes an element from the set, if it exists, potentially changing the set's contents (mutating)
     //
     // example:

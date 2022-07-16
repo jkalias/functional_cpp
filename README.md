@@ -62,14 +62,14 @@ cmake -S . -B build
 Then open the generated ```functional_cpp.sln``` in the ```build``` folder.
 
 ## Functional vector usage (fcpp::vector)
-### extract unique (distinct) elements
+### extract unique (distinct) elements in a set
 ```c++
 #include "vector.h" // instead of <vector>
 
 const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
 
 // contains only 1, 2, 3, 4, 5, 7, 8
-const auto& unique_numbers = numbers.distinct();
+const fcpp::set unique_numbers = numbers.distinct();
 ```
 
 ### zip, map, filter, sort
@@ -316,6 +316,9 @@ const fcpp::set<person, person_comparator> family({
 // all of our friends and family for the next party invitation
 // contains person(51, "George"), person(41, "Jackie"), person(42, "Crystal"), person(51, "Paul"), person(81, "Barbara") 
 const auto friends_and_family = friends.union_with(family);
+
+// all set keys in a vetor
+const fcpp::vector<person> = friends_and_family.keys();
 ```
 
 ### zip, map, filter

@@ -436,6 +436,13 @@ TEST(SetTest, ZipWithStdVectorDifferentSizes)
     EXPECT_DEATH(ages.zip(persons), "");
 }
 
+TEST(SetTest, Keys)
+{
+    const set<int> numbers({ 25, 45, 30, 63 });
+    const auto keys = numbers.keys();
+    EXPECT_EQ(vector<int>({25, 30, 45, 63}), keys);
+}
+
 TEST(SetTest, RemoveExistingElement)
 {
     set<int> numbers({1, 4, 2});
