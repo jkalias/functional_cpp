@@ -69,7 +69,7 @@ Then open the generated ```functional_cpp.sln``` in the ```build``` folder.
 const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
 
 // contains only 1, 2, 3, 4, 5, 7, 8
-const fcpp::set unique_numbers = numbers.distinct();
+const fcpp::set<int> unique_numbers = numbers.distinct();
 ```
 
 ### zip, map, filter, sort
