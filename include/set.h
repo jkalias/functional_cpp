@@ -534,6 +534,22 @@ public:
         return set();
     }
     
+    // Returns true if the set is empty
+    //
+    // example:
+    //      const fcpp::set<int> numbers({1, 4, 2});
+    //
+    //      // returns false
+    //      numbers.is_empty();
+    //
+    //      // returns true
+    //      fcpp::set<int>().is_empty();
+    [[nodiscard]] bool is_empty() const
+    {
+        return m_set.empty();
+    }
+    
+    
     // Returns true if the key is present in the set, otherwise false
     //
     // example:
@@ -550,9 +566,6 @@ public:
     {
         return m_set.size();
     }
-    
-    // clear
-    // is_empty
     
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::set<TKey>::iterator begin()

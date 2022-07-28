@@ -510,6 +510,13 @@ TEST(SetTest, Clearing)
     EXPECT_EQ(3, numbers.size());
 }
 
+TEST(SetTest, IsEmpty)
+{
+    const set<int> numbers({1, 4, 2});
+    EXPECT_FALSE(numbers.is_empty());
+    EXPECT_TRUE(set<int>().is_empty());
+}
+
 TEST(SetTest, Contains)
 {
     const set<int> numbers({1, 4, 2});
