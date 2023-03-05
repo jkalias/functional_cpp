@@ -1,7 +1,7 @@
 // MIT License
 //
 // Created by iamOgunyinka on 08 Sep 2021 (@iamOgunyinka, https://github.com/iamOgunyinka)
-// Copyright (c) 2022 Ioannis Kaliakatsos
+// Copyright (c) 2023 Ioannis Kaliakatsos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
