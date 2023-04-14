@@ -333,6 +333,17 @@ TEST(SetTest, NoneOf)
     EXPECT_FALSE(numbers.none_of([](const int &number) { return number < 6; }));
 }
 
+TEST(SetTest, Reduce)
+{
+    const set<std::string> tokens({ "the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "brown", "dog" });
+    const auto sentence = tokens.reduce(std::string(""), [](const std::string& partial, const std::string& token) {
+        return partial.length() != 0
+    		? partial + " " + token
+    		: token;
+    });
+    EXPECT_EQ("brown dog fox jumps lazy over quick the", sentence);
+}
+
 TEST(SetTest, Filter)
 {
     set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });

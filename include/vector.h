@@ -244,7 +244,35 @@ public:
                             std::forward<Callable>(unary_predicate));
     }
 #endif
-    
+
+    // Performs the functional `reduce` (fold/accumulate) algorithm, by returning the result of
+    // accumulating all the values in the vector to an initial value. (non-mutating)
+    //
+    // example:
+    //      const fcpp::vector<std::string> tokens({ "the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "brown", "dog" });
+    //      const auto sentence = tokens.reduce<std::string>("", [](const std::string& partial, const std::string& token) {
+    //          return partial.length() != 0
+    //              ? partial + " " + token
+    //              : token;
+    //      });
+    //
+    // outcome:
+    //      sentence -> std::string("the quick brown fox jumps over the lazy brown dog");
+#ifdef CPP17_AVAILABLE
+    template <typename U, typename Reduce, typename = std::enable_if_t<std::is_invocable_r_v<U, Reduce, U, T>>>
+#else
+    template <typename U, typename Reduce>
+#endif
+    U reduce(const U& initial, Reduce&& reduction) const
+    {
+        auto result = initial;
+        for(const auto &x: m_vector)
+        {
+            result = reduction(result, x);
+        }
+        return result;
+    }
+
     // Performs the functional `filter` algorithm, in which all elements of this instance
     // which match the given predicate are kept (mutating)
     //

@@ -258,6 +258,26 @@ TEST(VectorTest, FilteredParallel)
 }
 #endif
 
+TEST(VectorTest, Reduce)
+{
+	const vector<child> vector_under_test({ child(1), child(3), child(4) });
+	const auto age_sum = vector_under_test.reduce(0, [](const int& partial_sum, const child& child){
+    	return partial_sum + child.age;
+    });
+    EXPECT_EQ(8, age_sum);
+}
+
+TEST(VectorTest, ReduceString)
+{
+    const vector<std::string> tokens({ "the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "brown", "dog"});
+	const auto sentence = tokens.reduce(std::string(""), [](const std::string& partial, const std::string& token) {
+    	return partial.length() != 0
+			? partial + " " + token
+			: token;
+    });
+    EXPECT_EQ("the quick brown fox jumps over the lazy brown dog", sentence);
+}
+
 TEST(VectorTest, Reverse)
 {
     vector<child> vector_under_test({child(6), child(2), child(9)});
