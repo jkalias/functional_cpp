@@ -72,7 +72,7 @@ const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
 const fcpp::set<int> unique_numbers = numbers.distinct();
 ```
 
-### zip, map, filter, sort
+### zip, map, filter, sort, reduce
 ```c++
 #include "vector.h" // instead of <vector>
 
@@ -128,6 +128,11 @@ const auto employees_below_40 = ages
  */
 employees_below_40.for_each([](const person& p) {
     std::cout << p.name << " is " << p.age << " years old." << std::endl;
+});
+
+// total_age = 92
+const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, const person& p){
+    return partial_sum + p.age;
 });
 ```
 ### index search
@@ -321,7 +326,7 @@ const auto friends_and_family = friends.union_with(family);
 const fcpp::vector<person> = friends_and_family.keys();
 ```
 
-### zip, map, filter
+### zip, map, filter, reduce
 ```c++
 #include "set.h" // instead of <set>
 
@@ -352,6 +357,11 @@ const auto employees_below_40 = ages
  */
 employees_below_40.for_each([](const person& p) {
     std::cout << p.name << " is " << p.age << " years old." << std::endl;
+});
+
+// total_age = 55
+const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, const person& p){
+    return partial_sum + p.age;
 });
 ```
 
