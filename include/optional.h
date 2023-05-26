@@ -47,6 +47,23 @@ public:
     {
         reset();
     }
+
+    optional& operator=(optional const& other)
+    {
+        _value = nullptr;
+        if (other.has_value()) {
+            _value = new T{ other.value() };
+        }
+        return *this;
+    }
+
+    optional(const optional& other)
+    {
+        _value = nullptr;
+        if (other.has_value()) {
+            _value = new T{ other.value() };
+        }
+    }
     
     optional(T const& val)
     : _value(new T{val})
