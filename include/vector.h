@@ -22,6 +22,7 @@
 
 #pragma once
 #include <algorithm>
+#include <cassert>
 #include <type_traits>
 #include <vector>
 #include <iterator>
