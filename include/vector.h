@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <vector>
+#include <iterator>
 #include "index_range.h"
 #include "optional.h"
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
