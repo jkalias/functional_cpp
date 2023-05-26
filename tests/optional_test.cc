@@ -36,9 +36,54 @@ TEST(OptionalTest, ValidTest) {
     EXPECT_EQ(5, index.value());
 }
 
-TEST(OptionalTest, AssignmentTest) {
+TEST(OptionalTest, AssignmentFromValueTest) {
     optional_t<int> index(5);
     index = 3;
     EXPECT_TRUE(index.has_value());
     EXPECT_EQ(3, index.value());
+}
+
+TEST(OptionalTest, AssignmentFromOptionalTest) {
+    optional_t<int> v1(5);
+    const optional_t<int> v2(2);
+    v1 = v2;
+    EXPECT_TRUE(v1.has_value());
+    EXPECT_EQ(2, v1.value());
+
+	EXPECT_TRUE(v2.has_value());
+    EXPECT_EQ(2, v2.value());
+}
+
+TEST(OptionalTest, AssignmentFromNullOptionalTest) {
+    optional_t<int> v1(5);
+    const optional_t<int> v2;
+    v1 = v2;
+    EXPECT_FALSE(v1.has_value());
+    EXPECT_FALSE(v2.has_value());
+}
+
+TEST(OptionalTest, AssignmentToNullFromValueTest) {
+    optional_t<int> index;
+    index = 3;
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(3, index.value());
+}
+
+TEST(OptionalTest, AssignmentToNullFromOptionalTest) {
+    optional_t<int> v1;
+    const optional_t<int> v2(2);
+    v1 = v2;
+    EXPECT_TRUE(v1.has_value());
+    EXPECT_EQ(2, v1.value());
+
+	EXPECT_TRUE(v2.has_value());
+    EXPECT_EQ(2, v2.value());
+}
+
+TEST(OptionalTest, AssignmentToNullFromNullOptionalTest) {
+    optional_t<int> v1;
+    const optional_t<int> v2;
+    v1 = v2;
+    EXPECT_FALSE(v1.has_value());
+    EXPECT_FALSE(v2.has_value());
 }
