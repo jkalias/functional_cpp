@@ -828,7 +828,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
-    vector& remove_at(int index)
+    vector& remove_at(size_t index)
     {
         assert_smaller_size(index);
         m_vector.erase(begin() + index);
@@ -843,7 +843,7 @@ public:
     //
     // outcome:
     //      shorter_vector -> fcpp::vector<int>({1, 4, 2, 5, 3, 1, 7, 1});
-    [[nodiscard]] vector removing_at(int index) const
+    [[nodiscard]] vector removing_at(size_t index) const
     {
         assert_smaller_size(index);
         auto copy(m_vector);
@@ -961,7 +961,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
-    vector& insert_at(int index, const T& element)
+    vector& insert_at(size_t index, const T& element)
     {
         assert_smaller_or_equal_size(index);
         m_vector.insert(begin() + index, element);
@@ -976,7 +976,7 @@ public:
     //
     // outcome:
     //      augmented_numbers -> fcpp::vector({1, 4, 2, 18, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] vector inserting_at(int index, const T& element) const
+    [[nodiscard]] vector inserting_at(size_t index, const T& element) const
     {
         assert_smaller_or_equal_size(index);
         auto copy(m_vector);
@@ -993,7 +993,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    vector& insert_at(int index, const vector<T>& vector)
+    vector& insert_at(size_t index, const vector<T>& vector)
     {
         return insert_at_impl(index, vector.begin(), vector.end());
     }
@@ -1007,7 +1007,7 @@ public:
     //
     // outcome:
     //      augmented_numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] vector inserting_at(int index, const vector<T>& vector) const
+    [[nodiscard]] vector inserting_at(size_t index, const vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.begin(), vector.end());
     }
@@ -1021,7 +1021,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    vector& insert_at(int index, const std::vector<T>& vector)
+    vector& insert_at(size_t index, const std::vector<T>& vector)
     {
         return insert_at_impl(index, vector.cbegin(), vector.cend());
     }
@@ -1035,7 +1035,7 @@ public:
     //
     // outcome:
     //      augmented_numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] vector inserting_at(int index, const std::vector<T>& vector) const
+    [[nodiscard]] vector inserting_at(size_t index, const std::vector<T>& vector) const
     {
         return inserting_at_impl(index, vector.cbegin(), vector.cend());
     }
@@ -1049,7 +1049,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    vector& insert_at(int index, std::initializer_list<T> list)
+    vector& insert_at(size_t index, std::initializer_list<T> list)
     {
         return insert_at(index, std::vector<T>(std::move(list)));
     }
@@ -1063,7 +1063,7 @@ public:
     //
     // outcome:
     //      augmented_numbers -> fcpp::vector({1, 4, 2, 9, -5, 6, 5, 8, 3, 1, 7, 1});
-    [[nodiscard]] vector inserting_at(int index, std::initializer_list<T> list) const
+    [[nodiscard]] vector inserting_at(size_t index, std::initializer_list<T> list) const
     {
         return inserting_at(index, std::vector<T>(std::move(list)));
     }
@@ -1287,7 +1287,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    vector& replace_range_at(int index, const vector<T>& vector)
+    vector& replace_range_at(size_t index, const vector<T>& vector)
     {
         return replace_range_at_imp(index, vector.begin(), vector.end());
     }
@@ -1300,7 +1300,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    vector& replace_range_at(int index, const std::vector<T>& vector)
+    vector& replace_range_at(size_t index, const std::vector<T>& vector)
     {
         return replace_range_at_imp(index, vector.cbegin(), vector.cend());
     }
@@ -1313,7 +1313,7 @@ public:
     //
     // outcome:
     //      numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    vector& replace_range_at(int index, const std::initializer_list<T>& list)
+    vector& replace_range_at(size_t index, const std::initializer_list<T>& list)
     {
         return replace_range_at(index, std::vector<T>(list));
     }
@@ -1326,7 +1326,7 @@ public:
     //
     // outcome:
     //      replaced_numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    [[nodiscard]] vector replacing_range_at(int index, const vector<T>& vector) const
+    [[nodiscard]] vector replacing_range_at(size_t index, const vector<T>& vector) const
     {
         return replacing_range_at_imp(index, vector.begin(), vector.end());
     }
@@ -1339,7 +1339,7 @@ public:
     //
     // outcome:
     //      replaced_numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    [[nodiscard]] vector replacing_range_at(int index, const std::vector<T>& vector) const
+    [[nodiscard]] vector replacing_range_at(size_t index, const std::vector<T>& vector) const
     {
         return replacing_range_at_imp(index, vector.cbegin(), vector.cend());
     }
@@ -1352,7 +1352,7 @@ public:
     //
     // outcome:
     //      replaced_numbers -> fcpp::vector({ 1, 4, 2, 5, 9, -10, 8, 7, 1 })
-    [[nodiscard]] vector replacing_range_at(int index, const std::initializer_list<T>& list) const
+    [[nodiscard]] vector replacing_range_at(size_t index, const std::initializer_list<T>& list) const
     {
         return replacing_range_at(index, std::vector<T>(list));
     }
@@ -1473,7 +1473,7 @@ public:
     
     // Returns a reference to the element in the given index, allowing subscripting and value editing.
     // Bounds checking (assert) is enabled for debug builds.
-    T& operator[](int index)
+    T& operator[](size_t index)
     {
         assert_smaller_size(index);
         return m_vector[index];
@@ -1481,7 +1481,7 @@ public:
     
     // Returns a constant reference to the element in the given index, allowing subscripting.
     // Bounds checking (assert) is enabled for debug builds.
-    const T& operator[](int index) const
+    const T& operator[](size_t index) const
     {
         assert_smaller_size(index);
         return m_vector[index];
@@ -1604,7 +1604,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    vector& insert_at_impl(int index,
+    vector& insert_at_impl(size_t index,
                                       const Iterator& vec_begin,
                                       const Iterator& vec_end)
     {
@@ -1623,7 +1623,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    [[nodiscard]] vector inserting_at_impl(int index,
+    [[nodiscard]] vector inserting_at_impl(size_t index,
                                                       const Iterator& vec_begin,
                                                       const Iterator& vec_end) const
     {
@@ -1644,7 +1644,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    vector& replace_range_at_imp(int index,
+    vector& replace_range_at_imp(size_t index,
                                             const Iterator& vec_begin,
                                             const Iterator& vec_end)
     {
@@ -1661,7 +1661,7 @@ private:
 #else
     template<typename Iterator>
 #endif
-    [[nodiscard]] vector replacing_range_at_imp(int index,
+    [[nodiscard]] vector replacing_range_at_imp(size_t index,
                                                            const Iterator& vec_begin,
                                                            const Iterator& vec_end) const
     {
@@ -1674,14 +1674,14 @@ private:
         return vector(replaced_vector);
     }
     
-    void assert_smaller_size(int index) const
+    void assert_smaller_size(size_t index) const
     {
-        assert(index < size() && index >= 0);
+        assert(index < size());
     }
     
-    void assert_smaller_or_equal_size(int index) const
+    void assert_smaller_or_equal_size(size_t index) const
     {
-        assert(index <= size() && index >= 0);
+        assert(index <= size());
     }
 };
     

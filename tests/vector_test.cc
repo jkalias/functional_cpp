@@ -28,6 +28,9 @@
 #include "test_types.h"
 #include "warnings.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4245)
+
 using namespace fcpp;
 
 template <typename T>
@@ -1374,3 +1377,5 @@ TEST(VectorTest, DistinctCustomType)
     
     EXPECT_EQ(expected, unique_persons);
 }
+
+#pragma warning( pop )
