@@ -25,7 +25,6 @@
 #include "compatibility.h"
 
 namespace fcpp {
-
 #ifdef CPP17_AVAILABLE
 #include <optional>
 template<typename T>
@@ -34,88 +33,87 @@ using optional_t = std::optional<T>;
 #include <cstddef>
 #include <utility>
 
-// A replacement for std::optional when C++17 is not available
-template<typename T>
-class optional {
-public:
-    optional()
-    : _value{nullptr}
-    {
-    }
-    
-    ~optional()
-    {
-        reset();
-    }
+	// A replacement for std::optional when C++17 is not available
+	template <typename T>
+	class optional
+	{
+	public:
+		optional()
+			: _value{nullptr}
+		{
+		}
 
-    optional& operator=(optional const& other)
-    {
-        _value = nullptr;
-        if (other.has_value()) {
-            _value = new T{ other.value() };
-        }
-        return *this;
-    }
+		~optional()
+		{
+			reset();
+		}
 
-    optional(const optional& other)
-    {
-        _value = nullptr;
-        if (other.has_value()) {
-            _value = new T{ other.value() };
-        }
-    }
-    
-    optional(T const& val)
-    : _value(new T{val})
-    {
-    }
-    
-    bool has_value() const
-    {
-        return _value != nullptr;
-    }
-    
-    T* operator->() const
-    {
-        assert(has_value());
-        return _value;
-    }
-    
-    T& operator*() const
-    {
-        assert(has_value());
-        return *_value;
-    }
-    
-    const T& value() const
-    {
-        assert(has_value());
-        return *_value;
-    }
-    
-    optional<T>& operator= (T const& value)
-    {
-        reset();
-        _value = new T(value);
-        return *this;
-    }
-    
-private:
-    void reset()
-    {
-        if (_value)
-        {
-            delete _value;
-            _value = nullptr;
-        }
-    }
-    
-    T* _value;
-};
+		optional& operator=(optional const& other)
+		{
+			_value = nullptr;
+			if (other.has_value()) {
+				_value = new T{other.value()};
+			}
+			return *this;
+		}
 
-template<typename T>
-using optional_t = optional<T>;
+		optional(const optional& other)
+		{
+			_value = nullptr;
+			if (other.has_value()) {
+				_value = new T{other.value()};
+			}
+		}
+
+		optional(T const& val)
+			: _value(new T{val})
+		{
+		}
+
+		bool has_value() const
+		{
+			return _value != nullptr;
+		}
+
+		T* operator->() const
+		{
+			assert(has_value());
+			return _value;
+		}
+
+		T& operator*() const
+		{
+			assert(has_value());
+			return *_value;
+		}
+
+		const T& value() const
+		{
+			assert(has_value());
+			return *_value;
+		}
+
+		optional<T>& operator=(T const& value)
+		{
+			reset();
+			_value = new T(value);
+			return *this;
+		}
+
+	private:
+		void reset()
+		{
+			if (_value) {
+				delete _value;
+				_value = nullptr;
+			}
+		}
+
+		T* _value;
+	};
+
+	template <typename T>
+	using optional_t = optional<T>;
 
 #endif
-
 }
