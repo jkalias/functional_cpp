@@ -49,7 +49,6 @@ TEST(OptionalTest, AssignmentFromOptionalTest) {
     v1 = v2;
     EXPECT_TRUE(v1.has_value());
     EXPECT_EQ(2, v1.value());
-
 	EXPECT_TRUE(v2.has_value());
     EXPECT_EQ(2, v2.value());
 }
@@ -75,7 +74,6 @@ TEST(OptionalTest, AssignmentToNullFromOptionalTest) {
     v1 = v2;
     EXPECT_TRUE(v1.has_value());
     EXPECT_EQ(2, v1.value());
-
 	EXPECT_TRUE(v2.has_value());
     EXPECT_EQ(2, v2.value());
 }
@@ -86,4 +84,17 @@ TEST(OptionalTest, AssignmentToNullFromNullOptionalTest) {
     v1 = v2;
     EXPECT_FALSE(v1.has_value());
     EXPECT_FALSE(v2.has_value());
+}
+
+TEST(OptionalTest, CopyConstructorTest) {
+    const optional_t<int> v2(5);
+    const optional_t<int> v1(v2);
+    EXPECT_TRUE(v1.has_value());
+    EXPECT_EQ(5, v2.value());
+}
+
+TEST(OptionalTest, CopyConstructorNullTest) {
+    const optional_t<int> v2;
+    const optional_t<int> v1(v2);
+    EXPECT_FALSE(v1.has_value());
 }
