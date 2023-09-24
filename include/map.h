@@ -46,21 +46,11 @@ public:
     : m_map(std::move(map))
     {
     }
-    
-//    explicit map(const std::vector<TKey>& vector)
-//    : m_map(vector.begin(), vector.end())
-//    {
-//    }
-//    
-//    explicit map(const vector<TKey>& vector)
-//    : m_map(vector.begin(), vector.end())
-//    {
-//    }
-//    
-//    explicit set(const std::initializer_list<TKey>& list)
-//    : m_map(list.begin(), list.end())
-//    {
-//    }
+
+    explicit map(const std::initializer_list<std::pair<TKey, TValue>>& list)
+    : m_map(list.begin(), list.end())
+    {
+    }
     
 //    // Returns the set of elements which belong to the current set but not in the other set.
 //    // In Venn diagram notation, if A is the current set and B is the other set, then
@@ -560,20 +550,20 @@ public:
 //        return set();
 //    }
 //    
-//    // Returns true if the set is empty
-//    //
-//    // example:
-//    //      const fcpp::set<int> numbers({1, 4, 2});
-//    //
-//    //      // returns false
-//    //      numbers.is_empty();
-//    //
-//    //      // returns true
-//    //      fcpp::set<int>().is_empty();
-//    [[nodiscard]] bool is_empty() const
-//    {
-//        return m_map.empty();
-//    }
+    // Returns true if the map is empty
+    //
+    // example:
+    //      const fcpp::map<int, std::string> data({{1, "one"}, {2, "two"}, {3, "three"}});
+    //
+    //      // returns false
+    //      data.is_empty();
+    //
+    //      // returns true
+    //      fcpp::map<int, std::string>().is_empty();
+    [[nodiscard]] bool is_empty() const
+    {
+        return m_map.empty();
+    }
 //    
 //    
 //    // Returns true if the key is present in the set, otherwise false

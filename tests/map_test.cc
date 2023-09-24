@@ -48,60 +48,12 @@ TEST(MapTest, StdMapConstructor)
     test_contents(map_under_test);
 }
 
-//TEST(MapTest, StdVectorConstructor)
-//{
-//    const set<int> set_under_test(std::vector<int>({1, 5, 3, 3}));
-//    test_contents(set_under_test);
-//}
-//
-//TEST(MapTest, FunctionalVectorConstructor)
-//{
-//    const set<int> set_under_test(vector<int>({1, 5, 3, 3}));
-//    test_contents(set_under_test);
-//}
-//
-//TEST(MapTest, StdInitializerListConstructor)
-//{
-//    const set<int> set_under_test(std::initializer_list<int>({1, 5, 3, 3}));
-//    test_contents(set_under_test);
-//}
-//
-//TEST(MapTest, Subscripting)
-//{
-//    const set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-//    test_contents(set_under_test);
-//}
-//
-//TEST(MapTest, ConstSubscripting)
-//{
-//    const set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
-//    test_contents(set_under_test);
-//}
-//
-//TEST(MapTest, Difference)
-//{
-//    const set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
-//    const set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
-//    const auto& diff = set1.difference_with(set2);
-//    EXPECT_EQ(set<int>({1, 3, 8}), diff);
-//}
-//
-//TEST(MapTest, DifferenceStdSet)
-//{
-//    const set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
-//    const std::set<int> set2({2, 5, 7, 10, 15, 17});
-//    const auto& diff = set1.difference_with(set2);
-//    EXPECT_EQ(set<int>({1, 3, 8}), diff);
-//}
-//
-//TEST(MapTest, DifferenceFunctionalSet)
-//{
-//    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
-//    const set<int> set2({2, 5, 7, 10, 15, 17});
-//    const auto& diff = set1.difference_with(set2);
-//    EXPECT_EQ(set<int>({1, 3, 8}), diff);
-//}
-//
+TEST(MapTest, StdInitializerListConstructor)
+{
+    const map<int, std::string> map_under_test({{1, "one"}, {2, "two"}, {3, "three"}});
+    test_contents(map_under_test);
+}
+
 //TEST(MapTest, DifferenceFunctionalSetCustomType)
 //{
 //    const set<person, person_comparator> set1({
@@ -513,14 +465,15 @@ TEST(MapTest, StdMapConstructor)
 //    EXPECT_EQ(0, cleared_numbers.size());
 //    EXPECT_EQ(3, numbers.size());
 //}
-//
-//TEST(MapTest, IsEmpty)
-//{
-//    const set<int> numbers({1, 4, 2});
-//    EXPECT_FALSE(numbers.is_empty());
-//    EXPECT_TRUE(set<int>().is_empty());
-//}
-//
+
+TEST(MapTest, IsEmpty)
+{
+    const map<int, std::string> data({{1, "one"}, {2, "two"}, {3, "three"}});
+    EXPECT_FALSE(data.is_empty());
+    map<int, std::string> empty_map;
+    EXPECT_TRUE(empty_map.is_empty());
+}
+
 //TEST(MapTest, Contains)
 //{
 //    const set<int> numbers({1, 4, 2});
