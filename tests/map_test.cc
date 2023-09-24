@@ -478,13 +478,13 @@ TEST(MapTest, IsEmpty)
     EXPECT_TRUE(empty_map.is_empty());
 }
 
-//TEST(MapTest, Contains)
-//{
-//    const set<int> numbers({1, 4, 2});
-//    EXPECT_TRUE(numbers.contains(1));
-//    EXPECT_FALSE(numbers.contains(15));
-//}
-//
+TEST(MapTest, Contains)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_TRUE(persons.contains("jake"));
+    EXPECT_FALSE(persons.contains("bob"));
+}
+
 //TEST(MapTest, EqualityOperator)
 //{
 //    const set<int> set1(std::set<int>({1, 2, 3}));

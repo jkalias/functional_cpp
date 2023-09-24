@@ -550,19 +550,19 @@ public:
     {
         return m_map.empty();
     }
-//    
-//    
-//    // Returns true if the key is present in the set, otherwise false
-//    //
-//    // example:
-//    //      const fcpp::set<int> numbers({1, 4, 2});
-//    //      numbers.contains(1); // true
-//    //      numbers.contains(15); // false
-//    [[nodiscard]] bool contains(const TKey& key) const
-//    {
-//        return m_map.count(key) != 0;
-//    }
-//    
+    
+    
+    // Returns true if the key is present in the map, otherwise false
+    //
+    // example:
+    //      const fcpp::map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    //      persons.contains("jake"); // true
+    //      persons.contains("bob"); // false
+    [[nodiscard]] bool contains(const TKey& key) const
+    {
+        return m_map.find(key) != end();
+    }
+    
     // Returns the size of the map (how many elements it contains, it may be different from its capacity)
     [[nodiscard]] size_t size() const
     {
