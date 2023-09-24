@@ -42,8 +42,8 @@ public:
     {
     }
     
-    explicit map(std::set<TKey, TCompare> set)
-    : m_map(std::move(set))
+    explicit map(std::map<TKey, TValue, TCompare> map)
+    : m_map(std::move(map))
     {
     }
     
@@ -592,69 +592,39 @@ public:
     {
         return m_map.size();
     }
-//    
-//    // Returns the begin iterator, useful for other standard library algorithms
-//    [[nodiscard]] typename std::set<TKey>::iterator begin()
-//    {
-//        return m_map.begin();
-//    }
-//    
-//    // Returns the const begin iterator, useful for other standard library algorithms
-//    [[nodiscard]] typename std::set<TKey>::const_iterator begin() const
-//    {
-//        return m_map.begin();
-//    }
-//    
-//    // Returns the end iterator, useful for other standard library algorithms
-//    [[nodiscard]] typename std::set<TKey>::iterator end()
-//    {
-//        return m_map.end();
-//    }
-//    
-//    // Returns the const end iterator, useful for other standard library algorithms
-//    [[nodiscard]] typename std::set<TKey>::const_iterator end() const
-//    {
-//        return m_map.end();
-//    }
-//    
-//    // Returns the given key in the current set, allowing subscripting.
-//    // Bounds checking (assert) is enabled for debug builds.
-//    // Performance is O(n), so be careful for performance critical code sections.
-//    TKey operator[](size_t index)
-//    {
-//        assert_smaller_size(index);
-//#ifdef CPP17_AVAILABLE
-//        auto it = std::advance(begin(), index);
-//        return *it;
-//#else
-//        auto count = 0;
-//        auto it = begin();
-//        while (count++ < index) {
-//            it++;
-//        }
-//        return *it;
-//#endif
-//    }
-//    
-//    // Returns the given key in the current constant set, allowing subscripting.
-//    // Bounds checking (assert) is enabled for debug builds.
-//    // Performance is O(n), so be careful for performance critical code sections.
-//    TKey operator[](size_t index) const
-//    {
-//        assert_smaller_size(index);
-//#ifdef CPP17_AVAILABLE
-//        auto it = begin();
-//        std::advance(it, index);
-//        return *it;
-//#else
-//        auto count = 0;
-//        auto it = begin();
-//        while (count++ < index) {
-//            it++;
-//        }
-//        return *it;
-//#endif
-//    }
+    
+    // Returns the begin iterator, useful for other standard library algorithms
+    [[nodiscard]] typename std::map<TKey, TValue, TCompare>::iterator begin()
+    {
+        return m_map.begin();
+    }
+    
+    // Returns the const begin iterator, useful for other standard library algorithms
+    [[nodiscard]] typename std::map<TKey, TValue, TCompare>::const_iterator begin() const
+    {
+        return m_map.begin();
+    }
+    
+    // Returns the end iterator, useful for other standard library algorithms
+    [[nodiscard]] typename std::map<TKey, TValue, TCompare>::iterator end()
+    {
+        return m_map.end();
+    }
+    
+    // Returns the const end iterator, useful for other standard library algorithms
+    [[nodiscard]] typename std::map<TKey, TValue, TCompare>::const_iterator end() const
+    {
+        return m_map.end();
+    }
+    
+    // Returns the value for the given key in the current map.
+    // It asserts that the given key is present in the map.
+    const TValue& operator[](TKey key) const
+    {
+        auto it = m_map.find(key);
+        assert(it != end());
+        return (*it).second;
+    }
 //    
 //    // Returns true if both instances have equal sizes and the corresponding elements (keys) are equal
 //    bool operator ==(const set<TKey, TCompare>& rhs) const
