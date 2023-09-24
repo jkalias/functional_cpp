@@ -54,6 +54,18 @@ TEST(MapTest, StdInitializerListConstructor)
     test_contents(map_under_test);
 }
 
+TEST(MapTest, AccessConstOperator)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_EQ(32, persons["jake"]);
+}
+
+TEST(MapTest, AccessOperator)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_EQ(0, persons["john"]);
+}
+
 //TEST(MapTest, DifferenceFunctionalSetCustomType)
 //{
 //    const set<person, person_comparator> set1({

@@ -607,15 +607,22 @@ public:
         return m_map.end();
     }
     
-    // Returns the value for the given key in the current map.
-    // It asserts that the given key is present in the map.
-    const TValue& operator[](TKey key) const
+    // Returns a reference to the value that is mapped to a key,
+    // assuming that such key already exists.
+    const TValue& operator[](const TKey& key) const
     {
         auto it = m_map.find(key);
         assert(it != end());
         return (*it).second;
     }
-//    
+    
+    // Returns a reference to the value that is mapped to a key,
+    // performing an insertion if such key does not already exist.
+    TValue& operator[](const TKey& key)
+    {
+        return m_map[key];
+    }
+//
 //    // Returns true if both instances have equal sizes and the corresponding elements (keys) are equal
 //    bool operator ==(const set<TKey, TCompare>& rhs) const
 //    {
