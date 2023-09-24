@@ -522,34 +522,20 @@ public:
 //        return set(copy);
 //    }
 //    
-//    // Removes all keys from the set (mutating)
-//    //
-//    // example:
-//    //      fcpp::set<int> numbers({1, 4, 2});
-//    //      numbers.clear();
-//    //
-//    // outcome:
-//    //      numbers -> fcpp::set<int>({})
-//    set& clear()
-//    {
-//        m_map.clear();
-//        return *this;
-//    }
-//    
-//    // Returns a new set by clearing all keys from the current set (non-mutating)
-//    //
-//    // example:
-//    //      const fcpp::set<int> numbers({1, 4, 2});
-//    //      auto cleared_numbers = numbers.clearing();
-//    //
-//    // outcome:
-//    //      cleared_numbers -> fcpp::set<int>({})
-//    //      numbers -> fcpp::set<int> numbers({1, 4, 2})
-//    [[nodiscard]] set clearing() const
-//    {
-//        return set();
-//    }
-//    
+    // Removes all key/value pairs from the map (mutating)
+    //
+    // example:
+    //      map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    //      persons.clear();
+    //
+    // outcome:
+    //      persons -> fcpp::map<std::string, int>{{}}
+    map& clear()
+    {
+        m_map.clear();
+        return *this;
+    }
+    
     // Returns true if the map is empty
     //
     // example:

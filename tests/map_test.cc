@@ -31,9 +31,9 @@ using namespace fcpp;
 
 void test_contents(const map<int, std::string>& map) {
     EXPECT_EQ(3, map.size());
-    EXPECT_EQ(std::string("one"), map[1]);
-    EXPECT_EQ(std::string("two"), map[2]);
-    EXPECT_EQ(std::string("three"), map[3]);
+    EXPECT_EQ("one", map[1]);
+    EXPECT_EQ("two", map[2]);
+    EXPECT_EQ("three", map[3]);
 }
 
 TEST(MapTest, EmptyConstructor)
@@ -462,21 +462,13 @@ TEST(MapTest, AccessOperator)
 //    EXPECT_EQ(set<int>({1, 2, 4}), augmented_numbers);
 //    EXPECT_EQ(set<int>({1, 2, 4}), numbers);
 //}
-//
-//TEST(MapTest, Clear)
-//{
-//    set<int> numbers({1, 4, 2});
-//    numbers.clear();
-//    EXPECT_EQ(0, numbers.size());
-//}
-//
-//TEST(MapTest, Clearing)
-//{
-//    const set<int> numbers({1, 4, 2});
-//    const auto cleared_numbers = numbers.clearing();
-//    EXPECT_EQ(0, cleared_numbers.size());
-//    EXPECT_EQ(3, numbers.size());
-//}
+
+TEST(MapTest, Clear)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    persons.clear();
+    EXPECT_EQ(0, persons.size());
+}
 
 TEST(MapTest, IsEmpty)
 {
