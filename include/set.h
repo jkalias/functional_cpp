@@ -35,7 +35,7 @@ class vector;
 // of the standard library algorithms.
 //
 // Member functions can be mutating (eg. my_set.insert()) or
-// non-mutating (eg. my_vector.inserting()) enforcing thread safety if needed
+// non-mutating (eg. my_set.inserting()) enforcing thread safety if needed
 template <class TKey, class TCompare = std::less<TKey>>
 class set
 {
@@ -184,7 +184,7 @@ public:
     // output of applying the transform function on every element of this instance.
     //
     // example:
-    //      const fcpp::vector<int> input_set({ 1, 3, -5 });
+    //      const fcpp::set<int> input_set({ 1, 3, -5 });
     //      const auto output_set = input_set.map<std::string>([](const int& element) {
     //          return std::to_string(element);
     //      });
@@ -291,7 +291,7 @@ public:
     }
 
     // Performs the functional `reduce` (fold/accumulate) algorithm, by returning the result of
-    // accumulating all the values in the vector to an initial value. (non-mutating)
+    // accumulating all the values in the set to an initial value. (non-mutating)
     //
     // example:
     //      const fcpp::set<std::string> tokens({ "the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "brown", "dog" });
@@ -590,7 +590,7 @@ public:
     	return m_set.count(key) != 0;
     }
     
-    // Returns the size of the vector (how many elements it contains, it may be different from its capacity)
+    // Returns the size of the set (how many elements it contains, it may be different from its capacity)
     [[nodiscard]] size_t size() const
     {
         return m_set.size();
