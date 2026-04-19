@@ -112,6 +112,7 @@ jobs:
             -S . \
             -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -G "${{ matrix.config.generators }}"
       
       - name: Configure C++17
@@ -123,6 +124,7 @@ jobs:
             -S . \
             -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DCMAKE_CXX_STANDARD=17 \
             -G "${{ matrix.config.generators }}"
 
