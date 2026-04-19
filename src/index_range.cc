@@ -25,32 +25,32 @@
 index_range index_range::invalid = start_count(-1, -1);
 
 index_range::index_range(int start, int count)
-: start(-1), end(-1), count(-1)
+	: start(-1), end(-1), count(-1)
 {
-    is_valid = start >= 0 && count > 0;
-    if (is_valid) {
-        this->start = start;
-        this->count = count;
-        end = start + count - 1;
-    }
+	is_valid = start >= 0 && count > 0;
+	if (is_valid) {
+		this->start = start;
+		this->count = count;
+		end = start + count - 1;
+	}
 }
 
 index_range index_range::start_count(int start, int count)
 {
-    return index_range(start, count);
+	return index_range(start, count);
 }
 
 index_range index_range::start_end(int start, int end)
 {
-    return index_range(start, end - start + 1);
+	return index_range(start, end - start + 1);
 }
 
-bool index_range::operator == (const index_range& rhs) const
+bool index_range::operator ==(const index_range& rhs) const
 {
-    return start == rhs.start && count == rhs.count;
+	return start == rhs.start && count == rhs.count;
 }
 
-bool index_range::operator != (const index_range& rhs) const
+bool index_range::operator !=(const index_range& rhs) const
 {
-    return !(*this == rhs);
+	return !(*this == rhs);
 }

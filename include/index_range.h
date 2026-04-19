@@ -26,60 +26,60 @@
 // A struct used for container safe access based on index
 struct FunctionalCppExport index_range
 {
-    // Used for returning values of invalid operations
-    static index_range invalid;
-    
-    // Create with start index and element count (end index is calculated)
-    static index_range start_count(int start, int count);
-    
-    // Create with start and end index (count is calculated)
-    static index_range start_end(int start, int end);
-    
-    // The start index of the index range
-    // example:
-    //     [0] [1] [2] [3] [4] [5] [6]
-    //      5   3   9   1   8   3   2
-    //              ^       ^
-    //              |       |
-    //            start    end
-    //
-    //      start = 2
-    //      end = 4
-    //      count = 3
-    int start;
-    
-    // The end index of the index range
-    // example:
-    //     [0] [1] [2] [3] [4] [5] [6]
-    //      5   3   9   1   8   3   2
-    //              ^       ^
-    //              |       |
-    //            start    end
-    //
-    //      start = 2
-    //      end = 4
-    //      count = 3
-    int end;
-    
-    // The total count of the elements in the index range
-    // example:
-    //     [0] [1] [2] [3] [4] [5] [6]
-    //      5   3   9   1   8   3   2
-    //              ^       ^
-    //              |       |
-    //            start    end
-    //
-    //      start = 2
-    //      end = 4
-    //      count = 3
-    int count;
-    
-    // Returns true if it's safe to use its contents
-    bool is_valid;
-    
-    bool operator == (const index_range& rhs) const;
-    bool operator != (const index_range& rhs) const;
-    
+	// Used for returning values of invalid operations
+	static index_range invalid;
+
+	// Create with start index and element count (end index is calculated)
+	static index_range start_count(int start, int count);
+
+	// Create with start and end index (count is calculated)
+	static index_range start_end(int start, int end);
+
+	// The start index of the index range
+	// example:
+	//     [0] [1] [2] [3] [4] [5] [6]
+	//      5   3   9   1   8   3   2
+	//              ^       ^
+	//              |       |
+	//            start    end
+	//
+	//      start = 2
+	//      end = 4
+	//      count = 3
+	int start;
+
+	// The end index of the index range
+	// example:
+	//     [0] [1] [2] [3] [4] [5] [6]
+	//      5   3   9   1   8   3   2
+	//              ^       ^
+	//              |       |
+	//            start    end
+	//
+	//      start = 2
+	//      end = 4
+	//      count = 3
+	int end;
+
+	// The total count of the elements in the index range
+	// example:
+	//     [0] [1] [2] [3] [4] [5] [6]
+	//      5   3   9   1   8   3   2
+	//              ^       ^
+	//              |       |
+	//            start    end
+	//
+	//      start = 2
+	//      end = 4
+	//      count = 3
+	int count;
+
+	// Returns true if it's safe to use its contents
+	bool is_valid;
+
+	bool operator ==(const index_range& rhs) const;
+	bool operator !=(const index_range& rhs) const;
+
 private:
-    index_range(int start, int count);
+	index_range(int start, int count);
 };
