@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Ioannis Kaliakatsos
+// Copyright (c) 2026 Ioannis Kaliakatsos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,15 @@
 #include <gtest/gtest.h>
 #include "warnings.h"
 #include "map.h"
-#include "vector.h"
-#include "test_types.h"
 #include <string>
 
 using namespace fcpp;
 
-void test_contents(const map<int, std::string>& map) {
-    EXPECT_EQ(3, map.size());
-    EXPECT_EQ("one", map[1]);
-    EXPECT_EQ("two", map[2]);
-    EXPECT_EQ("three", map[3]);
+void test_contents(const map<int, std::string>& map_under_test) {
+    EXPECT_EQ(3, map_under_test.size());
+    EXPECT_EQ("one", map_under_test[1]);
+    EXPECT_EQ("two", map_under_test[2]);
+    EXPECT_EQ("three", map_under_test[3]);
 }
 
 TEST(MapTest, EmptyConstructor)
@@ -66,211 +64,171 @@ TEST(MapTest, AccessOperator)
     EXPECT_EQ(0, persons["john"]);
 }
 
-//TEST(MapTest, Map)
-//{
-//    const set<int> numbers({4, 1, 3});
-//    const auto mapped_set = numbers.map<child>([](const int& age) {
-//        return child(age);
-//    });
-//    EXPECT_EQ(3, mapped_set.size());
-//    EXPECT_EQ(1, mapped_set[0].age);
-//    EXPECT_EQ(3, mapped_set[1].age);
-//    EXPECT_EQ(4, mapped_set[2].age);
-//}
-//
-//TEST(MapTest, AllOf)
-//{
-//    const set<int> numbers({1, 4, 2, 5, 8, 3});
-//    EXPECT_TRUE(numbers.all_of([](const int &number) { return number < 10; }));
-//    EXPECT_FALSE(numbers.all_of([](const int &number) { return number > 2; }));
-//}
-//
-//TEST(MapTest, AnyOf)
-//{
-//    const set<int> numbers({1, 4, 2, 5, 8, 3});
-//    EXPECT_TRUE(numbers.any_of([](const int &number) { return number < 5; }));
-//    EXPECT_FALSE(numbers.any_of([](const int &number) { return number > 10; }));
-//}
-//
-//TEST(MapTest, NoneOf)
-//{
-//    const set<int> numbers({1, 4, 2, 5, 8, 3});
-//    EXPECT_TRUE(numbers.none_of([](const int &number) { return number > 10; }));
-//    EXPECT_FALSE(numbers.none_of([](const int &number) { return number < 6; }));
-//}
-//
-//TEST(MapTest, Reduce)
-//{
-//    const set<std::string> tokens({ "the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "brown", "dog" });
-//    const auto sentence = tokens.reduce(std::string(""), [](const std::string& partial, const std::string& token) {
-//        return partial.length() != 0
-//            ? partial + " " + token
-//            : token;
-//    });
-//    EXPECT_EQ("brown dog fox jumps lazy over quick the", sentence);
-//}
-//
-//TEST(MapTest, Filter)
-//{
-//    set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
-//    numbers.filter([](const int& element) {
-//        return element >= 1.5;
-//    });
-//    EXPECT_EQ(set<int>({2, 3, 9}), numbers);
-//}
-//
-//TEST(MapTest, Filtered)
-//{
-//    const set<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
-//    auto filtered_numbers = numbers.filtered([](const int& element) {
-//        return element >= 1.5;
-//    });
-//    EXPECT_EQ(set<int>({2, 3, 9}), filtered_numbers);
-//    EXPECT_EQ(set<int>({ 1, 3, -5, 2, -1, 9, -4 }), numbers);
-//}
-//
-//TEST(MapTest, ZipWithFunctionalSet)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
-//    const auto zipped = ages.zip(persons);
-//    const auto expected = set<std::pair<int, std::string>>({
-//        std::pair<int, std::string>(25, "Bob"),
-//        std::pair<int, std::string>(30, "Jake"),
-//        std::pair<int, std::string>(45, "Michael"),
-//        std::pair<int, std::string>(63, "Philipp"),
-//    });
-//    EXPECT_EQ(expected, zipped);
-//}
-//
-//TEST(MapTest, ZipWithFunctionalSetDifferentSizes)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const set<std::string> persons({ "Jake" });
-//    EXPECT_DEATH(ages.zip(persons), "");
-//}
-//
-//TEST(MapTest, ZipWithStdSet)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const std::set<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
-//    const auto zipped = ages.zip(persons);
-//    const auto expected = set<std::pair<int, std::string>>({
-//        std::pair<int, std::string>(25, "Bob"),
-//        std::pair<int, std::string>(30, "Jake"),
-//        std::pair<int, std::string>(45, "Michael"),
-//        std::pair<int, std::string>(63, "Philipp"),
-//    });
-//    EXPECT_EQ(expected, zipped);
-//}
-//
-//TEST(MapTest, ZipWithStdSetDifferentSizes)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const std::set<std::string> persons({ "Jake" });
-//    EXPECT_DEATH(ages.zip(persons), "");
-//}
-//
-//TEST(MapTest, ZipWithFunctionalVector)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const vector<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
-//    const auto zipped = ages.zip(persons);
-//    const auto expected = set<std::pair<int, std::string>>({
-//        std::pair<int, std::string>(25, "Bob"),
-//        std::pair<int, std::string>(30, "Jake"),
-//        std::pair<int, std::string>(45, "Michael"),
-//        std::pair<int, std::string>(63, "Philipp"),
-//    });
-//    EXPECT_EQ(expected, zipped);
-//}
-//
-//TEST(MapTest, ZipWithFunctionalVectorDifferentSizes)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const vector<std::string> persons({ "Jake" });
-//    EXPECT_DEATH(ages.zip(persons), "");
-//}
-//
-//TEST(MapTest, ZipWithStdVector)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const std::vector<std::string> persons({ "Jake", "Bob", "Michael", "Philipp" });
-//    const auto zipped = ages.zip(persons);
-//    const auto expected = set<std::pair<int, std::string>>({
-//        std::pair<int, std::string>(25, "Bob"),
-//        std::pair<int, std::string>(30, "Jake"),
-//        std::pair<int, std::string>(45, "Michael"),
-//        std::pair<int, std::string>(63, "Philipp"),
-//    });
-//    EXPECT_EQ(expected, zipped);
-//}
-//
-//TEST(MapTest, ZipWithStdVectorDifferentSizes)
-//{
-//    const set<int> ages({ 25, 45, 30, 63 });
-//    const std::vector<std::string> persons({ "Jake" });
-//    EXPECT_DEATH(ages.zip(persons), "");
-//}
-//
-//TEST(MapTest, Keys)
-//{
-//    const set<int> numbers({ 25, 45, 30, 63 });
-//    const auto keys = numbers.keys();
-//    EXPECT_EQ(vector<int>({25, 30, 45, 63}), keys);
-//}
-//
-//TEST(MapTest, RemoveExistingElement)
-//{
-//    set<int> numbers({1, 4, 2});
-//    numbers.remove(4);
-//    EXPECT_EQ(set<int>({1, 2}), numbers);
-//}
-//
-//TEST(MapTest, RemoveNonExistentElement)
-//{
-//    set<int> numbers({1, 4, 2});
-//    numbers.remove(18);
-//    EXPECT_EQ(set<int>({1, 2, 4}), numbers);
-//}
-//
-//TEST(MapTest, RemovingExistingElement)
-//{
-//    const set<int> numbers({1, 4, 2});
-//    const auto less_numbers = numbers.removing(4);
-//    EXPECT_EQ(set<int>({1, 2}), less_numbers);
-//    EXPECT_EQ(set<int>({1, 2, 4}), numbers);
-//}
-//
-//TEST(MapTest, InsertNewElement)
-//{
-//    set<int> numbers({1, 4, 2});
-//    numbers.insert(18);
-//    EXPECT_EQ(set<int>({1, 2, 4, 18}), numbers);
-//}
-//
-//TEST(MapTest, InsertingNewElement)
-//{
-//    const set<int> numbers({1, 4, 2});
-//    const auto augmented_numbers =  numbers.inserting(18);
-//    EXPECT_EQ(set<int>({1, 2, 4, 18}), augmented_numbers);
-//    EXPECT_EQ(set<int>({1, 2, 4}), numbers);
-//}
-//
-//TEST(MapTest, InsertExistingElement)
-//{
-//    set<int> numbers({1, 4, 2});
-//    numbers.insert(2);
-//    EXPECT_EQ(set<int>({1, 2, 4}), numbers);
-//}
-//
-//TEST(MapTest, InsertingExistingElement)
-//{
-//    const set<int> numbers({1, 4, 2});
-//    const auto augmented_numbers =  numbers.inserting(2);
-//    EXPECT_EQ(set<int>({1, 2, 4}), augmented_numbers);
-//    EXPECT_EQ(set<int>({1, 2, 4}), numbers);
-//}
+TEST(MapTest, MapValues)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto mapped = persons.map_values<std::string>([](const int& age) {
+        return std::to_string(age);
+    });
+
+    EXPECT_EQ(vector<std::string>({"40", "32", "26"}), mapped);
+}
+
+TEST(MapTest, MapKeys)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto mapped = persons.map_keys<char>([](const std::string& name) {
+        return name[0];
+    });
+
+    EXPECT_EQ(vector<char>({'d', 'j', 'm'}), mapped);
+}
+
+TEST(MapTest, MapTo)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto mapped = persons.map_to<char, std::string>([](const std::pair<const std::string, int>& element) {
+        return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+    });
+
+    EXPECT_EQ((map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}, {'m', "26 years"}})), mapped);
+}
+
+TEST(MapTest, AllOf)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_TRUE(persons.all_of([](const std::pair<const std::string, int>& element) {
+        return element.second > 20;
+    }));
+    EXPECT_FALSE(persons.all_of([](const std::pair<const std::string, int>& element) {
+        return element.second < 35;
+    }));
+}
+
+TEST(MapTest, AnyOf)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_TRUE(persons.any_of([](const std::pair<const std::string, int>& element) {
+        return element.second == 40;
+    }));
+    EXPECT_FALSE(persons.any_of([](const std::pair<const std::string, int>& element) {
+        return element.second > 50;
+    }));
+}
+
+TEST(MapTest, NoneOf)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_TRUE(persons.none_of([](const std::pair<const std::string, int>& element) {
+        return element.second < 18;
+    }));
+    EXPECT_FALSE(persons.none_of([](const std::pair<const std::string, int>& element) {
+        return element.second == 26;
+    }));
+}
+
+TEST(MapTest, Reduce)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto total_age = persons.reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
+        return partial_sum + element.second;
+    });
+    EXPECT_EQ(98, total_age);
+}
+
+TEST(MapTest, Filter)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    persons.filter([](const std::pair<const std::string, int>& element) {
+        return element.second >= 32;
+    });
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), persons);
+}
+
+TEST(MapTest, Filtered)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto filtered_persons = persons.filtered([](const std::pair<const std::string, int>& element) {
+        return element.second >= 32;
+    });
+
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), filtered_persons);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, ForEach)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    auto total_age = 0;
+    persons.for_each([&total_age](const std::pair<const std::string, int>& element) {
+        total_age += element.second;
+    });
+    EXPECT_EQ(98, total_age);
+}
+
+TEST(MapTest, Keys)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_EQ(vector<std::string>({"david", "jake", "mary"}), persons.keys());
+}
+
+TEST(MapTest, Values)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_EQ(vector<int>({40, 32, 26}), persons.values());
+}
+
+TEST(MapTest, RemoveExistingElement)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    persons.remove("mary");
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), persons);
+}
+
+TEST(MapTest, RemoveNonExistentElement)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    persons.remove("bob");
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, RemovingExistingElement)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto reduced_persons = persons.removing("mary");
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), reduced_persons);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, InsertNewElement)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    persons.insert("anna", 28);
+    EXPECT_EQ((map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, InsertingNewElement)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto augmented_persons = persons.inserting("anna", 28);
+    EXPECT_EQ((map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}, {"mary", 26}})), augmented_persons);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, InsertExistingElement)
+{
+    map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    persons.insert("jake", 999);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, InsertingExistingElement)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    const auto augmented_persons = persons.inserting("jake", 999);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), augmented_persons);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
 
 TEST(MapTest, Clear)
 {
@@ -294,36 +252,18 @@ TEST(MapTest, Contains)
     EXPECT_FALSE(persons.contains("bob"));
 }
 
-//TEST(MapTest, EqualityOperator)
-//{
-//    const set<int> set1(std::set<int>({1, 2, 3}));
-//    const set<int> set2(std::set<int>({1, 2, 3, 2, 3}));
-//    EXPECT_TRUE(set1 == set2);
-//    EXPECT_FALSE(set1 != set2);
-//}
-//
-//TEST(MapTest, InequalityOperator)
-//{
-//    const set<int> set1(std::set<int>({1, 2, 3}));
-//    const set<int> set2(std::set<int>({1, 2, 3, 4}));
-//    EXPECT_FALSE(set1 == set2);
-//    EXPECT_TRUE(set1 != set2);
-//}
-//
-//TEST(MapTest, EqualityOperatorCustomType)
-//{
-//    const set<person, person_comparator> set1({
-//        person(15, "Jake"),
-//        person(18, "Jannet"),
-//        person(25, "Kate")
-//    });
-//    
-//    const set<person, person_comparator> set2({
-//        person(15, "Jake"),
-//        person(18, "Jannet"),
-//        person(25, "Kate")
-//    });
-//
-//    EXPECT_TRUE(set1 == set2);
-//    EXPECT_FALSE(set1 != set2);
-//}
+TEST(MapTest, EqualityOperator)
+{
+    const map<int, std::string> map1({{1, "one"}, {2, "two"}, {3, "three"}});
+    const map<int, std::string> map2({{1, "one"}, {2, "two"}, {3, "three"}});
+    EXPECT_TRUE(map1 == map2);
+    EXPECT_FALSE(map1 != map2);
+}
+
+TEST(MapTest, InequalityOperator)
+{
+    const map<int, std::string> map1({{1, "one"}, {2, "two"}, {3, "three"}});
+    const map<int, std::string> map2({{1, "one"}, {2, "two"}, {4, "four"}});
+    EXPECT_FALSE(map1 == map2);
+    EXPECT_TRUE(map1 != map2);
+}
