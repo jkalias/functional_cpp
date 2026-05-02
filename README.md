@@ -1,7 +1,7 @@
 [![CMake Build Matrix](https://github.com/jkalias/functional_cpp/actions/workflows/cmake.yml/badge.svg)](https://github.com/jkalias/functional_cpp/actions/workflows/cmake.yml)
 [![GitHub license](https://img.shields.io/github/license/jkalias/functional_cpp)](https://github.com/jkalias/functional_cpp/blob/main/LICENSE)
 # Say hello to functional C++
-A wrapper for C++ std::vector and std::set geared towards functional programming and fluent APIs. This project is heavily influenced and inspired by C# and Swift.
+A wrapper for the C++ workhorses std::vector, std::set and std::map geared towards functional programming and fluent APIs. This project is heavily influenced and inspired by C# and Swift.
 
 The primary focus of this library is
 * readability at the call site ("make it work, make it right, make it fast")
@@ -268,6 +268,8 @@ for_each_parallel
 map_parallel
 filter_parallel
 sort_parallel
+sort_ascending_parallel
+sort_descending_parallel
 all_of_parallel
 any_of_parallel
 none_of_parallel
@@ -310,7 +312,7 @@ const auto colleagues_but_not_friends = colleagues.difference_with(friends);
 // find which friends are colleagues
 // same as colleagues.intersect_with(friends)
 // contains person(51, "George"), person(41, "Jackie")
-const auto good_colleagues = friends.intersection_with(colleagues);
+const auto good_colleagues = friends.intersect_with(colleagues);
 
 // a set of close family members
 const fcpp::set<person, person_comparator> family({
@@ -322,8 +324,8 @@ const fcpp::set<person, person_comparator> family({
 // contains person(51, "George"), person(41, "Jackie"), person(42, "Crystal"), person(51, "Paul"), person(81, "Barbara") 
 const auto friends_and_family = friends.union_with(family);
 
-// all set keys in a vetor
-const fcpp::vector<person> = friends_and_family.keys();
+// all set keys in a vector
+const auto people = friends_and_family.keys();
 ```
 
 ### zip, map, filter, reduce
@@ -408,10 +410,10 @@ numbers.none_of([](const int& number) {
 
 fcpp::set<int> numbers({1, 2, 3, 4, 5, 7, 8});
 
-// numbers -> fcpp::set<int> numbers({1, 2, 3, 5, 7, 8});
+// numbers -> fcpp::set<int>({1, 2, 3, 5, 7, 8});
 numbers.remove(4);
 
-// numbers -> fcpp::set<int> numbers({1, 2, 3, 5, 7, 8, 10});
+// numbers -> fcpp::set<int>({1, 2, 3, 5, 7, 8, 10});
 numbers.insert(10);
 
 // returns true
@@ -425,4 +427,111 @@ numbers.size();
 
 // removes all keys
 numbers.clear();
+```
+
+## Functional map usage (fcpp::map)
+### map_to, filter, reduce, for_each
+```c++
+#include "map.h" // instead of <map>
+
+const fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 16},
+    {"david", 40}
+});
+
+// keep only persons above 18 years old
+const auto adults = ages
+    .filtered([](const std::pair<const std::string, int>& element) {
+        return element.second >= 18;
+    });
+
+// ages_by_initial -> fcpp::map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}})
+const auto ages_by_initial = adults.map_to<char, std::string>([](const std::pair<const std::string, int>& element) {
+    return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+});
+
+// total_age = 72
+const auto total_age = adults.reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
+    return partial_sum + element.second;
+});
+
+/*
+ prints the following:
+ jake is 32 years old.
+ david is 40 years old.
+ */
+adults.for_each([](const std::pair<const std::string, int>& element) {
+    std::cout << element.first << " is " << element.second << " years old." << std::endl;
+});
+```
+
+### all_of, any_of, none_of
+```c++
+#include "map.h" // instead of <map>
+
+const fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 26},
+    {"david", 40}
+});
+
+// returns true
+ages.all_of([](const std::pair<const std::string, int>& element) {
+    return element.second > 20;
+});
+
+// returns false
+ages.all_of([](const std::pair<const std::string, int>& element) {
+    return element.second < 35;
+});
+
+// returns true
+ages.any_of([](const std::pair<const std::string, int>& element) {
+    return element.second == 40;
+});
+
+// returns false
+ages.any_of([](const std::pair<const std::string, int>& element) {
+    return element.second > 50;
+});
+
+// returns true
+ages.none_of([](const std::pair<const std::string, int>& element) {
+    return element.second < 18;
+});
+
+// returns false
+ages.none_of([](const std::pair<const std::string, int>& element) {
+    return element.second == 26;
+});
+```
+
+### keys, values, remove, insert
+```c++
+#include "map.h" // instead of <map>
+
+fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 26},
+    {"david", 40}
+});
+
+// names -> fcpp::vector<std::string>({"david", "jake", "mary"})
+const auto names = ages.keys();
+
+// years -> fcpp::vector<int>({40, 32, 26})
+const auto years = ages.values();
+
+// ages -> fcpp::map<std::string, int>({{"david", 40}, {"jake", 32}})
+ages.remove("mary");
+
+// ages -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}}), mary has already been removed
+ages.insert("anna", 28);
+
+// without_jake -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}})
+const auto without_jake = ages.removing("jake");
+
+// with_paul -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}, {"paul", 51}})
+const auto with_paul = ages.inserting("paul", 51);
 ```

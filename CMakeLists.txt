@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
-project(functional_cpp VERSION 1.0)
+if(POLICY CMP0135)
+  #set the timestamps of all extracted contents to the time of the extraction
+  cmake_policy(SET CMP0135 NEW)
+endif()
+project(functional_cpp VERSION 1.0.2)
 
 # GoogleTest requires at least C++11
 if(NOT "${CMAKE_CXX_STANDARD}")
@@ -16,7 +20,7 @@ endif()
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/8d51ffdfab10b3fba636ae69bc03da4b54f8c235.zip
+  URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
 )
 FetchContent_MakeAvailable(googletest)
 

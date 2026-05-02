@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Ioannis Kaliakatsos
+// Copyright (c) 2026 Ioannis Kaliakatsos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,13 @@
 #pragma once
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-#ifdef FUNCTIONAL_CPP_EXPORTS
-#define FunctionalCppExport __declspec( dllexport )
+    #ifdef FUNCTIONAL_CPP_EXPORTS
+        #define FunctionalCppExport __declspec( dllexport )
+    #else
+        #define FunctionalCppExport __declspec( dllimport )
+    #endif
 #else
-#define FunctionalCppExport __declspec( dllimport )
-#endif
-#else
-#define FunctionalCppExport __attribute__ ((__visibility__("default")))
+    #define FunctionalCppExport __attribute__ ((__visibility__("default")))
 #endif
 
 #include "compatibility.h"

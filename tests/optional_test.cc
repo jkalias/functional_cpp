@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Ioannis Kaliakatsos
+// Copyright (c) 2026 Ioannis Kaliakatsos
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,84 +27,84 @@ using namespace fcpp;
 
 TEST(OptionalTest, InvalidTest)
 {
-	const optional_t<int> index;
-	EXPECT_FALSE(index.has_value());
+    const optional_t<int> index;
+    EXPECT_FALSE(index.has_value());
 }
 
 TEST(OptionalTest, ValidTest)
 {
-	const optional_t<int> index(5);
-	EXPECT_TRUE(index.has_value());
-	EXPECT_EQ(5, index.value());
+    const optional_t<int> index(5);
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(5, index.value());
 }
 
 TEST(OptionalTest, AssignmentFromValueTest)
 {
-	optional_t<int> index(5);
-	index = 3;
-	EXPECT_TRUE(index.has_value());
-	EXPECT_EQ(3, index.value());
+    optional_t<int> index(5);
+    index = 3;
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(3, index.value());
 }
 
 TEST(OptionalTest, AssignmentFromOptionalTest)
 {
-	optional_t<int> v1(5);
-	const optional_t<int> v2(2);
-	v1 = v2;
-	EXPECT_TRUE(v1.has_value());
-	EXPECT_EQ(2, v1.value());
-	EXPECT_TRUE(v2.has_value());
-	EXPECT_EQ(2, v2.value());
+    optional_t<int> v1(5);
+    const optional_t<int> v2(2);
+    v1 = v2;
+    EXPECT_TRUE(v1.has_value());
+    EXPECT_EQ(2, v1.value());
+    EXPECT_TRUE(v2.has_value());
+    EXPECT_EQ(2, v2.value());
 }
 
 TEST(OptionalTest, AssignmentFromNullOptionalTest)
 {
-	optional_t<int> v1(5);
-	const optional_t<int> v2;
-	v1 = v2;
-	EXPECT_FALSE(v1.has_value());
-	EXPECT_FALSE(v2.has_value());
+    optional_t<int> v1(5);
+    const optional_t<int> v2;
+    v1 = v2;
+    EXPECT_FALSE(v1.has_value());
+    EXPECT_FALSE(v2.has_value());
 }
 
 TEST(OptionalTest, AssignmentToNullFromValueTest)
 {
-	optional_t<int> index;
-	index = 3;
-	EXPECT_TRUE(index.has_value());
-	EXPECT_EQ(3, index.value());
+    optional_t<int> index;
+    index = 3;
+    EXPECT_TRUE(index.has_value());
+    EXPECT_EQ(3, index.value());
 }
 
 TEST(OptionalTest, AssignmentToNullFromOptionalTest)
 {
-	optional_t<int> v1;
-	const optional_t<int> v2(2);
-	v1 = v2;
-	EXPECT_TRUE(v1.has_value());
-	EXPECT_EQ(2, v1.value());
-	EXPECT_TRUE(v2.has_value());
-	EXPECT_EQ(2, v2.value());
+    optional_t<int> v1;
+    const optional_t<int> v2(2);
+    v1 = v2;
+    EXPECT_TRUE(v1.has_value());
+    EXPECT_EQ(2, v1.value());
+    EXPECT_TRUE(v2.has_value());
+    EXPECT_EQ(2, v2.value());
 }
 
 TEST(OptionalTest, AssignmentToNullFromNullOptionalTest)
 {
-	optional_t<int> v1;
-	const optional_t<int> v2;
-	v1 = v2;
-	EXPECT_FALSE(v1.has_value());
-	EXPECT_FALSE(v2.has_value());
+    optional_t<int> v1;
+    const optional_t<int> v2;
+    v1 = v2;
+    EXPECT_FALSE(v1.has_value());
+    EXPECT_FALSE(v2.has_value());
 }
 
 TEST(OptionalTest, CopyConstructorTest)
 {
-	const optional_t<int> v2(5);
-	const optional_t<int> v1(v2);
-	EXPECT_TRUE(v1.has_value());
-	EXPECT_EQ(5, v2.value());
+    const optional_t<int> v2(5);
+    const optional_t<int> v1(v2);
+    EXPECT_TRUE(v1.has_value());
+    EXPECT_EQ(5, v2.value());
 }
 
 TEST(OptionalTest, CopyConstructorNullTest)
 {
-	const optional_t<int> v2;
-	const optional_t<int> v1(v2);
-	EXPECT_FALSE(v1.has_value());
+    const optional_t<int> v2;
+    const optional_t<int> v1(v2);
+    EXPECT_FALSE(v1.has_value());
 }
