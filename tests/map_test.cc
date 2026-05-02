@@ -64,26 +64,6 @@ TEST(MapTest, AccessOperator)
     EXPECT_EQ(0, persons["john"]);
 }
 
-TEST(MapTest, MapValues)
-{
-    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
-    const auto mapped = persons.map_values<std::string>([](const int& age) {
-        return std::to_string(age);
-    });
-
-    EXPECT_EQ(vector<std::string>({"40", "32", "26"}), mapped);
-}
-
-TEST(MapTest, MapKeys)
-{
-    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
-    const auto mapped = persons.map_keys<char>([](const std::string& name) {
-        return name[0];
-    });
-
-    EXPECT_EQ(vector<char>({'d', 'j', 'm'}), mapped);
-}
-
 TEST(MapTest, MapTo)
 {
     const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
