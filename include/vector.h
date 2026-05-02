@@ -1457,7 +1457,7 @@ namespace fcpp {
         //
         // example:
         //      const fcpp::vector<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
-        //      const auto& unique_numbers = numbers.distinct();
+        //      const auto unique_numbers = numbers.distinct();
         //
         // outcome:
         //      unique_numbers -> fcpp::set<int>({1, 2, 3, 4, 5, 7, 8})

@@ -430,7 +430,7 @@ public:
         return m_map.find(key) != end();
     }
 
-    // Returns the size of the map (how many elements it contains, it may be different from its capacity)
+    // Returns the number of elements in the map
     [[nodiscard]] size_t size() const
     {
         return m_map.size();

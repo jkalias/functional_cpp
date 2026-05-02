@@ -71,7 +71,7 @@ namespace fcpp {
         // example:
         //      const fcpp::set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
         //      const fcpp::set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
-        //      const auto& diff = set1.difference_with(set2);
+        //      const auto diff = set1.difference_with(set2);
         //
         // outcome:
         //      diff -> fcpp::set<int>({1, 3, 8})
@@ -98,7 +98,7 @@ namespace fcpp {
         // example:
         //      const fcpp::set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
         //      const fcpp::set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
-        //      const auto& combined = set1.union_with(set2);
+        //      const auto combined = set1.union_with(set2);
         //
         // outcome:
         //      combined -> fcpp::set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
@@ -125,7 +125,7 @@ namespace fcpp {
         // example:
         //      const fcpp::set<int> set1(std::set<int>({1, 2, 3, 5, 7, 8, 10}));
         //      const fcpp::set<int> set2(std::set<int>({2, 5, 7, 10, 15, 17}));
-        //      const auto& combined = set1.intersect_with(set2);
+        //      const auto combined = set1.intersect_with(set2);
         //
         // outcome:
         //      combined -> fcpp::set<int>({2, 5, 7, 10})
@@ -440,8 +440,8 @@ namespace fcpp {
             return zip(fcpp::set<UKey>(set));
         }
 
-        // Performs the functional `zip` algorithm by using the unique values of the vector.
-        // The number of uniques vector values must match the set's size.
+        // Performs the functional `zip` algorithm where duplicates are removed before zipping.
+        // The input vector must contain the same number of distinct values as the set size.
         // For more details, see the zip function which accepts a fcpp::set as input.
         template <typename UKey>
         [[nodiscard]] set<std::pair<TKey, UKey>> zip(const vector<UKey>& vector) const
@@ -450,8 +450,8 @@ namespace fcpp {
             return zip(distinct_values);
         }
 
-        // Performs the functional `zip` algorithm by using the unique values of the vector.
-        // The number of uniques vector values must match the set's size.
+        // Performs the functional `zip` algorithm where duplicates are removed before zipping.
+        // The input vector must contain the same number of distinct values as the set size.
         // For more details, see the zip function which accepts a fcpp::set as input.
         template <typename UKey>
         [[nodiscard]] set<std::pair<TKey, UKey>> zip(const std::vector<UKey>& vector) const
@@ -474,6 +474,14 @@ namespace fcpp {
             return *this;
         }
 
+        // Returns a vector whose elements are the set's values in sorted key order.
+        //
+        // example:
+        //      fcpp::set<int> numbers({1, 4, 2});
+        //      const auto keys = numbers.keys();
+        //
+        // outcome:
+        //      keys -> fcpp::vector<int>({1, 2, 4})
         vector<TKey> keys() const
         {
             vector<TKey> vec;
@@ -598,7 +606,7 @@ namespace fcpp {
             return m_set.count(key) != 0;
         }
 
-        // Returns the size of the set (how many elements it contains, it may be different from its capacity)
+        // Returns the number of elements in the set
         [[nodiscard]] size_t size() const
         {
             return m_set.size();
@@ -628,7 +636,7 @@ namespace fcpp {
             return m_set.end();
         }
 
-        // Returns the given key in the current set, allowing subscripting.
+        // Returns a copy of the key at the given sorted position.
         // Bounds checking (assert) is enabled for debug builds.
         // Performance is O(n), so be careful for performance critical code sections.
         TKey operator[](size_t index)
@@ -647,7 +655,7 @@ namespace fcpp {
 #endif
         }
 
-        // Returns the given key in the current constant set, allowing subscripting.
+        // Returns a copy of the key at the given sorted position.
         // Bounds checking (assert) is enabled for debug builds.
         // Performance is O(n), so be careful for performance critical code sections.
         TKey operator[](size_t index) const
