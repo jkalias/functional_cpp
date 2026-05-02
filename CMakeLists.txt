@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 if(POLICY CMP0135)
+  #set the timestamps of all extracted contents to the time of the extraction
   cmake_policy(SET CMP0135 NEW)
 endif()
 project(functional_cpp VERSION 1.0.2)
