@@ -151,7 +151,7 @@ namespace fcpp {
         //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
         //      auto minimum = numbers.min();
         //
-        //      // an empty's set minimum value
+        //      // an empty set's minimum value
         //      fcpp::set<int>().min().has_value() // false
         //
         // outcome:
@@ -172,7 +172,7 @@ namespace fcpp {
         //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3, 1, 7, 1});
         //      auto maximum = numbers.max();
         //
-        //      // an empty's set maximum value
+        //      // an empty set's maximum value
         //      fcpp::set<int>().max().has_value() // false
         //
         // outcome:
@@ -246,7 +246,7 @@ namespace fcpp {
                                std::forward<Callable>(unary_predicate));
         }
 
-        // Returns true if at least one key match the predicate (returns true)
+        // Returns true if at least one key matches the predicate (returns true)
         //
         // example:
         //      const fcpp::set<int> numbers({1, 4, 2, 5, 8, 3});
@@ -474,7 +474,7 @@ namespace fcpp {
             return *this;
         }
 
-        // Returns a vector whose elements are the set's values in sorted key order.
+        // Returns a vector whose elements are the set's keys in sorted order.
         //
         // example:
         //      fcpp::set<int> numbers({1, 4, 2});
@@ -574,7 +574,7 @@ namespace fcpp {
         //
         // outcome:
         //      cleared_numbers -> fcpp::set<int>({})
-        //      numbers -> fcpp::set<int> numbers({1, 4, 2})
+        //      numbers -> fcpp::set<int>({1, 4, 2})
         [[nodiscard]] set clearing() const
         {
             return set();

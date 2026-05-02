@@ -60,7 +60,7 @@ public:
     // Performs the functional `map` algorithm from one map to another map, in which every key/value
     // pair of the resulting map is the output of applying the transform function on every key/value
     // pair of this instance. If two source elements produce equivalent result keys, the first
-    // transformed key/value pair is kept, following std::map::insert semantics.
+    // pair encountered during map iteration is kept, following std::map::insert semantics.
     //
     // example:
     //      const fcpp::map<std::string, int> ages({{"jake", 32}, {"mary", 26}, {"david", 40}});

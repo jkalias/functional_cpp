@@ -268,6 +268,8 @@ for_each_parallel
 map_parallel
 filter_parallel
 sort_parallel
+sort_ascending_parallel
+sort_descending_parallel
 all_of_parallel
 any_of_parallel
 none_of_parallel
@@ -408,10 +410,10 @@ numbers.none_of([](const int& number) {
 
 fcpp::set<int> numbers({1, 2, 3, 4, 5, 7, 8});
 
-// numbers -> fcpp::set<int> numbers({1, 2, 3, 5, 7, 8});
+// numbers -> fcpp::set<int>({1, 2, 3, 5, 7, 8});
 numbers.remove(4);
 
-// numbers -> fcpp::set<int> numbers({1, 2, 3, 5, 7, 8, 10});
+// numbers -> fcpp::set<int>({1, 2, 3, 5, 7, 8, 10});
 numbers.insert(10);
 
 // returns true

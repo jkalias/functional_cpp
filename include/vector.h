@@ -672,7 +672,7 @@ namespace fcpp {
         }
 #endif
 
-        // Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less [<] (non-mutating).
+        // Creates a copy and sorts it in ascending order, when comparison by std::less is supported [<] (non-mutating).
         //
         // example:
         //      const fcpp::vector numbers({3, 1, 9, -4});
@@ -694,7 +694,7 @@ namespace fcpp {
         }
 #endif
 
-        // Sorts its elements copied and sorted in descending order, when its elements support comparison by std::greater [>] (non-mutating).
+        // Creates a copy and sorts it in descending order, when comparison by std::greater is supported [>] (non-mutating).
         //
         // example:
         //      const fcpp::vector numbers({3, 1, 9, -4});
@@ -1125,7 +1125,7 @@ namespace fcpp {
         //      numbers.insert_back(fcpp::vector({1, 2, 3}));
         //
         // outcome:
-        //      numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+        //      numbers -> fcpp::vector<int>({ 4, 5, 6, 1, 2, 3 });
         vector& insert_back(const vector<T>& vector)
         {
             return insert_back_range_impl(vector.begin(), vector.end());
@@ -1138,7 +1138,7 @@ namespace fcpp {
         //      numbers.insert_front(fcpp::vector({1, 2, 3}));
         //
         // outcome:
-        //      numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+        //      numbers -> fcpp::vector<int>({ 1, 2, 3, 4, 5, 6 });
         vector& insert_front(const vector<T>& vector)
         {
             return insert_front_range_impl(vector.begin(), vector.end());
@@ -1151,7 +1151,7 @@ namespace fcpp {
         //      auto augmented_numbers = numbers.inserting_back(fcpp::vector({1, 2, 3}));
         //
         // outcome:
-        //      augmented_numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+        //      augmented_numbers -> fcpp::vector<int>({ 4, 5, 6, 1, 2, 3 });
         [[nodiscard]] vector inserting_back(const vector<T>& vector) const
         {
             return inserting_back_range_impl(vector.begin(), vector.end());
@@ -1164,7 +1164,7 @@ namespace fcpp {
         //      auto augmented_numbers = numbers.inserting_front(fcpp::vector({1, 2, 3}));
         //
         // outcome:
-        //      augmented_numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+        //      augmented_numbers -> fcpp::vector<int>({ 1, 2, 3, 4, 5, 6 });
         [[nodiscard]] vector inserting_front(const vector<T>& vector) const
         {
             return inserting_front_range_impl(vector.begin(), vector.end());
@@ -1177,7 +1177,7 @@ namespace fcpp {
         //      numbers.insert_back(std::vector({1, 2, 3}));
         //
         // outcome:
-        //      numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+        //      numbers -> fcpp::vector<int>({ 4, 5, 6, 1, 2, 3 });
         vector& insert_back(const std::vector<T>& vector)
         {
             return insert_back_range_impl(vector.cbegin(), vector.cend());
@@ -1190,7 +1190,7 @@ namespace fcpp {
         //      numbers.insert_front(std::vector({1, 2, 3}));
         //
         // outcome:
-        //      numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+        //      numbers -> fcpp::vector<int>({ 1, 2, 3, 4, 5, 6 });
         vector& insert_front(const std::vector<T>& vector)
         {
             return insert_front_range_impl(vector.cbegin(), vector.cend());
@@ -1203,7 +1203,7 @@ namespace fcpp {
         //      auto augmented_numbers = numbers.inserting_back(std::vector({1, 2, 3}));
         //
         // outcome:
-        //      augmented_numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+        //      augmented_numbers -> fcpp::vector<int>({ 4, 5, 6, 1, 2, 3 });
         [[nodiscard]] vector inserting_back(const std::vector<T>& vector) const
         {
             return inserting_back_range_impl(vector.cbegin(), vector.cend());
@@ -1216,7 +1216,7 @@ namespace fcpp {
         //      auto augmented_numbers = numbers.inserting_front(std::vector({1, 2, 3}));
         //
         // outcome:
-        //      augmented_numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+        //      augmented_numbers -> fcpp::vector<int>({ 1, 2, 3, 4, 5, 6 });
         [[nodiscard]] vector inserting_front(const std::vector<T>& vector) const
         {
             return inserting_front_range_impl(vector.cbegin(), vector.cend());
@@ -1229,7 +1229,7 @@ namespace fcpp {
         //      numbers.insert_back(std::initializer_list({1, 2, 3}));
         //
         // outcome:
-        //      numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+        //      numbers -> fcpp::vector<int>({ 4, 5, 6, 1, 2, 3 });
         vector& insert_back(const std::initializer_list<T>& list)
         {
             return insert_back(std::vector<T>(list));
@@ -1242,7 +1242,7 @@ namespace fcpp {
         //      numbers.insert_front(std::initializer_list({1, 2, 3}));
         //
         // outcome:
-        //      numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+        //      numbers -> fcpp::vector<int>({ 1, 2, 3, 4, 5, 6 });
         vector& insert_front(const std::initializer_list<T>& list)
         {
             return insert_front(std::vector<T>(list));
@@ -1255,7 +1255,7 @@ namespace fcpp {
         //      auto augmented_numbers = numbers.inserting_back(std::initializer_list({1, 2, 3}));
         //
         // outcome:
-        //      augmented_numbers -> fcpp::vector<int> numbers({ 4, 5, 6, 1, 2, 3 });
+        //      augmented_numbers -> fcpp::vector<int>({ 4, 5, 6, 1, 2, 3 });
         [[nodiscard]] vector inserting_back(const std::initializer_list<T>& list) const
         {
             return inserting_back(std::vector<T>(list));
@@ -1268,7 +1268,7 @@ namespace fcpp {
         //      auto augmented_numbers = numbers.inserting_front(std::initializer_list({1, 2, 3}));
         //
         // outcome:
-        //      augmented_numbers -> fcpp::vector<int> numbers({ 1, 2, 3, 4, 5, 6 });
+        //      augmented_numbers -> fcpp::vector<int>({ 1, 2, 3, 4, 5, 6 });
         [[nodiscard]] vector inserting_front(const std::initializer_list<T>& list) const
         {
             return inserting_front(std::vector<T>(list));
@@ -1387,7 +1387,7 @@ namespace fcpp {
             return m_vector.empty();
         }
 
-        // Returns the underlying capacity of the vector, which can be larger from its size
+        // Returns the underlying capacity of the vector, which can be larger than its size
         [[nodiscard]] size_t capacity() const
         {
             return m_vector.capacity();
