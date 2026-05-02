@@ -273,118 +273,6 @@ any_of_parallel
 none_of_parallel
 ```
 
-## Functional map usage (fcpp::map)
-### map_keys, map_values, map_to, filter, reduce, for_each
-```c++
-#include "map.h" // instead of <map>
-
-const fcpp::map<std::string, int> ages({
-    {"jake", 32},
-    {"mary", 26},
-    {"david", 40}
-});
-
-const auto adults = ages
-    // keep only key/value pairs matching the predicate
-    .filtered([](const std::pair<const std::string, int>& element) {
-        return element.second >= 32;
-    });
-
-// initials -> fcpp::vector<char>({'d', 'j'})
-const auto initials = adults.map_keys<char>([](const std::string& name) {
-    return name[0];
-});
-
-// labels -> fcpp::vector<std::string>({"40 years", "32 years"})
-const auto labels = adults.map_values<std::string>([](const int& age) {
-    return std::to_string(age) + " years";
-});
-
-// ages_by_initial -> fcpp::map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}})
-const auto ages_by_initial = adults.map_to<char, std::string>([](const std::pair<const std::string, int>& element) {
-    return std::make_pair(element.first[0], std::to_string(element.second) + " years");
-});
-
-// total_age = 72
-const auto total_age = adults.reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
-    return partial_sum + element.second;
-});
-
-adults.for_each([](const std::pair<const std::string, int>& element) {
-    std::cout << element.first << " is " << element.second << " years old." << std::endl;
-});
-```
-
-### all_of, any_of, none_of
-```c++
-#include "map.h" // instead of <map>
-
-const fcpp::map<std::string, int> ages({
-    {"jake", 32},
-    {"mary", 26},
-    {"david", 40}
-});
-
-// returns true
-ages.all_of([](const std::pair<const std::string, int>& element) {
-    return element.second > 20;
-});
-
-// returns false
-ages.all_of([](const std::pair<const std::string, int>& element) {
-    return element.second < 35;
-});
-
-// returns true
-ages.any_of([](const std::pair<const std::string, int>& element) {
-    return element.second == 40;
-});
-
-// returns false
-ages.any_of([](const std::pair<const std::string, int>& element) {
-    return element.second > 50;
-});
-
-// returns true
-ages.none_of([](const std::pair<const std::string, int>& element) {
-    return element.second < 18;
-});
-
-// returns false
-ages.none_of([](const std::pair<const std::string, int>& element) {
-    return element.second == 26;
-});
-```
-
-### keys, values, remove, insert
-```c++
-#include "map.h" // instead of <map>
-
-fcpp::map<std::string, int> ages({
-    {"jake", 32},
-    {"mary", 26},
-    {"david", 40}
-});
-
-// names -> fcpp::vector<std::string>({"david", "jake", "mary"})
-const auto names = ages.keys();
-
-// years -> fcpp::vector<int>({40, 32, 26})
-const auto years = ages.values();
-
-// ages -> fcpp::map<std::string, int>({{"david", 40}, {"jake", 32}})
-ages.remove("mary");
-
-// ages -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}})
-ages.insert("anna", 28);
-
-// without_jake -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}})
-const auto without_jake = ages.removing("jake");
-
-// with_paul -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}, {"paul", 51}})
-const auto with_paul = ages.inserting("paul", 51);
-```
-
 ## Functional set usage (fcpp::set)
 ### difference, union, intersection (works with fcpp::set and std::set)
 ```c++
@@ -537,4 +425,111 @@ numbers.size();
 
 // removes all keys
 numbers.clear();
+```
+
+## Functional map usage (fcpp::map)
+### map_to, filter, reduce, for_each
+```c++
+#include "map.h" // instead of <map>
+
+const fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 16},
+    {"david", 40}
+});
+
+// keep only persons above 18 years old
+const auto adults = ages
+    .filtered([](const std::pair<const std::string, int>& element) {
+        return element.second >= 18;
+    });
+
+// ages_by_initial -> fcpp::map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}})
+const auto ages_by_initial = adults.map_to<char, std::string>([](const std::pair<const std::string, int>& element) {
+    return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+});
+
+// total_age = 72
+const auto total_age = adults.reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
+    return partial_sum + element.second;
+});
+
+/*
+ prints the following:
+ jake is 32 years old.
+ david is 40 years old.
+ */
+adults.for_each([](const std::pair<const std::string, int>& element) {
+    std::cout << element.first << " is " << element.second << " years old." << std::endl;
+});
+```
+
+### all_of, any_of, none_of
+```c++
+#include "map.h" // instead of <map>
+
+const fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 26},
+    {"david", 40}
+});
+
+// returns true
+ages.all_of([](const std::pair<const std::string, int>& element) {
+    return element.second > 20;
+});
+
+// returns false
+ages.all_of([](const std::pair<const std::string, int>& element) {
+    return element.second < 35;
+});
+
+// returns true
+ages.any_of([](const std::pair<const std::string, int>& element) {
+    return element.second == 40;
+});
+
+// returns false
+ages.any_of([](const std::pair<const std::string, int>& element) {
+    return element.second > 50;
+});
+
+// returns true
+ages.none_of([](const std::pair<const std::string, int>& element) {
+    return element.second < 18;
+});
+
+// returns false
+ages.none_of([](const std::pair<const std::string, int>& element) {
+    return element.second == 26;
+});
+```
+
+### keys, values, remove, insert
+```c++
+#include "map.h" // instead of <map>
+
+fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 26},
+    {"david", 40}
+});
+
+// names -> fcpp::vector<std::string>({"david", "jake", "mary"})
+const auto names = ages.keys();
+
+// years -> fcpp::vector<int>({40, 32, 26})
+const auto years = ages.values();
+
+// ages -> fcpp::map<std::string, int>({{"david", 40}, {"jake", 32}})
+ages.remove("mary");
+
+// ages -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}}), mary has already been removed
+ages.insert("anna", 28);
+
+// without_jake -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}})
+const auto without_jake = ages.removing("jake");
+
+// with_paul -> fcpp::map<std::string, int>({{"anna", 28}, {"david", 40}, {"jake", 32}, {"paul", 51}})
+const auto with_paul = ages.inserting("paul", 51);
 ```
