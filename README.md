@@ -310,7 +310,7 @@ const auto colleagues_but_not_friends = colleagues.difference_with(friends);
 // find which friends are colleagues
 // same as colleagues.intersect_with(friends)
 // contains person(51, "George"), person(41, "Jackie")
-const auto good_colleagues = friends.intersection_with(colleagues);
+const auto good_colleagues = friends.intersect_with(colleagues);
 
 // a set of close family members
 const fcpp::set<person, person_comparator> family({
@@ -322,8 +322,8 @@ const fcpp::set<person, person_comparator> family({
 // contains person(51, "George"), person(41, "Jackie"), person(42, "Crystal"), person(51, "Paul"), person(81, "Barbara") 
 const auto friends_and_family = friends.union_with(family);
 
-// all set keys in a vetor
-const fcpp::vector<person> = friends_and_family.keys();
+// all set keys in a vector
+const auto people = friends_and_family.keys();
 ```
 
 ### zip, map, filter, reduce

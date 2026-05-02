@@ -604,7 +604,7 @@ namespace fcpp {
         //
         // example:
         //      fcpp::vector numbers({3, 1, 9, -4});
-        //      numbers.sort_ascending();
+        //      numbers.sort_descending();
         //
         // outcome:
         //      numbers -> fcpp::vector({9, 3, 1, -4});
@@ -614,7 +614,7 @@ namespace fcpp {
         }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
-        // Performs the `sort_ascending` algorithm in parallel.
+        // Performs the `sort_descending` algorithm in parallel.
         // See also the sequential version for more documentation.
         vector& sort_descending_parallel()
         {
