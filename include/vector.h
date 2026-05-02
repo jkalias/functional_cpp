@@ -578,7 +578,7 @@ namespace fcpp {
         }
 #endif
 
-        // Sorts the vector in place in ascending order, when its elements support comparison by std::less_equal [<=] (mutating).
+        // Sorts the vector in place in ascending order, when its elements support comparison by std::less [<] (mutating).
         //
         // example:
         //      fcpp::vector numbers({3, 1, 9, -4});
@@ -588,7 +588,7 @@ namespace fcpp {
         //      numbers -> fcpp::vector({-4, 1, 3, 9});
         vector& sort_ascending()
         {
-            return sort(std::less_equal<T>());
+            return sort(std::less<T>());
         }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
@@ -596,7 +596,7 @@ namespace fcpp {
         // See also the sequential version for more documentation.
         vector& sort_ascending_parallel()
         {
-            return sort_parallel(std::less_equal<T>());
+            return sort_parallel(std::less<T>());
         }
 #endif
 
@@ -672,7 +672,7 @@ namespace fcpp {
         }
 #endif
 
-        // Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less_equal [<=] (non-mutating).
+        // Sorts its elements copied and sorted in ascending order, when its elements support comparison by std::less [<] (non-mutating).
         //
         // example:
         //      const fcpp::vector numbers({3, 1, 9, -4});
@@ -682,7 +682,7 @@ namespace fcpp {
         //      sorted_numbers -> fcpp::vector({-4, 1, 3, 9});
         [[nodiscard]] vector sorted_ascending() const
         {
-            return sorted(std::less_equal<T>());
+            return sorted(std::less<T>());
         }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
@@ -690,7 +690,7 @@ namespace fcpp {
         // See also the sequential version for more documentation.
         [[nodiscard]] vector sorted_ascending_parallel() const
         {
-            return sorted_parallel(std::less_equal<T>());
+            return sorted_parallel(std::less<T>());
         }
 #endif
 
