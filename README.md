@@ -484,7 +484,7 @@ const auto total = numbers
 // total -> 42
 ```
 
-Lazy set zip can combine a lazy set with an `fcpp::set`, a `std::set`, an `fcpp::vector`, a `std::vector`, or another `fcpp::lazy_set`. Size validation is deferred until a terminal operation is called. When zipping with a vector, duplicate vector values are removed before zipping, just like the eager set zip operation. When zipping with another lazy set, the right-hand lazy set is materialized internally at that point, so its keys can be paired in set order.
+Lazy set zip can combine a lazy set with an `fcpp::set`, a `std::set`, an `fcpp::vector`, a `std::vector`, an `fcpp::lazy_vector`, or another `fcpp::lazy_set`. Size validation is deferred until a terminal operation is called. When zipping with a vector, duplicate vector values are removed before zipping, just like the eager set zip operation. When zipping with a lazy vector, the right-hand lazy vector is materialized internally at that point and then deduplicated. When zipping with another lazy set, the right-hand lazy set is materialized internally at that point, so its keys can be paired in set order.
 
 ```c++
 const fcpp::set<int> ages({25, 45, 30, 63});

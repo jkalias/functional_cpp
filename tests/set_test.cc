@@ -711,6 +711,37 @@ TEST(SetTest, LazyZipWithStdVector)
     EXPECT_EQ(expected, zipped);
 }
 
+TEST(SetTest, LazyZipWithLazyVector)
+{
+    const set<int> ages({25, 45, 30, 63});
+    const vector<std::string> persons({"Jake", "Bob", "Michael", "Philipp"});
+    int map_call_count = 0;
+
+    const auto lazy_persons = persons
+        .lazy()
+        .map<std::string>([&map_call_count](const std::string& name) {
+            ++map_call_count;
+            return name + "!";
+        });
+
+    const auto lazy_zipped = ages
+        .lazy()
+        .zip(lazy_persons);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto zipped = lazy_zipped.get();
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob!"),
+        std::pair<int, std::string>(30, "Jake!"),
+        std::pair<int, std::string>(45, "Michael!"),
+        std::pair<int, std::string>(63, "Philipp!"),
+    });
+    EXPECT_EQ(expected, zipped);
+    EXPECT_EQ(4, map_call_count);
+}
+
 TEST(SetTest, LazyZipWithLazySet)
 {
     const set<int> ages({25, 45, 30, 63});

@@ -35,6 +35,9 @@ namespace fcpp {
     template <typename T>
     class vector;
 
+    template <typename T>
+    class lazy_vector;
+
     template <class TKey, class TCompare>
     class set;
 
@@ -217,6 +220,27 @@ namespace fcpp {
         {
             std::set<UKey> distinct_values(vector.begin(), vector.end());
             return zip(lazy_set<UKey>(std::move(distinct_values)));
+        }
+
+        // Performs the functional `zip` algorithm lazily where the lazy vector is materialized
+        // and duplicates are removed when a terminal operation is called. The lazy vector must
+        // contain the same number of distinct values as the set size.
+        template <typename UKey>
+        [[nodiscard]] lazy_set<std::pair<TKey, UKey>> zip(const lazy_vector<UKey>& vector) const
+        {
+            const auto previous = m_operation;
+            return lazy_set<std::pair<TKey, UKey>>(
+                [previous, vector](const std::function<void(const std::pair<TKey, UKey>&)>& consumer) {
+                    const auto materialized_vector = vector.get();
+                    std::set<UKey> distinct_values(materialized_vector.begin(), materialized_vector.end());
+                    auto it = distinct_values.begin();
+                    previous([&distinct_values, &it, &consumer](const TKey& key) {
+                        assert(it != distinct_values.end());
+                        consumer({key, *it});
+                        ++it;
+                    });
+                    assert(it == distinct_values.end());
+                });
         }
 
         // Performs the functional `zip` algorithm lazily, in which every key of the resulting
