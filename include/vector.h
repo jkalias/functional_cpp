@@ -82,16 +82,6 @@ namespace fcpp {
             };
         }
 
-        // Creates a lazy vector by referring to an existing std::vector source.
-        // The referenced vector must outlive this lazy vector.
-        explicit lazy_vector(const std::vector<T>* vector)
-            : m_capacity_hint(vector->size())
-        {
-            m_operation = [vector](const std::function<void(const T&)>& consumer) {
-                std::for_each(vector->begin(), vector->end(), consumer);
-            };
-        }
-
         // Creates a lazy vector by directly providing the deferred operation.
         // This constructor is mostly useful for composing lazy_vector instances.
         lazy_vector(std::function<void(const std::function<void(const T&)>&)> operation, size_t capacity_hint)
@@ -216,15 +206,16 @@ namespace fcpp {
         {
             const auto previous = m_operation;
             const auto capacity_hint = m_capacity_hint;
+            const auto vector_copy = vector;
             return lazy_vector<std::pair<T, U>>(
-                [previous, &vector](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
                     size_t index = 0;
-                    previous([&vector, &consumer, &index](const T& element) {
-                        assert(index < vector.size());
-                        consumer({element, vector[index]});
+                    previous([&vector_copy, &consumer, &index](const T& element) {
+                        assert(index < vector_copy.size());
+                        consumer({element, vector_copy[index]});
                         ++index;
                     });
-                    assert(index == vector.size());
+                    assert(index == vector_copy.size());
                 },
                 capacity_hint);
         }
@@ -237,15 +228,16 @@ namespace fcpp {
         {
             const auto previous = m_operation;
             const auto capacity_hint = m_capacity_hint;
+            const auto vector_copy = vector;
             return lazy_vector<std::pair<T, U>>(
-                [previous, &vector](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
                     size_t index = 0;
-                    previous([&vector, &consumer, &index](const T& element) {
-                        assert(index < vector.size());
-                        consumer({element, vector[index]});
+                    previous([&vector_copy, &consumer, &index](const T& element) {
+                        assert(index < vector_copy.size());
+                        consumer({element, vector_copy[index]});
                         ++index;
                     });
-                    assert(index == vector.size());
+                    assert(index == vector_copy.size());
                 },
                 capacity_hint);
         }
@@ -1785,7 +1777,7 @@ namespace fcpp {
         // transformations until a terminal operation, such as get() or reduce(), is called.
         [[nodiscard]] lazy_vector<T> lazy() const
         {
-            return lazy_vector<T>(&m_vector);
+            return lazy_vector<T>(m_vector);
         }
 
         // Returns the begin iterator, useful for other standard library algorithms

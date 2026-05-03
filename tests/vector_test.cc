@@ -1448,6 +1448,32 @@ TEST(VectorTest, LazyReduce)
     EXPECT_EQ(10, filter_call_count);
 }
 
+TEST(VectorTest, LazySourceCanOutliveFunctionalVector)
+{
+    lazy_vector<int> lazy_numbers;
+    {
+        const vector<int> vector_under_test({1, 2, 3, 4});
+        lazy_numbers = vector_under_test
+            .lazy()
+            .filter([](const int& value) {
+                return value > 2;
+            });
+    }
+
+    EXPECT_EQ(vector<int>({3, 4}), lazy_numbers.get());
+}
+
+TEST(VectorTest, LazySourceCanStartFromTemporaryFunctionalVector)
+{
+    const auto lazy_numbers = vector<int>({1, 2, 3, 4})
+        .lazy()
+        .map<int>([](const int& value) {
+            return value * 2;
+        });
+
+    EXPECT_EQ(vector<int>({2, 4, 6, 8}), lazy_numbers.get());
+}
+
 TEST(VectorTest, LazySort)
 {
     const vector<person> vector_under_test({
@@ -1567,6 +1593,44 @@ TEST(VectorTest, LazyZipWithStdVector)
         .lazy()
         .zip(names)
         .get();
+
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(1, zipped_vector[0].first);
+    EXPECT_EQ("one", zipped_vector[0].second);
+    EXPECT_EQ(2, zipped_vector[1].first);
+    EXPECT_EQ("two", zipped_vector[1].second);
+    EXPECT_EQ(3, zipped_vector[2].first);
+    EXPECT_EQ("three", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithTemporaryFunctionalVector)
+{
+    const vector<int> vector_under_test({1, 2, 3});
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .zip(vector<std::string>({"one", "two", "three"}));
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(1, zipped_vector[0].first);
+    EXPECT_EQ("one", zipped_vector[0].second);
+    EXPECT_EQ(2, zipped_vector[1].first);
+    EXPECT_EQ("two", zipped_vector[1].second);
+    EXPECT_EQ(3, zipped_vector[2].first);
+    EXPECT_EQ("three", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithTemporaryStdVector)
+{
+    const vector<int> vector_under_test({1, 2, 3});
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .zip(std::vector<std::string>({"one", "two", "three"}));
+
+    const auto zipped_vector = lazy_vector.get();
 
     EXPECT_EQ(3, zipped_vector.size());
     EXPECT_EQ(1, zipped_vector[0].first);
