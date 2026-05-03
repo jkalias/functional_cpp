@@ -135,6 +135,65 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
     return partial_sum + p.age;
 });
 ```
+
+### lazy vectors
+Lazy vectors are useful when chaining multiple operations over a large vector. A regular `map().filter().reduce()` style chain creates intermediate vectors and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process elements in one pass. Sorting is the important exception: it cannot be streamed element by element, so lazy `sort`, `sort_ascending`, and `sort_descending` first collect the current lazy pipeline's values, sort that collected vector, and then continue feeding the rest of the lazy chain.
+
+```c++
+#include "vector.h" // instead of <vector>
+
+const fcpp::vector<int> numbers({5, 1, 4, 2, 3});
+
+const auto processed_numbers = numbers
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const int& number) {
+        return number > 2;
+    })
+
+    // sorting is also deferred, but it needs to materialize the filtered
+    // values internally when the terminal operation is called
+    .sort_ascending()
+
+    // this transform is not evaluated yet
+    .map<std::string>([](const int& number) {
+        return std::to_string(number);
+    })
+
+    // terminal operation: all stored operations are executed here
+    .get();
+
+// processed_numbers -> fcpp::vector<std::string>({ "3", "4", "5" })
+// numbers -> fcpp::vector<int>({ 5, 1, 4, 2, 3 })
+```
+
+Here is another example without sorting, thus all operations are materialized in the end.
+
+```c++
+const auto total = numbers
+    // start a lazy pipeline from this point on
+    .lazy()
+    
+    // this transform is not evaluated yet
+    .map<int>([](const int& number) {
+        return number * 3;
+    })
+    
+    // this predicate is not evaluated yet
+    .filter([](const int& number) {
+        return number > 5;
+    })
+    
+    // terminal operation: all stored operations are executed here
+    .reduce(0, [](const int& partial_sum, const int& number) {
+        return partial_sum + number;
+    });
+
+// total -> 42
+```
+
 ### index search
 ```c++
 #include "vector.h" // instead of <vector>
