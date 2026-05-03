@@ -20,10 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <gtest/gtest.h>
-#include "warnings.h"
-#include "map.h"
+#include <map>
 #include <string>
+#include <utility>
+
+#include <gtest/gtest.h>
+
+#include "map.h"
+#include "warnings.h"
 
 using namespace fcpp;
 

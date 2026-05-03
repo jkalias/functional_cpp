@@ -20,11 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <initializer_list>
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include <gtest/gtest.h>
-#include "vector.h"
-#include "set.h"
+
 #include "index_range.h"
+#include "set.h"
 #include "test_types.h"
+#include "vector.h"
 #include "warnings.h"
 
 #pragma warning( push )

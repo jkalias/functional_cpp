@@ -20,11 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <initializer_list>
+#include <iostream>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <gtest/gtest.h>
-#include "warnings.h"
+
 #include "set.h"
-#include "vector.h"
 #include "test_types.h"
+#include "vector.h"
+#include "warnings.h"
 
 using namespace fcpp;
 

@@ -23,7 +23,9 @@
 #pragma once
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <set>
 #include <type_traits>

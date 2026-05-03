@@ -21,19 +21,24 @@
 // SOFTWARE.
 
 #pragma once
+#include "compatibility.h"
+
 #include <algorithm>
 #include <cassert>
-#include <functional>
-#include <type_traits>
-#include <vector>
-#include <iterator>
-#include <memory>
-#include <utility>
-#include "index_range.h"
-#include "optional.h"
+#include <cstddef>
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 #include <execution>
 #endif
+#include <functional>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#include "index_range.h"
+#include "optional.h"
 
 namespace fcpp {
     template <class T, class Compare>
