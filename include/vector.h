@@ -188,6 +188,83 @@ namespace fcpp {
             return filter(std::forward<Filter>(predicate_to_keep));
         }
 
+        // Sorts the lazy vector. The comparison predicate takes two elements
+        // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
+        // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 3, 1, 9, -4 });
+        //      const auto sorted_numbers = numbers
+        //          .lazy()
+        //          .sort([](const auto& number1, const auto& number2) {
+        //              return number1 < number2;
+        //          })
+        //          .get();
+        //
+        // outcome:
+        //      sorted_numbers -> fcpp::vector<int>({ -4, 1, 3, 9 })
+#ifdef CPP17_AVAILABLE
+        template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
+#else
+        template <typename Sortable>
+#endif
+        [[nodiscard]] lazy_vector sort(Sortable&& comparison_predicate) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            typename std::decay<Sortable>::type comparison_copy(std::forward<Sortable>(comparison_predicate));
+            return lazy_vector(
+                [previous, capacity_hint, comparison_copy](const std::function<void(const T&)>& consumer) mutable {
+                    std::vector<T> sorted_vector;
+                    sorted_vector.reserve(capacity_hint);
+                    previous([&sorted_vector](const T& element) {
+                        sorted_vector.push_back(element);
+                    });
+
+                    std::sort(sorted_vector.begin(),
+                              sorted_vector.end(),
+                              comparison_copy);
+                    std::for_each(sorted_vector.begin(),
+                                  sorted_vector.end(),
+                                  consumer);
+                },
+                capacity_hint);
+        }
+
+        // Sorts the lazy vector in ascending order, when its elements support comparison by std::less [<].
+        // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 3, 1, 9, -4 });
+        //      const auto sorted_numbers = numbers
+        //          .lazy()
+        //          .sort_ascending()
+        //          .get();
+        //
+        // outcome:
+        //      sorted_numbers -> fcpp::vector<int>({ -4, 1, 3, 9 })
+        [[nodiscard]] lazy_vector sort_ascending() const
+        {
+            return sort(std::less<T>());
+        }
+
+        // Sorts the lazy vector in descending order, when its elements support comparison by std::greater [>].
+        // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 3, 1, 9, -4 });
+        //      const auto sorted_numbers = numbers
+        //          .lazy()
+        //          .sort_descending()
+        //          .get();
+        //
+        // outcome:
+        //      sorted_numbers -> fcpp::vector<int>({ 9, 3, 1, -4 })
+        [[nodiscard]] lazy_vector sort_descending() const
+        {
+            return sort(std::greater<T>());
+        }
+
         // Performs the functional `reduce` (fold/accumulate) algorithm, by returning the result of
         // accumulating all the values in this lazy vector to an initial value.
         //

@@ -1441,4 +1441,88 @@ TEST(VectorTest, LazyReduce)
     EXPECT_EQ(10, filter_call_count);
 }
 
+TEST(VectorTest, LazySort)
+{
+    const vector<person> vector_under_test({
+        person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
+    });
+
+    const auto sorted_vector = vector_under_test
+        .lazy()
+        .sort([](const person& person1, const person& person2) {
+            return person1.name < person2.name;
+        })
+        .get();
+
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ("Jake", vector_under_test[0].name);
+    EXPECT_EQ("Bob", vector_under_test[1].name);
+    EXPECT_EQ("Manfred", vector_under_test[2].name);
+    EXPECT_EQ("Alice", vector_under_test[3].name);
+
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ("Alice", sorted_vector[0].name);
+    EXPECT_EQ(8, sorted_vector[0].age);
+    EXPECT_EQ("Bob", sorted_vector[1].name);
+    EXPECT_EQ(34, sorted_vector[1].age);
+    EXPECT_EQ("Jake", sorted_vector[2].name);
+    EXPECT_EQ(45, sorted_vector[2].age);
+    EXPECT_EQ("Manfred", sorted_vector[3].name);
+    EXPECT_EQ(52, sorted_vector[3].age);
+}
+
+TEST(VectorTest, LazySortAscending)
+{
+    const vector<int> vector_under_test({3, 1, 9, -4});
+
+    const auto sorted_vector = vector_under_test
+        .lazy()
+        .sort_ascending()
+        .get();
+
+    EXPECT_EQ(vector<int>({3, 1, 9, -4}), vector_under_test);
+    EXPECT_EQ(vector<int>({-4, 1, 3, 9}), sorted_vector);
+}
+
+TEST(VectorTest, LazySortDescending)
+{
+    const vector<int> vector_under_test({3, 1, 9, -4});
+
+    const auto sorted_vector = vector_under_test
+        .lazy()
+        .sort_descending()
+        .get();
+
+    EXPECT_EQ(vector<int>({3, 1, 9, -4}), vector_under_test);
+    EXPECT_EQ(vector<int>({9, 3, 1, -4}), sorted_vector);
+}
+
+TEST(VectorTest, LazyFilterSortMap)
+{
+    const vector<int> vector_under_test({5, 1, 4, 2, 3});
+    int filter_call_count = 0;
+    int map_call_count = 0;
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 2;
+        })
+        .sort_ascending()
+        .map<std::string>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return std::to_string(value);
+        });
+
+    EXPECT_EQ(0, filter_call_count);
+    EXPECT_EQ(0, map_call_count);
+
+    const auto materialized_vector = lazy_vector.get();
+
+    EXPECT_EQ(vector<std::string>({"3", "4", "5"}), materialized_vector);
+    EXPECT_EQ(5, filter_call_count);
+    EXPECT_EQ(3, map_call_count);
+}
+
 #pragma warning( pop )
