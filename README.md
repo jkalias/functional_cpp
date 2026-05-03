@@ -640,6 +640,57 @@ adults.for_each([](const std::pair<const std::string, int>& element) {
 });
 ```
 
+### Lazy operations
+Lazy maps are useful when chaining `map_to`, `filter`, and `reduce` over a large map. A regular `filtered().map_to().reduce()` style chain creates intermediate maps and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map_to/filter/reduce-style pipelines process key/value pairs in one pass. When a lazy `map_to` creates equivalent output keys, the first key/value pair encountered in sorted map order is kept, following `std::map::insert` semantics.
+
+```c++
+#include "map.h" // instead of <map>
+
+const fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 16},
+    {"david", 40}
+});
+
+const auto ages_by_initial = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const std::pair<const std::string, int>& element) {
+        return element.second >= 18;
+    })
+
+    // this transform is not evaluated yet
+    .map_to<char, std::string>([](const std::pair<const std::string, int>& element) {
+        return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+    })
+
+    // terminal operation: all stored operations are executed here
+    .get();
+
+// ages_by_initial -> fcpp::map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}})
+// ages -> fcpp::map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 16}})
+```
+
+```c++
+const auto total_age = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const std::pair<const std::string, int>& element) {
+        return element.second >= 18;
+    })
+
+    // terminal operation: all stored operations are executed here
+    .reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
+        return partial_sum + element.second;
+    });
+
+// total_age -> 72
+```
+
 ### all_of, any_of, none_of
 ```c++
 #include "map.h" // instead of <map>

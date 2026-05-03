@@ -23,12 +23,185 @@
 #pragma once
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <map>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include "vector.h"
 
 namespace fcpp {
+
+template <class TKey, class TValue, class TCompare>
+class map;
+
+// A lightweight wrapper representing a deferred map pipeline, enabling fluent and functional
+// programming while avoiding intermediate map materialization.
+//
+// Member functions are non-mutating and keep extending the pipeline. Terminal functions such as
+// `get` and `reduce` execute the stored operations.
+template <class TKey, class TValue, class TCompare = std::less<TKey>>
+class lazy_map
+{
+public:
+    using value_type = std::pair<const TKey, TValue>;
+
+    lazy_map()
+        : m_operation([](const std::function<void(const value_type&)>&) {})
+    {
+    }
+
+    // Creates a lazy map by copying the provided std::map as an owned source.
+    explicit lazy_map(const std::map<TKey, TValue, TCompare>& map)
+    {
+        auto source = std::make_shared<std::map<TKey, TValue, TCompare>>(map);
+        m_operation = [source](const std::function<void(const value_type&)>& consumer) {
+            std::for_each(source->begin(), source->end(), consumer);
+        };
+    }
+
+    // Creates a lazy map by moving the provided std::map as an owned source.
+    explicit lazy_map(std::map<TKey, TValue, TCompare>&& map)
+    {
+        auto source = std::make_shared<std::map<TKey, TValue, TCompare>>(std::move(map));
+        m_operation = [source](const std::function<void(const value_type&)>& consumer) {
+            std::for_each(source->begin(), source->end(), consumer);
+        };
+    }
+
+    // Creates a lazy map by referring to an existing std::map source.
+    // The referenced map must outlive this lazy map.
+    explicit lazy_map(const std::map<TKey, TValue, TCompare>* map)
+    {
+        m_operation = [map](const std::function<void(const value_type&)>& consumer) {
+            std::for_each(map->begin(), map->end(), consumer);
+        };
+    }
+
+    // Creates a lazy map by directly providing the deferred operation.
+    // This constructor is mostly useful for composing lazy_map instances.
+    explicit lazy_map(std::function<void(const std::function<void(const value_type&)>&)> operation)
+        : m_operation(std::move(operation))
+    {
+    }
+
+    // Performs the functional `map_to` algorithm lazily. The transform is not applied until
+    // a terminal operation, such as `get` or `reduce`, is called.
+    //
+    // example:
+    //      const fcpp::map<std::string, int> ages({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    //      const auto labels_by_initial = ages
+    //          .lazy()
+    //          .map_to<char, std::string>([](const auto& element) {
+    //              return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+    //          })
+    //          .get();
+    //
+    // outcome:
+    //      labels_by_initial -> fcpp::map<char, std::string>({
+    //          {'d', "40 years"}, {'j', "32 years"}, {'m', "26 years"}
+    //      })
+#ifdef CPP17_AVAILABLE
+    template <typename UKey, typename UValue, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<std::pair<UKey, UValue>, Transform, value_type>>>
+#else
+    template <typename UKey, typename UValue, typename Transform>
+#endif
+    [[nodiscard]] lazy_map<UKey, UValue> map_to(Transform&& transform) const
+    {
+        const auto previous = m_operation;
+        typename std::decay<Transform>::type transform_copy(std::forward<Transform>(transform));
+        return lazy_map<UKey, UValue>(
+            [previous, transform_copy](const std::function<void(const typename lazy_map<UKey, UValue>::value_type&)>& consumer) mutable {
+                previous([&consumer, &transform_copy](const value_type& element) {
+                    const auto transformed = transform_copy(element);
+                    const typename lazy_map<UKey, UValue>::value_type transformed_element(transformed.first, transformed.second);
+                    consumer(transformed_element);
+                });
+            });
+    }
+
+    // Performs the functional `filter` algorithm lazily, in which all key/value pairs which match
+    // the given predicate are kept. The predicate is not applied until a terminal operation,
+    // such as `get` or `reduce`, is called.
+    //
+    // example:
+    //      const fcpp::map<std::string, int> ages({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    //      const auto adults = ages
+    //          .lazy()
+    //          .filter([](const auto& element) {
+    //              return element.second >= 32;
+    //          })
+    //          .get();
+    //
+    // outcome:
+    //      adults -> fcpp::map<std::string, int>({{"david", 40}, {"jake", 32}})
+#ifdef CPP17_AVAILABLE
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, value_type>>>
+#else
+    template <typename Filter>
+#endif
+    [[nodiscard]] lazy_map filter(Filter&& predicate_to_keep) const
+    {
+        const auto previous = m_operation;
+        typename std::decay<Filter>::type predicate_copy(std::forward<Filter>(predicate_to_keep));
+        return lazy_map(
+            [previous, predicate_copy](const std::function<void(const value_type&)>& consumer) mutable {
+                previous([&consumer, &predicate_copy](const value_type& element) {
+                    if (predicate_copy(element)) {
+                        consumer(element);
+                    }
+                });
+            });
+    }
+
+    // Performs the functional `filter` algorithm lazily.
+    // See also `filter` for more documentation.
+#ifdef CPP17_AVAILABLE
+    template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, value_type>>>
+#else
+    template <typename Filter>
+#endif
+    [[nodiscard]] lazy_map filtered(Filter&& predicate_to_keep) const
+    {
+        return filter(std::forward<Filter>(predicate_to_keep));
+    }
+
+    // Performs the functional `reduce` (fold/accumulate) algorithm, by returning the result of
+    // accumulating all key/value pairs in this lazy map to an initial value.
+    //
+    // example:
+    //      const fcpp::map<std::string, int> ages({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    //      const auto total_age = ages
+    //          .lazy()
+    //          .filter([](const auto& element) {
+    //              return element.second >= 32;
+    //          })
+    //          .reduce(0, [](const int& partial_sum, const auto& element) {
+    //              return partial_sum + element.second;
+    //          });
+    //
+    // outcome:
+    //      total_age -> 72
+#ifdef CPP17_AVAILABLE
+    template <typename U, typename Reduce, typename = std::enable_if_t<std::is_invocable_r_v<U, Reduce, U, value_type>>>
+#else
+    template <typename U, typename Reduce>
+#endif
+    U reduce(const U& initial, Reduce&& reduction) const
+    {
+        auto result = initial;
+        m_operation([&result, &reduction](const value_type& element) {
+            result = reduction(result, element);
+        });
+        return result;
+    }
+
+    // Materializes this lazy map to a functional map, executing all stored operations.
+    [[nodiscard]] map<TKey, TValue, TCompare> get() const;
+
+private:
+    std::function<void(const std::function<void(const value_type&)>&)> m_operation;
+};
 
 // A lightweight wrapper around std::map, enabling fluent and functional
 // programming on the map itself, rather than using the more procedural style
@@ -436,6 +609,13 @@ public:
         return m_map.size();
     }
 
+    // Starts a lazy pipeline. The returned lazy map defers following map_to/filter transformations
+    // until a terminal operation, such as get() or reduce(), is called.
+    [[nodiscard]] lazy_map<TKey, TValue, TCompare> lazy() const
+    {
+        return lazy_map<TKey, TValue, TCompare>(&m_map);
+    }
+
     // Returns the begin iterator, useful for other standard library algorithms
     [[nodiscard]] typename std::map<TKey, TValue, TCompare>::iterator begin()
     {
@@ -510,5 +690,15 @@ public:
 private:
     std::map<TKey, TValue, TCompare> m_map;
 };
+
+template <class TKey, class TValue, class TCompare>
+[[nodiscard]] map<TKey, TValue, TCompare> lazy_map<TKey, TValue, TCompare>::get() const
+{
+    std::map<TKey, TValue, TCompare> materialized;
+    m_operation([&materialized](const value_type& element) {
+        materialized.insert(element);
+    });
+    return map<TKey, TValue, TCompare>(std::move(materialized));
+}
 
 }

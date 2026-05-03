@@ -247,3 +247,79 @@ TEST(MapTest, InequalityOperator)
     EXPECT_FALSE(map1 == map2);
     EXPECT_TRUE(map1 != map2);
 }
+
+TEST(MapTest, LazyMapToFilterGet)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto lazy_persons = persons
+        .lazy()
+        .map_to<char, std::string>([&map_call_count](const std::pair<const std::string, int>& element) {
+            ++map_call_count;
+            return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+        })
+        .filter([&filter_call_count](const std::pair<const char, std::string>& element) {
+            ++filter_call_count;
+            return element.first != 'm';
+        });
+
+    EXPECT_EQ(0, map_call_count);
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto mapped = lazy_persons.get();
+
+    EXPECT_EQ((map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}})), mapped);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+    EXPECT_EQ(3, map_call_count);
+    EXPECT_EQ(3, filter_call_count);
+}
+
+TEST(MapTest, LazyFiltered)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+
+    const auto filtered_persons = persons
+        .lazy()
+        .filtered([](const std::pair<const std::string, int>& element) {
+            return element.second >= 32;
+        })
+        .get();
+
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), filtered_persons);
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, LazyReduce)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    int filter_call_count = 0;
+
+    const auto total_age = persons
+        .lazy()
+        .filter([&filter_call_count](const std::pair<const std::string, int>& element) {
+            ++filter_call_count;
+            return element.second >= 32;
+        })
+        .reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
+            return partial_sum + element.second;
+        });
+
+    EXPECT_EQ(72, total_age);
+    EXPECT_EQ(3, filter_call_count);
+}
+
+TEST(MapTest, LazyMapToDuplicateKeysKeepsFirst)
+{
+    const map<std::string, int> persons({{"anna", 28}, {"alex", 30}, {"david", 40}});
+
+    const auto mapped = persons
+        .lazy()
+        .map_to<char, int>([](const std::pair<const std::string, int>& element) {
+            return std::make_pair(element.first[0], element.second);
+        })
+        .get();
+
+    EXPECT_EQ((map<char, int>({{'a', 30}, {'d', 40}})), mapped);
+}
