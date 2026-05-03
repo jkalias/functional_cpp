@@ -454,6 +454,65 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 });
 ```
 
+### Lazy operations
+Lazy sets are useful when chaining operations over a large set and only needing the final materialized set or a reduced value. A regular `map().filter().reduce()` chain creates intermediate sets and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process keys in one pass. Unlike vectors, sets are already ordered by their comparator, so lazy sets focus on the operations that make sense for set data: `map`, `filter`, `zip`, and `reduce`.
+
+```c++
+#include "set.h" // instead of <set>
+
+const fcpp::set<int> numbers({1, 2, 3, 4, 5});
+
+const auto total = numbers
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this transform is not evaluated yet
+    .map<int>([](const int& number) {
+        return number * 3;
+    })
+
+    // this predicate is not evaluated yet
+    .filter([](const int& number) {
+        return number > 5;
+    })
+
+    // terminal operation: all stored operations are executed here
+    .reduce(0, [](const int& partial_sum, const int& number) {
+        return partial_sum + number;
+    });
+
+// total -> 42
+```
+
+Lazy set zip can combine a lazy set with an `fcpp::set`, a `std::set`, an `fcpp::vector`, a `std::vector`, or another `fcpp::lazy_set`. Size validation is deferred until a terminal operation is called. When zipping with a vector, duplicate vector values are removed before zipping, just like the eager set zip operation. When zipping with another lazy set, the right-hand lazy set is materialized internally at that point, so its keys can be paired in set order.
+
+```c++
+const fcpp::set<int> ages({25, 45, 30, 63});
+const fcpp::set<std::string> names({"Jake", "Bob", "Michael", "Philipp"});
+
+const auto employees = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // zip is not evaluated yet
+    .zip(names)
+
+    // this transform is not evaluated yet
+    .map<person>([](const std::pair<int, std::string>& pair) {
+        return person(pair.first, pair.second);
+    })
+
+    // terminal operation: zip size validation and all stored operations run here
+    .get();
+
+// employees -> fcpp::set<person>({
+//                  person(25, "Bob"),
+//                  person(30, "Jake"),
+//                  person(45, "Michael"),
+//                  person(63, "Philipp"),
+//              })
+```
+
 ### all_of, any_of, none_of
 ```c++
 #include "set.h" // instead of <set>

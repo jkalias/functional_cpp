@@ -568,3 +568,184 @@ TEST(SetTest, EqualityOperatorCustomType)
     EXPECT_TRUE(set1 == set2);
     EXPECT_FALSE(set1 != set2);
 }
+
+TEST(SetTest, LazyMapFilterGet)
+{
+    const set<int> set_under_test({1, 2, 3, 4});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto lazy_set = set_under_test
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value * 2;
+        })
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 4;
+        });
+
+    EXPECT_EQ(0, map_call_count);
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto materialized_set = lazy_set.get();
+    EXPECT_EQ(set<int>({6, 8}), materialized_set);
+    EXPECT_EQ(set<int>({1, 2, 3, 4}), set_under_test);
+    EXPECT_EQ(4, map_call_count);
+    EXPECT_EQ(4, filter_call_count);
+}
+
+TEST(SetTest, LazyFiltered)
+{
+    const set<int> set_under_test({1, 2, 3, 4});
+    const auto filtered_set = set_under_test
+        .lazy()
+        .filtered([](const int& value) {
+            return value % 2 == 0;
+        })
+        .get();
+
+    EXPECT_EQ(set<int>({2, 4}), filtered_set);
+    EXPECT_EQ(set<int>({1, 2, 3, 4}), set_under_test);
+}
+
+TEST(SetTest, LazyReduce)
+{
+    const set<int> set_under_test({1, 2, 3, 4, 5});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto result = set_under_test
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value * 3;
+        })
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 5;
+        })
+        .reduce(0, [](const int& partial_sum, const int& value) {
+            return partial_sum + value;
+        });
+
+    EXPECT_EQ(42, result);
+    EXPECT_EQ(5, map_call_count);
+    EXPECT_EQ(5, filter_call_count);
+}
+
+TEST(SetTest, LazyZipWithFunctionalSet)
+{
+    const set<int> ages({25, 45, 30, 63});
+    const set<std::string> persons({"Jake", "Bob", "Michael", "Philipp"});
+
+    const auto zipped = ages
+        .lazy()
+        .zip(persons)
+        .get();
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(SetTest, LazyZipWithStdSet)
+{
+    const set<int> ages({25, 45, 30, 63});
+    const std::set<std::string> persons({"Jake", "Bob", "Michael", "Philipp"});
+
+    const auto zipped = ages
+        .lazy()
+        .zip(persons)
+        .get();
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(SetTest, LazyZipWithFunctionalVector)
+{
+    const set<int> ages({25, 45, 30, 63});
+    const vector<std::string> persons({"Jake", "Bob", "Michael", "Philipp"});
+
+    const auto zipped = ages
+        .lazy()
+        .zip(persons)
+        .get();
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(SetTest, LazyZipWithStdVector)
+{
+    const set<int> ages({25, 45, 30, 63});
+    const std::vector<std::string> persons({"Jake", "Bob", "Michael", "Philipp"});
+
+    const auto zipped = ages
+        .lazy()
+        .zip(persons)
+        .get();
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, zipped);
+}
+
+TEST(SetTest, LazyZipWithLazySet)
+{
+    const set<int> ages({25, 45, 30, 63});
+    const set<std::string> persons({"Jake", "Bob", "Michael", "Philipp"});
+    int map_call_count = 0;
+
+    const auto lazy_persons = persons
+        .lazy()
+        .map<std::string>([&map_call_count](const std::string& name) {
+            ++map_call_count;
+            return name + "!";
+        });
+
+    const auto lazy_zipped = ages
+        .lazy()
+        .zip(lazy_persons);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto zipped = lazy_zipped.get();
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob!"),
+        std::pair<int, std::string>(30, "Jake!"),
+        std::pair<int, std::string>(45, "Michael!"),
+        std::pair<int, std::string>(63, "Philipp!"),
+    });
+    EXPECT_EQ(expected, zipped);
+    EXPECT_EQ(4, map_call_count);
+}
+
+TEST(SetTest, LazyZipWithDifferentSizesThrows)
+{
+    const set<int> ages({25, 45});
+    const std::set<std::string> persons({"Jake"});
+
+    EXPECT_DEATH({ const auto zipped = ages.lazy().zip(persons).get(); }, "");
+}
