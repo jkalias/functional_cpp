@@ -21,11 +21,14 @@
 // SOFTWARE.
 
 #pragma once
+#include "compatibility.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
+#include <iterator>
 #include <memory>
 #include <set>
 #include <type_traits>

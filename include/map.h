@@ -21,6 +21,8 @@
 // SOFTWARE.
 
 #pragma once
+#include "compatibility.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
