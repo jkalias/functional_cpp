@@ -1375,4 +1375,70 @@ TEST(VectorTest, DistinctCustomType)
     EXPECT_EQ(expected, unique_persons);
 }
 
+TEST(VectorTest, LazyMapFilterGet)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value * 2;
+        })
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 4;
+        });
+
+    EXPECT_EQ(0, map_call_count);
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto materialized_vector = lazy_vector.get();
+    EXPECT_EQ(vector<int>({6, 8}), materialized_vector);
+    EXPECT_EQ(vector<int>({1, 2, 3, 4}), vector_under_test);
+    EXPECT_EQ(4, map_call_count);
+    EXPECT_EQ(4, filter_call_count);
+}
+
+TEST(VectorTest, LazyFiltered)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4});
+    const auto filtered_vector = vector_under_test
+        .lazy()
+        .filtered([](const int& value) {
+            return value % 2 == 0;
+        })
+        .get();
+
+    EXPECT_EQ(vector<int>({2, 4}), filtered_vector);
+    EXPECT_EQ(vector<int>({1, 2, 3, 4}), vector_under_test);
+}
+
+TEST(VectorTest, LazyReduce)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto result = vector_under_test
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value * 3;
+        })
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 5;
+        })
+        .reduce(0, [](const int& partial_sum, const int& value) {
+            return partial_sum + value;
+        });
+
+    EXPECT_EQ(162, result);
+    EXPECT_EQ(10, map_call_count);
+    EXPECT_EQ(10, filter_call_count);
+}
+
 #pragma warning( pop )
