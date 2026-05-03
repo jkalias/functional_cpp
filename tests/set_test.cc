@@ -780,3 +780,183 @@ TEST(SetTest, LazyZipWithDifferentSizesThrows)
 
     EXPECT_DEATH({ const auto zipped = ages.lazy().zip(persons).get(); }, "");
 }
+
+TEST(SetTest, LazyDifferenceWithFunctionalSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const set<int> set2({2, 5, 7, 10, 15, 17});
+    int filter_call_count = 0;
+
+    const auto lazy_diff = set1
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value < 10;
+        })
+        .difference_with(set2);
+
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto diff = lazy_diff.get();
+
+    EXPECT_EQ(set<int>({1, 3, 8}), diff);
+    EXPECT_EQ(7, filter_call_count);
+}
+
+TEST(SetTest, LazyDifferenceWithStdSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const std::set<int> set2({2, 5, 7, 10, 15, 17});
+
+    const auto diff = set1
+        .lazy()
+        .difference_with(set2)
+        .get();
+
+    EXPECT_EQ(set<int>({1, 3, 8}), diff);
+}
+
+TEST(SetTest, LazyDifferenceWithLazySet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const set<int> set2({1, 2, 3, 5, 7, 8});
+    int map_call_count = 0;
+
+    const auto lazy_set2 = set2
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value + 2;
+        });
+
+    const auto lazy_diff = set1
+        .lazy()
+        .difference_with(lazy_set2);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto diff = lazy_diff.get();
+
+    EXPECT_EQ(set<int>({1, 2, 8}), diff);
+    EXPECT_EQ(6, map_call_count);
+}
+
+TEST(SetTest, LazyUnionWithFunctionalSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const set<int> set2({2, 5, 7, 10, 15, 17});
+    int filter_call_count = 0;
+
+    const auto lazy_combined = set1
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value < 10;
+        })
+        .union_with(set2);
+
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto combined = lazy_combined.get();
+
+    EXPECT_EQ(set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), combined);
+    EXPECT_EQ(7, filter_call_count);
+}
+
+TEST(SetTest, LazyUnionWithStdSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const std::set<int> set2({2, 5, 7, 10, 15, 17});
+
+    const auto combined = set1
+        .lazy()
+        .union_with(set2)
+        .get();
+
+    EXPECT_EQ(set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), combined);
+}
+
+TEST(SetTest, LazyUnionWithLazySet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const set<int> set2({1, 2, 3, 5, 7, 8});
+    int map_call_count = 0;
+
+    const auto lazy_set2 = set2
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value + 2;
+        });
+
+    const auto lazy_combined = set1
+        .lazy()
+        .union_with(lazy_set2);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto combined = lazy_combined.get();
+
+    EXPECT_EQ(set<int>({1, 2, 3, 4, 5, 7, 8, 9, 10}), combined);
+    EXPECT_EQ(6, map_call_count);
+}
+
+TEST(SetTest, LazyIntersectionWithFunctionalSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const set<int> set2({2, 5, 7, 10, 15, 17});
+    int filter_call_count = 0;
+
+    const auto lazy_intersection = set1
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value < 10;
+        })
+        .intersect_with(set2);
+
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto intersection = lazy_intersection.get();
+
+    EXPECT_EQ(set<int>({2, 5, 7}), intersection);
+    EXPECT_EQ(7, filter_call_count);
+}
+
+TEST(SetTest, LazyIntersectionWithStdSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const std::set<int> set2({2, 5, 7, 10, 15, 17});
+
+    const auto intersection = set1
+        .lazy()
+        .intersect_with(set2)
+        .get();
+
+    EXPECT_EQ(set<int>({2, 5, 7, 10}), intersection);
+}
+
+TEST(SetTest, LazyIntersectionWithLazySet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+    const set<int> set2({1, 2, 3, 5, 7, 8});
+    int map_call_count = 0;
+
+    const auto lazy_set2 = set2
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value + 2;
+        });
+
+    const auto lazy_intersection = set1
+        .lazy()
+        .intersect_with(lazy_set2);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto intersection = lazy_intersection.get();
+
+    EXPECT_EQ(set<int>({3, 5, 7, 10}), intersection);
+    EXPECT_EQ(6, map_call_count);
+}

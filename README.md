@@ -455,7 +455,7 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 ```
 
 ### Lazy operations
-Lazy sets are useful when chaining operations over a large set and only needing the final materialized set or a reduced value. A regular `map().filter().reduce()` chain creates intermediate sets and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process keys in one pass. Unlike vectors, sets are already ordered by their comparator, so lazy sets focus on the operations that make sense for set data: `map`, `filter`, `zip`, and `reduce`.
+Lazy sets are useful when chaining operations over a large set and only needing the final materialized set or a reduced value. A regular `map().filter().reduce()` chain creates intermediate sets and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process keys in one pass. Unlike vectors, sets are already ordered by their comparator, so lazy sets focus on the operations that make sense for set data: `map`, `filter`, `difference_with`, `union_with`, `intersect_with`, `zip`, and `reduce`.
 
 ```c++
 #include "set.h" // instead of <set>
@@ -482,6 +482,34 @@ const auto total = numbers
     });
 
 // total -> 42
+```
+
+Lazy set algebra can combine a lazy set with an `fcpp::set`, a `std::set`, or another `fcpp::lazy_set`. The operation is still deferred, but set algebra needs set membership and sorted set semantics, so the current lazy pipeline is materialized internally when the terminal operation is called. When the right-hand side is also lazy, it is materialized internally at the same point.
+
+```c++
+const fcpp::set<int> colleague_ages({15, 18, 25, 41, 51});
+const fcpp::set<int> friend_ages({41, 42, 51});
+const fcpp::set<int> family_ages({51, 81});
+
+const auto guests = colleague_ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const int& age) {
+        return age >= 18;
+    })
+
+    // set difference is not evaluated yet
+    .difference_with(friend_ages)
+
+    // set union is not evaluated yet
+    .union_with(family_ages)
+
+    // terminal operation: the lazy filter and set algebra run here
+    .get();
+
+// guests -> fcpp::set<int>({18, 25, 51, 81})
 ```
 
 Lazy set zip can combine a lazy set with an `fcpp::set`, a `std::set`, an `fcpp::vector`, a `std::vector`, an `fcpp::lazy_vector`, or another `fcpp::lazy_set`. Size validation is deferred until a terminal operation is called. When zipping with a vector, duplicate vector values are removed before zipping, just like the eager set zip operation. When zipping with a lazy vector, the right-hand lazy vector is materialized internally at that point and then deduplicated. When zipping with another lazy set, the right-hand lazy set is materialized internally at that point, so its keys can be paired in set order.

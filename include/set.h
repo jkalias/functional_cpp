@@ -167,6 +167,195 @@ namespace fcpp {
             return filter(std::forward<Filter>(predicate_to_keep));
         }
 
+        // Returns the lazy set of elements which belong to this lazy set but not in the other set.
+        // The operation is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::set<int> set1({1, 2, 3, 5, 7, 8, 10});
+        //      const fcpp::set<int> set2({2, 5, 7, 10, 15, 17});
+        //      const auto diff = set1
+        //          .lazy()
+        //          .difference_with(set2)
+        //          .get();
+        //
+        // outcome:
+        //      diff -> fcpp::set<int>({1, 3, 8})
+        [[nodiscard]] lazy_set difference_with(const set<TKey, TCompare>& other) const
+        {
+            const auto previous = m_operation;
+            return lazy_set(
+                [previous, &other](const std::function<void(const TKey&)>& consumer) {
+                    std::set<TKey, TCompare> current;
+                    previous([&current](const TKey& key) {
+                        current.insert(key);
+                    });
+
+                    std::set<TKey, TCompare> diff;
+                    std::set_difference(current.begin(),
+                                        current.end(),
+                                        other.begin(),
+                                        other.end(),
+                                        std::inserter(diff, diff.begin()));
+                    std::for_each(diff.begin(), diff.end(), consumer);
+                });
+        }
+
+        // Returns the lazy set of elements which belong to this lazy set but not in the std::set.
+        // The operation is deferred until a terminal operation is called.
+        [[nodiscard]] lazy_set difference_with(const std::set<TKey, TCompare>& other) const
+        {
+            return difference_with(lazy_set(other));
+        }
+
+        // Returns the lazy set of elements which belong to this lazy set but not in the other lazy set.
+        // Both lazy sets are materialized internally when a terminal operation is called.
+        [[nodiscard]] lazy_set difference_with(const lazy_set& other) const
+        {
+            const auto previous = m_operation;
+            return lazy_set(
+                [previous, other](const std::function<void(const TKey&)>& consumer) {
+                    std::set<TKey, TCompare> current;
+                    previous([&current](const TKey& key) {
+                        current.insert(key);
+                    });
+
+                    const auto materialized_other = other.get();
+                    std::set<TKey, TCompare> diff;
+                    std::set_difference(current.begin(),
+                                        current.end(),
+                                        materialized_other.begin(),
+                                        materialized_other.end(),
+                                        std::inserter(diff, diff.begin()));
+                    std::for_each(diff.begin(), diff.end(), consumer);
+                });
+        }
+
+        // Returns the lazy set of elements which belong either to this lazy set or the other set.
+        // The operation is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::set<int> set1({1, 2, 3, 5, 7, 8, 10});
+        //      const fcpp::set<int> set2({2, 5, 7, 10, 15, 17});
+        //      const auto combined = set1
+        //          .lazy()
+        //          .union_with(set2)
+        //          .get();
+        //
+        // outcome:
+        //      combined -> fcpp::set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
+        [[nodiscard]] lazy_set union_with(const set<TKey, TCompare>& other) const
+        {
+            const auto previous = m_operation;
+            return lazy_set(
+                [previous, &other](const std::function<void(const TKey&)>& consumer) {
+                    std::set<TKey, TCompare> current;
+                    previous([&current](const TKey& key) {
+                        current.insert(key);
+                    });
+
+                    std::set<TKey, TCompare> combined;
+                    std::set_union(current.begin(),
+                                   current.end(),
+                                   other.begin(),
+                                   other.end(),
+                                   std::inserter(combined, combined.begin()));
+                    std::for_each(combined.begin(), combined.end(), consumer);
+                });
+        }
+
+        // Returns the lazy set of elements which belong either to this lazy set or the std::set.
+        // The operation is deferred until a terminal operation is called.
+        [[nodiscard]] lazy_set union_with(const std::set<TKey, TCompare>& other) const
+        {
+            return union_with(lazy_set(other));
+        }
+
+        // Returns the lazy set of elements which belong either to this lazy set or the other lazy set.
+        // Both lazy sets are materialized internally when a terminal operation is called.
+        [[nodiscard]] lazy_set union_with(const lazy_set& other) const
+        {
+            const auto previous = m_operation;
+            return lazy_set(
+                [previous, other](const std::function<void(const TKey&)>& consumer) {
+                    std::set<TKey, TCompare> current;
+                    previous([&current](const TKey& key) {
+                        current.insert(key);
+                    });
+
+                    const auto materialized_other = other.get();
+                    std::set<TKey, TCompare> combined;
+                    std::set_union(current.begin(),
+                                   current.end(),
+                                   materialized_other.begin(),
+                                   materialized_other.end(),
+                                   std::inserter(combined, combined.begin()));
+                    std::for_each(combined.begin(), combined.end(), consumer);
+                });
+        }
+
+        // Returns the lazy set of elements which belong to both this lazy set and the other set.
+        // The operation is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::set<int> set1({1, 2, 3, 5, 7, 8, 10});
+        //      const fcpp::set<int> set2({2, 5, 7, 10, 15, 17});
+        //      const auto combined = set1
+        //          .lazy()
+        //          .intersect_with(set2)
+        //          .get();
+        //
+        // outcome:
+        //      combined -> fcpp::set<int>({2, 5, 7, 10})
+        [[nodiscard]] lazy_set intersect_with(const set<TKey, TCompare>& other) const
+        {
+            const auto previous = m_operation;
+            return lazy_set(
+                [previous, &other](const std::function<void(const TKey&)>& consumer) {
+                    std::set<TKey, TCompare> current;
+                    previous([&current](const TKey& key) {
+                        current.insert(key);
+                    });
+
+                    std::set<TKey, TCompare> intersection;
+                    std::set_intersection(current.begin(),
+                                          current.end(),
+                                          other.begin(),
+                                          other.end(),
+                                          std::inserter(intersection, intersection.begin()));
+                    std::for_each(intersection.begin(), intersection.end(), consumer);
+                });
+        }
+
+        // Returns the lazy set of elements which belong to both this lazy set and the std::set.
+        // The operation is deferred until a terminal operation is called.
+        [[nodiscard]] lazy_set intersect_with(const std::set<TKey, TCompare>& other) const
+        {
+            return intersect_with(lazy_set(other));
+        }
+
+        // Returns the lazy set of elements which belong to both this lazy set and the other lazy set.
+        // Both lazy sets are materialized internally when a terminal operation is called.
+        [[nodiscard]] lazy_set intersect_with(const lazy_set& other) const
+        {
+            const auto previous = m_operation;
+            return lazy_set(
+                [previous, other](const std::function<void(const TKey&)>& consumer) {
+                    std::set<TKey, TCompare> current;
+                    previous([&current](const TKey& key) {
+                        current.insert(key);
+                    });
+
+                    const auto materialized_other = other.get();
+                    std::set<TKey, TCompare> intersection;
+                    std::set_intersection(current.begin(),
+                                          current.end(),
+                                          materialized_other.begin(),
+                                          materialized_other.end(),
+                                          std::inserter(intersection, intersection.begin()));
+                    std::for_each(intersection.begin(), intersection.end(), consumer);
+                });
+        }
+
         // Performs the functional `zip` algorithm lazily, in which every key of the resulting
         // lazy set is a tuple of this instance's key (first) and the second set's key (second).
         // The sizes of the two sets must be equal.
