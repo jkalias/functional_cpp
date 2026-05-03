@@ -136,7 +136,7 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 });
 ```
 
-### lazy vectors
+### Lazy operations
 Lazy vectors are useful when chaining multiple operations over a large vector. A regular `map().filter().reduce()` style chain creates intermediate vectors and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process elements in one pass. Sorting is an important exception: it cannot be streamed element by element, so lazy `sort`, `sort_ascending`, and `sort_descending` first collect the current lazy pipeline's values, sort that collected vector, and then continue feeding the rest of the lazy chain.
 
 ```c++
