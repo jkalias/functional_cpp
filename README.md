@@ -10,6 +10,36 @@ The primary focus of this library is
 * encapsulation of the iterator madness
 * removal of manual for-loops
 
+## Contents
+* [Compilation (Cmake)](#compilation-cmake)
+  * [Dependencies](#dependencies)
+  * [Minimum C++ version](#minimum-c-version)
+  * [macOS (Xcode)](#macos-xcode)
+  * [macOS (Makefiles/clang)](#macos-makefilesclang)
+  * [macOS (Makefiles/g++)](#macos-makefilesg)
+  * [Linux (Makefiles)](#linux-makefiles)
+  * [Windows (Visual Studio)](#windows-visual-studio)
+* [Functional vector usage (fcpp::vector)](#functional-vector-usage-fcppvector)
+  * [extract unique (distinct) elements in a set](#extract-unique-distinct-elements-in-a-set)
+  * [zip, map, filter, sort, reduce](#zip-map-filter-sort-reduce)
+  * [Lazy operations](#lazy-operations)
+  * [index search](#index-search)
+  * [remove, insert](#remove-insert)
+  * [size, capacity, reserve, resize](#size-capacity-reserve-resize)
+  * [all_of, any_of, none_of](#all_of-any_of-none_of)
+  * [Parallel algorithms](#parallel-algorithms)
+* [Functional set usage (fcpp::set)](#functional-set-usage-fcppset)
+  * [difference, union, intersection](#difference-union-intersection-works-with-fcppset-and-stdset)
+  * [zip, map, filter, reduce](#zip-map-filter-reduce)
+  * [Lazy operations](#lazy-operations-1)
+  * [all_of, any_of, none_of](#all_of-any_of-none_of-1)
+  * [remove, insert, contains, size, clear](#remove-insert-contains-size-clear)
+* [Functional map usage (fcpp::map)](#functional-map-usage-fcppmap)
+  * [map_to, filter, reduce, for_each](#map_to-filter-reduce-for_each)
+  * [Lazy operations](#lazy-operations-2)
+  * [all_of, any_of, none_of](#all_of-any_of-none_of-2)
+  * [keys, values, remove, insert](#keys-values-remove-insert)
+
 ## Compilation (Cmake)
 ### Dependencies
 * CMake >= 3.14
