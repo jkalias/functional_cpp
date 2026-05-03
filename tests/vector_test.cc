@@ -1525,4 +1525,88 @@ TEST(VectorTest, LazyFilterSortMap)
     EXPECT_EQ(3, map_call_count);
 }
 
+TEST(VectorTest, LazyZipWithFunctionalVector)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4});
+    const vector<std::string> names({"three", "four"});
+    int filter_call_count = 0;
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 2;
+        })
+        .zip(names);
+
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(2, zipped_vector.size());
+    EXPECT_EQ(3, zipped_vector[0].first);
+    EXPECT_EQ("three", zipped_vector[0].second);
+    EXPECT_EQ(4, zipped_vector[1].first);
+    EXPECT_EQ("four", zipped_vector[1].second);
+    EXPECT_EQ(4, filter_call_count);
+}
+
+TEST(VectorTest, LazyZipWithStdVector)
+{
+    const vector<int> vector_under_test({1, 2, 3});
+    const std::vector<std::string> names({"one", "two", "three"});
+
+    const auto zipped_vector = vector_under_test
+        .lazy()
+        .zip(names)
+        .get();
+
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(1, zipped_vector[0].first);
+    EXPECT_EQ("one", zipped_vector[0].second);
+    EXPECT_EQ(2, zipped_vector[1].first);
+    EXPECT_EQ("two", zipped_vector[1].second);
+    EXPECT_EQ(3, zipped_vector[2].first);
+    EXPECT_EQ("three", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithLazyVector)
+{
+    const vector<int> ages({32, 45, 37});
+    const vector<std::string> names({"Jake", "Anna", "Kate"});
+    int map_call_count = 0;
+
+    const auto lazy_names = names
+        .lazy()
+        .map<std::string>([&map_call_count](const std::string& name) {
+            ++map_call_count;
+            return name + "!";
+        });
+
+    const auto lazy_vector = ages
+        .lazy()
+        .zip(lazy_names);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(3, map_call_count);
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(32, zipped_vector[0].first);
+    EXPECT_EQ("Jake!", zipped_vector[0].second);
+    EXPECT_EQ(45, zipped_vector[1].first);
+    EXPECT_EQ("Anna!", zipped_vector[1].second);
+    EXPECT_EQ(37, zipped_vector[2].first);
+    EXPECT_EQ("Kate!", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithDifferentSizesThrows)
+{
+    const vector<int> vector_under_test({1, 2});
+    const std::vector<std::string> names({"one"});
+
+    EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
+}
+
 #pragma warning( pop )

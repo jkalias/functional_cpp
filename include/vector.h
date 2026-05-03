@@ -188,6 +188,86 @@ namespace fcpp {
             return filter(std::forward<Filter>(predicate_to_keep));
         }
 
+        // Performs the functional `zip` algorithm lazily, in which every element of the resulting
+        // lazy vector is a tuple of this instance's element (first) and the second vector's element
+        // (second) at the same index. The sizes of the two vectors must be equal.
+        //
+        // example:
+        //      const fcpp::vector<int> ages_vector({ 32, 25, 53 });
+        //      const fcpp::vector<std::string> names_vector({ "Jake", "Mary", "John" });
+        //      const auto zipped_vector = ages_vector
+        //          .lazy()
+        //          .zip(names_vector)
+        //          .get();
+        //
+        // outcome:
+        //      zipped_vector -> fcpp::vector<std::pair<int, std::string>>({
+        //                          (32, "Jake"),
+        //                          (25, "Mary"),
+        //                          (53, "John"),
+        //                       })
+        template <typename U>
+        [[nodiscard]] lazy_vector<std::pair<T, U>> zip(const vector<U>& vector) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            return lazy_vector<std::pair<T, U>>(
+                [previous, &vector](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                    size_t index = 0;
+                    previous([&vector, &consumer, &index](const T& element) {
+                        assert(index < vector.size());
+                        consumer({element, vector[index]});
+                        ++index;
+                    });
+                    assert(index == vector.size());
+                },
+                capacity_hint);
+        }
+
+        // Performs the functional `zip` algorithm lazily, in which every element of the resulting
+        // lazy vector is a tuple of this instance's element (first) and the std::vector's element
+        // (second) at the same index. The sizes of the two vectors must be equal.
+        template <typename U>
+        [[nodiscard]] lazy_vector<std::pair<T, U>> zip(const std::vector<U>& vector) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            return lazy_vector<std::pair<T, U>>(
+                [previous, &vector](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                    size_t index = 0;
+                    previous([&vector, &consumer, &index](const T& element) {
+                        assert(index < vector.size());
+                        consumer({element, vector[index]});
+                        ++index;
+                    });
+                    assert(index == vector.size());
+                },
+                capacity_hint);
+        }
+
+        // Performs the functional `zip` algorithm lazily, in which every element of the resulting
+        // lazy vector is a tuple of this instance's element (first) and the second lazy vector's
+        // element (second) at the same index. The sizes of the two lazy vectors must be equal.
+        // The right-hand lazy vector is materialized internally when a terminal operation is called.
+        template <typename U>
+        [[nodiscard]] lazy_vector<std::pair<T, U>> zip(const lazy_vector<U>& vector) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            return lazy_vector<std::pair<T, U>>(
+                [previous, vector](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                    const auto materialized_vector = vector.get();
+                    size_t index = 0;
+                    previous([&materialized_vector, &consumer, &index](const T& element) {
+                        assert(index < materialized_vector.size());
+                        consumer({element, materialized_vector[index]});
+                        ++index;
+                    });
+                    assert(index == materialized_vector.size());
+                },
+                capacity_hint);
+        }
+
         // Sorts the lazy vector. The comparison predicate takes two elements
         // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
         // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.

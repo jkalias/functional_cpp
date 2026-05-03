@@ -137,7 +137,7 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 ```
 
 ### lazy vectors
-Lazy vectors are useful when chaining multiple operations over a large vector. A regular `map().filter().reduce()` style chain creates intermediate vectors and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process elements in one pass. Sorting is the important exception: it cannot be streamed element by element, so lazy `sort`, `sort_ascending`, and `sort_descending` first collect the current lazy pipeline's values, sort that collected vector, and then continue feeding the rest of the lazy chain.
+Lazy vectors are useful when chaining multiple operations over a large vector. A regular `map().filter().reduce()` style chain creates intermediate vectors and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process elements in one pass. Sorting is an important exception: it cannot be streamed element by element, so lazy `sort`, `sort_ascending`, and `sort_descending` first collect the current lazy pipeline's values, sort that collected vector, and then continue feeding the rest of the lazy chain.
 
 ```c++
 #include "vector.h" // instead of <vector>
@@ -192,6 +192,34 @@ const auto total = numbers
     });
 
 // total -> 42
+```
+
+Lazy zip can combine a lazy vector with an `fcpp::vector`, a `std::vector`, or another `fcpp::lazy_vector` and also waits until a terminal operation is called, and only then checks that both sides have equal sizes. When zipping with another lazy vector, the right-hand lazy vector is materialized internally at that point, so its values can be paired by index.
+
+```c++
+const fcpp::vector<int> ages({32, 45, 37});
+const fcpp::vector<std::string> names({"Jake", "Anna", "Kate"});
+
+const auto employees = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+    
+    // zip is not evaluated yet
+    .zip(names)
+    
+    // this transform is not evaluated yet
+    .map<person>([](const std::pair<int, std::string>& pair) {
+        return person(pair.first, pair.second);
+    })
+    
+    // terminal operation: zip size validation and all stored operations run here
+    .get();
+
+// employees -> fcpp::vector<person>({
+//                  person(32, "Jake"),
+//                  person(45, "Anna"),
+//                  person(37, "Kate"),
+//              })
 ```
 
 ### index search
