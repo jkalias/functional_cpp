@@ -22,7 +22,7 @@ The primary focus of this library is
 * [Functional vector usage (fcpp::vector)](#functional-vector-usage-fcppvector)
   * [extract unique (distinct) elements in a set](#extract-unique-distinct-elements-in-a-set)
   * [zip, map, filter, sort, reduce](#zip-map-filter-sort-reduce)
-  * [Lazy operations](#lazy-operations)
+  * [lazy operations](#lazy-operations)
   * [index search](#index-search)
   * [remove, insert](#remove-insert)
   * [size, capacity, reserve, resize](#size-capacity-reserve-resize)
@@ -31,12 +31,12 @@ The primary focus of this library is
 * [Functional set usage (fcpp::set)](#functional-set-usage-fcppset)
   * [difference, union, intersection](#difference-union-intersection-works-with-fcppset-and-stdset)
   * [zip, map, filter, reduce](#zip-map-filter-reduce)
-  * [Lazy operations](#lazy-operations-1)
+  * [lazy operations](#lazy-operations-1)
   * [all_of, any_of, none_of](#all_of-any_of-none_of-1)
   * [remove, insert, contains, size, clear](#remove-insert-contains-size-clear)
 * [Functional map usage (fcpp::map)](#functional-map-usage-fcppmap)
   * [map_to, filter, reduce, for_each](#map_to-filter-reduce-for_each)
-  * [Lazy operations](#lazy-operations-2)
+  * [lazy operations](#lazy-operations-2)
   * [all_of, any_of, none_of](#all_of-any_of-none_of-2)
   * [keys, values, remove, insert](#keys-values-remove-insert)
 
@@ -166,7 +166,7 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 });
 ```
 
-### Lazy operations
+### lazy operations
 Lazy vectors are useful when chaining multiple operations over a large vector. A regular `map().filter().reduce()` style chain creates intermediate vectors and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process elements in one pass. Sorting is an important exception: it cannot be streamed element by element, so lazy `sort`, `sort_ascending`, and `sort_descending` first collect the current lazy pipeline's values, sort that collected vector, and then continue feeding the rest of the lazy chain.
 
 ```c++
@@ -484,7 +484,7 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 });
 ```
 
-### Lazy operations
+### lazy operations
 Lazy sets are useful when chaining operations over a large set and only needing the final materialized set or a reduced value. A regular `map().filter().reduce()` chain creates intermediate sets and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process keys in one pass. Unlike vectors, sets are already ordered by their comparator, so lazy sets focus on the operations that make sense for set data: `map`, `filter`, `difference_with`, `union_with`, `intersect_with`, `zip`, and `reduce`.
 
 ```c++
@@ -670,7 +670,7 @@ adults.for_each([](const std::pair<const std::string, int>& element) {
 });
 ```
 
-### Lazy operations
+### lazy operations
 Lazy maps are useful when chaining `map_to`, `filter`, and `reduce` over a large map. A regular `filtered().map_to().reduce()` style chain creates intermediate maps and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map_to/filter/reduce-style pipelines process key/value pairs in one pass. When a lazy `map_to` creates equivalent output keys, the first key/value pair encountered in sorted map order is kept, following `std::map::insert` semantics.
 
 ```c++
