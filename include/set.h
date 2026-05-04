@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <cstdlib>
 #include <functional>
 #include <initializer_list>
 #include <iterator>
@@ -376,11 +377,17 @@ namespace fcpp {
                     const auto materialized_set = set.get();
                     size_t index = 0;
                     previous([&materialized_set, &consumer, &index](const TKey& key) {
-                        assert(index < materialized_set.size());
+                        if (index >= materialized_set.size()) {
+                            assert(false);
+                            std::abort();
+                        }
                         consumer({key, materialized_set[index]});
                         ++index;
                     });
-                    assert(index == materialized_set.size());
+                    if (index != materialized_set.size()) {
+                        assert(false);
+                        std::abort();
+                    }
                 });
         }
 

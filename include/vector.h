@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <cstdlib>
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 #include <execution>
 #endif
@@ -211,11 +212,17 @@ namespace fcpp {
                 [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
                     size_t index = 0;
                     previous([&vector_copy, &consumer, &index](const T& element) {
-                        assert(index < vector_copy.size());
+                        if (index >= vector_copy.size()) {
+                            assert(false);
+                            std::abort();
+                        }
                         consumer({element, vector_copy[index]});
                         ++index;
                     });
-                    assert(index == vector_copy.size());
+                    if (index != vector_copy.size()) {
+                        assert(false);
+                        std::abort();
+                    }
                 },
                 capacity_hint);
         }
@@ -233,11 +240,17 @@ namespace fcpp {
                 [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
                     size_t index = 0;
                     previous([&vector_copy, &consumer, &index](const T& element) {
-                        assert(index < vector_copy.size());
+                        if (index >= vector_copy.size()) {
+                            assert(false);
+                            std::abort();
+                        }
                         consumer({element, vector_copy[index]});
                         ++index;
                     });
-                    assert(index == vector_copy.size());
+                    if (index != vector_copy.size()) {
+                        assert(false);
+                        std::abort();
+                    }
                 },
                 capacity_hint);
         }
@@ -256,11 +269,17 @@ namespace fcpp {
                     const auto materialized_vector = vector.get();
                     size_t index = 0;
                     previous([&materialized_vector, &consumer, &index](const T& element) {
-                        assert(index < materialized_vector.size());
+                        if (index >= materialized_vector.size()) {
+                            assert(false);
+                            std::abort();
+                        }
                         consumer({element, materialized_vector[index]});
                         ++index;
                     });
-                    assert(index == materialized_vector.size());
+                    if (index != materialized_vector.size()) {
+                        assert(false);
+                        std::abort();
+                    }
                 },
                 capacity_hint);
         }

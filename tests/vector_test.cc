@@ -1680,4 +1680,20 @@ TEST(VectorTest, LazyZipWithDifferentSizesThrows)
     EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
 }
 
+TEST(VectorTest, LazyZipWithFunctionalVectorDifferentSizesThrows)
+{
+    const vector<int> vector_under_test({1, 2});
+    const vector<std::string> names({"one"});
+
+    EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
+}
+
+TEST(VectorTest, LazyZipWithLazyVectorDifferentSizesThrows)
+{
+    const vector<int> vector_under_test({1, 2});
+    const auto names = vector<std::string>({"one"}).lazy();
+
+    EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
+}
+
 #pragma warning( pop )
