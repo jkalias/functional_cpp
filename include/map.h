@@ -51,12 +51,14 @@ public:
     using value_type = std::pair<const TKey, TValue>;
 
     lazy_map()
-        : m_operation([](const std::function<void(const value_type&)>&) {})
+        : m_compare()
+        , m_operation([](const std::function<void(const value_type&)>&) {})
     {
     }
 
     // Creates a lazy map by copying the provided std::map as an owned source.
     explicit lazy_map(const std::map<TKey, TValue, TCompare>& map)
+        : m_compare(map.key_comp())
     {
         auto source = std::make_shared<std::map<TKey, TValue, TCompare>>(map);
         m_operation = [source](const std::function<void(const value_type&)>& consumer) {
@@ -66,6 +68,7 @@ public:
 
     // Creates a lazy map by moving the provided std::map as an owned source.
     explicit lazy_map(std::map<TKey, TValue, TCompare>&& map)
+        : m_compare(map.key_comp())
     {
         auto source = std::make_shared<std::map<TKey, TValue, TCompare>>(std::move(map));
         m_operation = [source](const std::function<void(const value_type&)>& consumer) {
@@ -76,7 +79,18 @@ public:
     // Creates a lazy map by directly providing the deferred operation.
     // This constructor is mostly useful for composing lazy_map instances.
     explicit lazy_map(std::function<void(const std::function<void(const value_type&)>&)> operation)
-        : m_operation(std::move(operation))
+        : m_compare()
+        , m_operation(std::move(operation))
+    {
+    }
+
+    // Creates a lazy map by directly providing the deferred operation and comparator.
+    // This constructor is mostly useful for preserving comparator state while composing
+    // lazy_map instances.
+    lazy_map(std::function<void(const std::function<void(const value_type&)>&)> operation,
+             const TCompare& compare)
+        : m_compare(compare)
+        , m_operation(std::move(operation))
     {
     }
 
@@ -146,7 +160,8 @@ public:
                         consumer(element);
                     }
                 });
-            });
+            },
+            m_compare);
     }
 
     // Performs the functional `filter` algorithm lazily.
@@ -195,6 +210,7 @@ public:
     [[nodiscard]] map<TKey, TValue, TCompare> get() const;
 
 private:
+    TCompare m_compare;
     std::function<void(const std::function<void(const value_type&)>&)> m_operation;
 };
 
@@ -689,7 +705,7 @@ private:
 template <class TKey, class TValue, class TCompare>
 [[nodiscard]] map<TKey, TValue, TCompare> lazy_map<TKey, TValue, TCompare>::get() const
 {
-    std::map<TKey, TValue, TCompare> materialized;
+    std::map<TKey, TValue, TCompare> materialized(m_compare);
     m_operation([&materialized](const value_type& element) {
         materialized.insert(element);
     });

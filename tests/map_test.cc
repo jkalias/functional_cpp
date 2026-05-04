@@ -38,6 +38,33 @@ void test_contents(const map<int, std::string>& map_under_test) {
     EXPECT_EQ("three", map_under_test[3]);
 }
 
+struct stateful_descending_int_compare
+{
+    stateful_descending_int_compare() = delete;
+
+    explicit stateful_descending_int_compare(bool descending)
+        : descending(descending)
+    {
+    }
+
+    bool operator()(const int& lhs, const int& rhs) const
+    {
+        return descending
+            ? lhs > rhs
+            : lhs < rhs;
+    }
+
+    bool descending;
+};
+
+std::map<int, std::string, stateful_descending_int_compare> make_stateful_descending_map(
+    const std::initializer_list<std::pair<const int, std::string>>& values)
+{
+    std::map<int, std::string, stateful_descending_int_compare> result(stateful_descending_int_compare(true));
+    result.insert(values.begin(), values.end());
+    return result;
+}
+
 TEST(MapTest, EmptyConstructor)
 {
     const map<int, std::string> map_under_test;
@@ -293,6 +320,23 @@ TEST(MapTest, LazyFiltered)
 
     EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), filtered_persons);
     EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 26}})), persons);
+}
+
+TEST(MapTest, LazyFilteredPreservesComparatorState)
+{
+    const map<int, std::string, stateful_descending_int_compare> numbers(
+        make_stateful_descending_map({{1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}}));
+
+    const auto filtered_numbers = numbers
+        .lazy()
+        .filtered([](const std::pair<const int, std::string>& element) {
+            return element.first % 2 == 0;
+        })
+        .get();
+
+    EXPECT_EQ((vector<int>({4, 2})), filtered_numbers.keys());
+    EXPECT_EQ("four", filtered_numbers[4]);
+    EXPECT_EQ("two", filtered_numbers[2]);
 }
 
 TEST(MapTest, LazyReduce)

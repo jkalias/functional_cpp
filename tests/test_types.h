@@ -45,12 +45,6 @@ struct child
     }
 };
 
-struct child_comparator {
-    bool operator() (const child& a, const child& b) const {
-        return a < b;
-    }
-};
-
 struct person
 {
     person()
