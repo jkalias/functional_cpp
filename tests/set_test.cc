@@ -719,6 +719,66 @@ TEST(SetTest, LazyZipWithStdVector)
     EXPECT_EQ(expected, zipped);
 }
 
+TEST(SetTest, LazySourceCanOutliveFunctionalSet)
+{
+    lazy_set<int> lazy_numbers;
+    {
+        const set<int> numbers({1, 2, 3, 4});
+        lazy_numbers = numbers
+            .lazy()
+            .filter([](const int& value) {
+                return value > 2;
+            });
+    }
+
+    EXPECT_EQ(set<int>({3, 4}), lazy_numbers.get());
+}
+
+TEST(SetTest, LazySourceCanStartFromTemporaryFunctionalSet)
+{
+    const auto lazy_numbers = set<int>({1, 2, 3, 4})
+        .lazy()
+        .map<int>([](const int& value) {
+            return value * 2;
+        });
+
+    EXPECT_EQ(set<int>({2, 4, 6, 8}), lazy_numbers.get());
+}
+
+TEST(SetTest, LazyZipWithTemporaryFunctionalSet)
+{
+    const set<int> ages({25, 45, 30, 63});
+
+    const auto lazy_zipped = ages
+        .lazy()
+        .zip(set<std::string>({"Jake", "Bob", "Michael", "Philipp"}));
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, lazy_zipped.get());
+}
+
+TEST(SetTest, LazyZipWithTemporaryStdSet)
+{
+    const set<int> ages({25, 45, 30, 63});
+
+    const auto lazy_zipped = ages
+        .lazy()
+        .zip(std::set<std::string>({"Jake", "Bob", "Michael", "Philipp"}));
+
+    const auto expected = set<std::pair<int, std::string>>({
+        std::pair<int, std::string>(25, "Bob"),
+        std::pair<int, std::string>(30, "Jake"),
+        std::pair<int, std::string>(45, "Michael"),
+        std::pair<int, std::string>(63, "Philipp"),
+    });
+    EXPECT_EQ(expected, lazy_zipped.get());
+}
+
 TEST(SetTest, LazyZipWithLazyVector)
 {
     const set<int> ages({25, 45, 30, 63});
@@ -849,6 +909,17 @@ TEST(SetTest, LazyDifferenceWithLazySet)
     EXPECT_EQ(6, map_call_count);
 }
 
+TEST(SetTest, LazyDifferenceWithTemporaryFunctionalSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+
+    const auto lazy_diff = set1
+        .lazy()
+        .difference_with(set<int>({2, 5, 7, 10, 15, 17}));
+
+    EXPECT_EQ(set<int>({1, 3, 8}), lazy_diff.get());
+}
+
 TEST(SetTest, LazyUnionWithFunctionalSet)
 {
     const set<int> set1({1, 2, 3, 5, 7, 8, 10});
@@ -909,6 +980,17 @@ TEST(SetTest, LazyUnionWithLazySet)
     EXPECT_EQ(6, map_call_count);
 }
 
+TEST(SetTest, LazyUnionWithTemporaryFunctionalSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+
+    const auto lazy_combined = set1
+        .lazy()
+        .union_with(set<int>({2, 5, 7, 10, 15, 17}));
+
+    EXPECT_EQ(set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), lazy_combined.get());
+}
+
 TEST(SetTest, LazyIntersectionWithFunctionalSet)
 {
     const set<int> set1({1, 2, 3, 5, 7, 8, 10});
@@ -967,4 +1049,15 @@ TEST(SetTest, LazyIntersectionWithLazySet)
 
     EXPECT_EQ(set<int>({3, 5, 7, 10}), intersection);
     EXPECT_EQ(6, map_call_count);
+}
+
+TEST(SetTest, LazyIntersectionWithTemporaryFunctionalSet)
+{
+    const set<int> set1({1, 2, 3, 5, 7, 8, 10});
+
+    const auto lazy_intersection = set1
+        .lazy()
+        .intersect_with(set<int>({2, 5, 7, 10, 15, 17}));
+
+    EXPECT_EQ(set<int>({2, 5, 7, 10}), lazy_intersection.get());
 }

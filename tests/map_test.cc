@@ -314,6 +314,32 @@ TEST(MapTest, LazyReduce)
     EXPECT_EQ(3, filter_call_count);
 }
 
+TEST(MapTest, LazySourceCanOutliveFunctionalMap)
+{
+    lazy_map<std::string, int> lazy_persons;
+    {
+        const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+        lazy_persons = persons
+            .lazy()
+            .filter([](const std::pair<const std::string, int>& element) {
+                return element.second >= 32;
+            });
+    }
+
+    EXPECT_EQ((map<std::string, int>({{"david", 40}, {"jake", 32}})), lazy_persons.get());
+}
+
+TEST(MapTest, LazySourceCanStartFromTemporaryFunctionalMap)
+{
+    const auto lazy_persons = map<std::string, int>({{"jake", 32}, {"mary", 26}})
+        .lazy()
+        .map_to<char, int>([](const std::pair<const std::string, int>& element) {
+            return std::make_pair(element.first[0], element.second);
+        });
+
+    EXPECT_EQ((map<char, int>({{'j', 32}, {'m', 26}})), lazy_persons.get());
+}
+
 TEST(MapTest, LazyMapToDuplicateKeysKeepsFirst)
 {
     const map<std::string, int> persons({{"anna", 28}, {"alex", 30}, {"david", 40}});

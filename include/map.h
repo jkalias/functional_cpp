@@ -73,15 +73,6 @@ public:
         };
     }
 
-    // Creates a lazy map by referring to an existing std::map source.
-    // The referenced map must outlive this lazy map.
-    explicit lazy_map(const std::map<TKey, TValue, TCompare>* map)
-    {
-        m_operation = [map](const std::function<void(const value_type&)>& consumer) {
-            std::for_each(map->begin(), map->end(), consumer);
-        };
-    }
-
     // Creates a lazy map by directly providing the deferred operation.
     // This constructor is mostly useful for composing lazy_map instances.
     explicit lazy_map(std::function<void(const std::function<void(const value_type&)>&)> operation)
@@ -617,7 +608,7 @@ public:
     // until a terminal operation, such as get() or reduce(), is called.
     [[nodiscard]] lazy_map<TKey, TValue, TCompare> lazy() const
     {
-        return lazy_map<TKey, TValue, TCompare>(&m_map);
+        return lazy_map<TKey, TValue, TCompare>(m_map);
     }
 
     // Returns the begin iterator, useful for other standard library algorithms

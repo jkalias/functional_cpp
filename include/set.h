@@ -78,15 +78,6 @@ namespace fcpp {
             };
         }
 
-        // Creates a lazy set by referring to an existing std::set source.
-        // The referenced set must outlive this lazy set.
-        explicit lazy_set(const std::set<TKey, TCompare>* set)
-        {
-            m_operation = [set](const std::function<void(const TKey&)>& consumer) {
-                std::for_each(set->begin(), set->end(), consumer);
-            };
-        }
-
         // Creates a lazy set by directly providing the deferred operation.
         // This constructor is mostly useful for composing lazy_set instances.
         explicit lazy_set(std::function<void(const std::function<void(const TKey&)>&)> operation)
@@ -187,22 +178,7 @@ namespace fcpp {
         //      diff -> fcpp::set<int>({1, 3, 8})
         [[nodiscard]] lazy_set difference_with(const set<TKey, TCompare>& other) const
         {
-            const auto previous = m_operation;
-            return lazy_set(
-                [previous, &other](const std::function<void(const TKey&)>& consumer) {
-                    std::set<TKey, TCompare> current;
-                    previous([&current](const TKey& key) {
-                        current.insert(key);
-                    });
-
-                    std::set<TKey, TCompare> diff;
-                    std::set_difference(current.begin(),
-                                        current.end(),
-                                        other.begin(),
-                                        other.end(),
-                                        std::inserter(diff, diff.begin()));
-                    std::for_each(diff.begin(), diff.end(), consumer);
-                });
+            return difference_with(lazy_set(std::set<TKey, TCompare>(other.begin(), other.end())));
         }
 
         // Returns the lazy set of elements which belong to this lazy set but not in the std::set.
@@ -250,22 +226,7 @@ namespace fcpp {
         //      combined -> fcpp::set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17})
         [[nodiscard]] lazy_set union_with(const set<TKey, TCompare>& other) const
         {
-            const auto previous = m_operation;
-            return lazy_set(
-                [previous, &other](const std::function<void(const TKey&)>& consumer) {
-                    std::set<TKey, TCompare> current;
-                    previous([&current](const TKey& key) {
-                        current.insert(key);
-                    });
-
-                    std::set<TKey, TCompare> combined;
-                    std::set_union(current.begin(),
-                                   current.end(),
-                                   other.begin(),
-                                   other.end(),
-                                   std::inserter(combined, combined.begin()));
-                    std::for_each(combined.begin(), combined.end(), consumer);
-                });
+            return union_with(lazy_set(std::set<TKey, TCompare>(other.begin(), other.end())));
         }
 
         // Returns the lazy set of elements which belong either to this lazy set or the std::set.
@@ -313,22 +274,7 @@ namespace fcpp {
         //      combined -> fcpp::set<int>({2, 5, 7, 10})
         [[nodiscard]] lazy_set intersect_with(const set<TKey, TCompare>& other) const
         {
-            const auto previous = m_operation;
-            return lazy_set(
-                [previous, &other](const std::function<void(const TKey&)>& consumer) {
-                    std::set<TKey, TCompare> current;
-                    previous([&current](const TKey& key) {
-                        current.insert(key);
-                    });
-
-                    std::set<TKey, TCompare> intersection;
-                    std::set_intersection(current.begin(),
-                                          current.end(),
-                                          other.begin(),
-                                          other.end(),
-                                          std::inserter(intersection, intersection.begin()));
-                    std::for_each(intersection.begin(), intersection.end(), consumer);
-                });
+            return intersect_with(lazy_set(std::set<TKey, TCompare>(other.begin(), other.end())));
         }
 
         // Returns the lazy set of elements which belong to both this lazy set and the std::set.
@@ -367,17 +313,7 @@ namespace fcpp {
         template <typename UKey, typename UCompare>
         [[nodiscard]] lazy_set<std::pair<TKey, UKey>> zip(const set<UKey, UCompare>& set) const
         {
-            const auto previous = m_operation;
-            return lazy_set<std::pair<TKey, UKey>>(
-                [previous, &set](const std::function<void(const std::pair<TKey, UKey>&)>& consumer) {
-                    size_t index = 0;
-                    previous([&set, &consumer, &index](const TKey& key) {
-                        assert(index < set.size());
-                        consumer({key, set[index]});
-                        ++index;
-                    });
-                    assert(index == set.size());
-                });
+            return zip(lazy_set<UKey, UCompare>(std::set<UKey, UCompare>(set.begin(), set.end())));
         }
 
         // Performs the functional `zip` algorithm lazily.
@@ -385,17 +321,7 @@ namespace fcpp {
         template <typename UKey, typename UCompare>
         [[nodiscard]] lazy_set<std::pair<TKey, UKey>> zip(const std::set<UKey, UCompare>& set) const
         {
-            const auto previous = m_operation;
-            return lazy_set<std::pair<TKey, UKey>>(
-                [previous, &set](const std::function<void(const std::pair<TKey, UKey>&)>& consumer) {
-                    auto it = set.begin();
-                    previous([&set, &it, &consumer](const TKey& key) {
-                        assert(it != set.end());
-                        consumer({key, *it});
-                        ++it;
-                    });
-                    assert(it == set.end());
-                });
+            return zip(lazy_set<UKey, UCompare>(set));
         }
 
         // Performs the functional `zip` algorithm lazily where duplicates are removed before zipping.
@@ -1082,7 +1008,7 @@ namespace fcpp {
         // transformations until a terminal operation, such as get() or reduce(), is called.
         [[nodiscard]] lazy_set<TKey, TCompare> lazy() const
         {
-            return lazy_set<TKey, TCompare>(&m_set);
+            return lazy_set<TKey, TCompare>(m_set);
         }
 
         // Returns the begin iterator, useful for other standard library algorithms
