@@ -22,7 +22,6 @@
 
 #include <atomic>
 #include <initializer_list>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -38,14 +37,6 @@
 #pragma warning( disable : 4245)
 
 using namespace fcpp;
-
-template <typename T>
-void debug(const vector<T>& vec)
-{
-    vec.for_each([](const T& element){
-        std::cout << element << std::endl;
-    });
-}
 
 TEST(VectorTest, InsertBack)
 {

@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #include <initializer_list>
-#include <iostream>
 #include <set>
 #include <string>
 #include <utility>
@@ -36,19 +35,38 @@
 
 using namespace fcpp;
 
-template <typename T>
-void debug(set<T>& set)
-{
-    set.for_each([](const T& element) {
-        std::cout << element << std::endl;
-    });
-}
-
 void test_contents(const set<int>& set) {
     EXPECT_EQ(3, set.size());
     EXPECT_EQ(1, set[0]);
     EXPECT_EQ(3, set[1]);
     EXPECT_EQ(5, set[2]);
+}
+
+struct stateful_descending_int_compare
+{
+    stateful_descending_int_compare() = delete;
+
+    explicit stateful_descending_int_compare(bool descending)
+        : descending(descending)
+    {
+    }
+
+    bool operator()(const int& lhs, const int& rhs) const
+    {
+        return descending
+            ? lhs > rhs
+            : lhs < rhs;
+    }
+
+    bool descending;
+};
+
+std::set<int, stateful_descending_int_compare> make_stateful_descending_set(
+    const std::initializer_list<int>& values)
+{
+    std::set<int, stateful_descending_int_compare> result(stateful_descending_int_compare(true));
+    result.insert(values.begin(), values.end());
+    return result;
 }
 
 TEST(SetTest, EmptyConstructor)
@@ -745,6 +763,22 @@ TEST(SetTest, LazySourceCanStartFromTemporaryFunctionalSet)
     EXPECT_EQ(set<int>({2, 4, 6, 8}), lazy_numbers.get());
 }
 
+TEST(SetTest, LazyFilterPreservesComparatorState)
+{
+    const set<int, stateful_descending_int_compare> numbers(make_stateful_descending_set({1, 2, 3, 4}));
+
+    const auto filtered = numbers
+        .lazy()
+        .filter([](const int& value) {
+            return value % 2 == 0;
+        })
+        .get();
+
+    EXPECT_EQ(2, filtered.size());
+    EXPECT_EQ(4, filtered[0]);
+    EXPECT_EQ(2, filtered[1]);
+}
+
 TEST(SetTest, LazyZipWithTemporaryFunctionalSet)
 {
     const set<int> ages({25, 45, 30, 63});
@@ -760,6 +794,24 @@ TEST(SetTest, LazyZipWithTemporaryFunctionalSet)
         std::pair<int, std::string>(63, "Philipp"),
     });
     EXPECT_EQ(expected, lazy_zipped.get());
+}
+
+TEST(SetTest, LazyZipWithFunctionalSetPreservesComparatorState)
+{
+    const set<int> left({1, 2, 3});
+    const set<int, stateful_descending_int_compare> right(make_stateful_descending_set({10, 20, 30}));
+
+    const auto zipped = left
+        .lazy()
+        .zip(right)
+        .get();
+
+    const auto expected = set<std::pair<int, int>>({
+        std::pair<int, int>(1, 30),
+        std::pair<int, int>(2, 20),
+        std::pair<int, int>(3, 10),
+    });
+    EXPECT_EQ(expected, zipped);
 }
 
 TEST(SetTest, LazyZipWithTemporaryStdSet)
@@ -920,6 +972,21 @@ TEST(SetTest, LazyDifferenceWithTemporaryFunctionalSet)
     EXPECT_EQ(set<int>({1, 3, 8}), lazy_diff.get());
 }
 
+TEST(SetTest, LazyDifferenceWithFunctionalSetPreservesComparatorState)
+{
+    const set<int, stateful_descending_int_compare> set1(make_stateful_descending_set({1, 2, 3, 4}));
+    const set<int, stateful_descending_int_compare> set2(make_stateful_descending_set({2, 4, 6}));
+
+    const auto diff = set1
+        .lazy()
+        .difference_with(set2)
+        .get();
+
+    EXPECT_EQ(2, diff.size());
+    EXPECT_EQ(3, diff[0]);
+    EXPECT_EQ(1, diff[1]);
+}
+
 TEST(SetTest, LazyUnionWithFunctionalSet)
 {
     const set<int> set1({1, 2, 3, 5, 7, 8, 10});
@@ -991,6 +1058,24 @@ TEST(SetTest, LazyUnionWithTemporaryFunctionalSet)
     EXPECT_EQ(set<int>({1, 2, 3, 5, 7, 8, 10, 15, 17}), lazy_combined.get());
 }
 
+TEST(SetTest, LazyUnionWithFunctionalSetPreservesComparatorState)
+{
+    const set<int, stateful_descending_int_compare> set1(make_stateful_descending_set({1, 2, 3, 4}));
+    const set<int, stateful_descending_int_compare> set2(make_stateful_descending_set({2, 4, 6}));
+
+    const auto combined = set1
+        .lazy()
+        .union_with(set2)
+        .get();
+
+    EXPECT_EQ(5, combined.size());
+    EXPECT_EQ(6, combined[0]);
+    EXPECT_EQ(4, combined[1]);
+    EXPECT_EQ(3, combined[2]);
+    EXPECT_EQ(2, combined[3]);
+    EXPECT_EQ(1, combined[4]);
+}
+
 TEST(SetTest, LazyIntersectionWithFunctionalSet)
 {
     const set<int> set1({1, 2, 3, 5, 7, 8, 10});
@@ -1060,4 +1145,19 @@ TEST(SetTest, LazyIntersectionWithTemporaryFunctionalSet)
         .intersect_with(set<int>({2, 5, 7, 10, 15, 17}));
 
     EXPECT_EQ(set<int>({2, 5, 7, 10}), lazy_intersection.get());
+}
+
+TEST(SetTest, LazyIntersectionWithFunctionalSetPreservesComparatorState)
+{
+    const set<int, stateful_descending_int_compare> set1(make_stateful_descending_set({1, 2, 3, 4}));
+    const set<int, stateful_descending_int_compare> set2(make_stateful_descending_set({2, 4, 6}));
+
+    const auto intersection = set1
+        .lazy()
+        .intersect_with(set2)
+        .get();
+
+    EXPECT_EQ(2, intersection.size());
+    EXPECT_EQ(4, intersection[0]);
+    EXPECT_EQ(2, intersection[1]);
 }
