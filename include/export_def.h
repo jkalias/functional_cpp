@@ -31,5 +31,3 @@
 #else
     #define FunctionalCppExport __attribute__ ((__visibility__("default")))
 #endif
-
-#include "compatibility.h"

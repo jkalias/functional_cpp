@@ -10,6 +10,36 @@ The primary focus of this library is
 * encapsulation of the iterator madness
 * removal of manual for-loops
 
+## Contents
+* [Compilation (Cmake)](#compilation-cmake)
+  * [Dependencies](#dependencies)
+  * [Minimum C++ version](#minimum-c-version)
+  * [macOS (Xcode)](#macos-xcode)
+  * [macOS (Makefiles/clang)](#macos-makefilesclang)
+  * [macOS (Makefiles/g++)](#macos-makefilesg)
+  * [Linux (Makefiles)](#linux-makefiles)
+  * [Windows (Visual Studio)](#windows-visual-studio)
+* [Functional vector usage (fcpp::vector)](#functional-vector-usage-fcppvector)
+  * [extract unique (distinct) elements in a set](#extract-unique-distinct-elements-in-a-set)
+  * [zip, map, filter, sort, reduce](#zip-map-filter-sort-reduce)
+  * [lazy operations](#lazy-operations)
+  * [index search](#index-search)
+  * [remove, insert](#remove-insert)
+  * [size, capacity, reserve, resize](#size-capacity-reserve-resize)
+  * [all_of, any_of, none_of](#all_of-any_of-none_of)
+  * [Parallel algorithms](#parallel-algorithms)
+* [Functional set usage (fcpp::set)](#functional-set-usage-fcppset)
+  * [difference, union, intersection](#difference-union-intersection-works-with-fcppset-and-stdset)
+  * [zip, map, filter, reduce](#zip-map-filter-reduce)
+  * [lazy operations](#lazy-operations-1)
+  * [all_of, any_of, none_of](#all_of-any_of-none_of-1)
+  * [remove, insert, contains, size, clear](#remove-insert-contains-size-clear)
+* [Functional map usage (fcpp::map)](#functional-map-usage-fcppmap)
+  * [map_to, filter, reduce, for_each](#map_to-filter-reduce-for_each)
+  * [lazy operations](#lazy-operations-2)
+  * [all_of, any_of, none_of](#all_of-any_of-none_of-2)
+  * [keys, values, remove, insert](#keys-values-remove-insert)
+
 ## Compilation (Cmake)
 ### Dependencies
 * CMake >= 3.14
@@ -135,6 +165,93 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
     return partial_sum + p.age;
 });
 ```
+
+### lazy operations
+Lazy vectors are useful when chaining multiple operations over a large vector. A regular `map().filter().reduce()` style chain creates intermediate vectors and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process elements in one pass. Sorting is an important exception: it cannot be streamed element by element, so lazy `sort`, `sort_ascending`, and `sort_descending` first collect the current lazy pipeline's values, sort that collected vector, and then continue feeding the rest of the lazy chain.
+
+```c++
+#include "vector.h" // instead of <vector>
+
+const fcpp::vector<int> numbers({5, 1, 4, 2, 3});
+
+const auto processed_numbers = numbers
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const int& number) {
+        return number > 2;
+    })
+
+    // sorting is also deferred, but it needs to materialize the filtered
+    // values internally when the terminal operation is called
+    .sort_ascending()
+
+    // this transform is not evaluated yet
+    .map<std::string>([](const int& number) {
+        return std::to_string(number);
+    })
+
+    // terminal operation: all stored operations are executed here
+    .get();
+
+// processed_numbers -> fcpp::vector<std::string>({ "3", "4", "5" })
+// numbers -> fcpp::vector<int>({ 5, 1, 4, 2, 3 })
+```
+
+Here is another example without sorting, thus all operations are materialized in the end.
+
+```c++
+const auto total = numbers
+    // start a lazy pipeline from this point on
+    .lazy()
+    
+    // this transform is not evaluated yet
+    .map<int>([](const int& number) {
+        return number * 3;
+    })
+    
+    // this predicate is not evaluated yet
+    .filter([](const int& number) {
+        return number > 5;
+    })
+    
+    // terminal operation: all stored operations are executed here
+    .reduce(0, [](const int& partial_sum, const int& number) {
+        return partial_sum + number;
+    });
+
+// total -> 42
+```
+
+Lazy zip can combine a lazy vector with an `fcpp::vector`, a `std::vector`, or another `fcpp::lazy_vector` and also waits until a terminal operation is called, and only then checks that both sides have equal sizes. When zipping with another lazy vector, the right-hand lazy vector is materialized internally at that point, so its values can be paired by index.
+
+```c++
+const fcpp::vector<int> ages({32, 45, 37});
+const fcpp::vector<std::string> names({"Jake", "Anna", "Kate"});
+
+const auto employees = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+    
+    // zip is not evaluated yet
+    .zip(names)
+    
+    // this transform is not evaluated yet
+    .map<person>([](const std::pair<int, std::string>& pair) {
+        return person(pair.first, pair.second);
+    })
+    
+    // terminal operation: zip size validation and all stored operations run here
+    .get();
+
+// employees -> fcpp::vector<person>({
+//                  person(32, "Jake"),
+//                  person(45, "Anna"),
+//                  person(37, "Kate"),
+//              })
+```
+
 ### index search
 ```c++
 #include "vector.h" // instead of <vector>
@@ -367,6 +484,93 @@ const auto total_age = employees_below_40.reduce(0, [](const int& partial_sum, c
 });
 ```
 
+### lazy operations
+Lazy sets are useful when chaining operations over a large set and only needing the final materialized set or a reduced value. A regular `map().filter().reduce()` chain creates intermediate sets and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map/filter/reduce-style pipelines process keys in one pass. Unlike vectors, sets are already ordered by their comparator, so lazy sets focus on the operations that make sense for set data: `map`, `filter`, `difference_with`, `union_with`, `intersect_with`, `zip`, and `reduce`.
+
+```c++
+#include "set.h" // instead of <set>
+
+const fcpp::set<int> numbers({1, 2, 3, 4, 5});
+
+const auto total = numbers
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this transform is not evaluated yet
+    .map<int>([](const int& number) {
+        return number * 3;
+    })
+
+    // this predicate is not evaluated yet
+    .filter([](const int& number) {
+        return number > 5;
+    })
+
+    // terminal operation: all stored operations are executed here
+    .reduce(0, [](const int& partial_sum, const int& number) {
+        return partial_sum + number;
+    });
+
+// total -> 42
+```
+
+Lazy set algebra can combine a lazy set with an `fcpp::set`, a `std::set`, or another `fcpp::lazy_set`. The operation is still deferred, but set algebra needs set membership and sorted set semantics, so the current lazy pipeline is materialized internally when the terminal operation is called. When the right-hand side is also lazy, it is materialized internally at the same point.
+
+```c++
+const fcpp::set<int> colleague_ages({15, 18, 25, 41, 51});
+const fcpp::set<int> friend_ages({41, 42, 51});
+const fcpp::set<int> family_ages({51, 81});
+
+const auto guests = colleague_ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const int& age) {
+        return age >= 18;
+    })
+
+    // set difference is not evaluated yet
+    .difference_with(friend_ages)
+
+    // set union is not evaluated yet
+    .union_with(family_ages)
+
+    // terminal operation: the lazy filter and set algebra run here
+    .get();
+
+// guests -> fcpp::set<int>({18, 25, 51, 81})
+```
+
+Lazy set zip can combine a lazy set with an `fcpp::set`, a `std::set`, an `fcpp::vector`, a `std::vector`, an `fcpp::lazy_vector`, or another `fcpp::lazy_set`. Size validation is deferred until a terminal operation is called. When zipping with a vector, duplicate vector values are removed before zipping, just like the eager set zip operation. When zipping with a lazy vector, the right-hand lazy vector is materialized internally at that point and then deduplicated. When zipping with another lazy set, the right-hand lazy set is materialized internally at that point, so its keys can be paired in set order.
+
+```c++
+const fcpp::set<int> ages({25, 45, 30, 63});
+const fcpp::set<std::string> names({"Jake", "Bob", "Michael", "Philipp"});
+
+const auto employees = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // zip is not evaluated yet
+    .zip(names)
+
+    // this transform is not evaluated yet
+    .map<person>([](const std::pair<int, std::string>& pair) {
+        return person(pair.first, pair.second);
+    })
+
+    // terminal operation: zip size validation and all stored operations run here
+    .get();
+
+// employees -> fcpp::set<person>({
+//                  person(25, "Bob"),
+//                  person(30, "Jake"),
+//                  person(45, "Michael"),
+//                  person(63, "Philipp"),
+//              })
+```
+
 ### all_of, any_of, none_of
 ```c++
 #include "set.h" // instead of <set>
@@ -464,6 +668,57 @@ const auto total_age = adults.reduce(0, [](const int& partial_sum, const std::pa
 adults.for_each([](const std::pair<const std::string, int>& element) {
     std::cout << element.first << " is " << element.second << " years old." << std::endl;
 });
+```
+
+### lazy operations
+Lazy maps are useful when chaining `map_to`, `filter`, and `reduce` over a large map. A regular `filtered().map_to().reduce()` style chain creates intermediate maps and iterates once per algorithm. Calling `.lazy()` stores the following operations and executes them only when a terminal operation is called, such as `get()` or `reduce()`. This can avoid unnecessary intermediate allocations and lets map_to/filter/reduce-style pipelines process key/value pairs in one pass. When a lazy `map_to` creates equivalent output keys, the first key/value pair encountered in sorted map order is kept, following `std::map::insert` semantics.
+
+```c++
+#include "map.h" // instead of <map>
+
+const fcpp::map<std::string, int> ages({
+    {"jake", 32},
+    {"mary", 16},
+    {"david", 40}
+});
+
+const auto ages_by_initial = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const std::pair<const std::string, int>& element) {
+        return element.second >= 18;
+    })
+
+    // this transform is not evaluated yet
+    .map_to<char, std::string>([](const std::pair<const std::string, int>& element) {
+        return std::make_pair(element.first[0], std::to_string(element.second) + " years");
+    })
+
+    // terminal operation: all stored operations are executed here
+    .get();
+
+// ages_by_initial -> fcpp::map<char, std::string>({{'d', "40 years"}, {'j', "32 years"}})
+// ages -> fcpp::map<std::string, int>({{"david", 40}, {"jake", 32}, {"mary", 16}})
+```
+
+```c++
+const auto total_age = ages
+    // start a lazy pipeline from this point on
+    .lazy()
+
+    // this predicate is not evaluated yet
+    .filter([](const std::pair<const std::string, int>& element) {
+        return element.second >= 18;
+    })
+
+    // terminal operation: all stored operations are executed here
+    .reduce(0, [](const int& partial_sum, const std::pair<const std::string, int>& element) {
+        return partial_sum + element.second;
+    });
+
+// total_age -> 72
 ```
 
 ### all_of, any_of, none_of

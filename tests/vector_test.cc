@@ -20,25 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <atomic>
+#include <initializer_list>
+#include <string>
+#include <vector>
+
 #include <gtest/gtest.h>
-#include "vector.h"
-#include "set.h"
+
 #include "index_range.h"
+#include "set.h"
 #include "test_types.h"
+#include "vector.h"
 #include "warnings.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4245)
 
 using namespace fcpp;
-
-template <typename T>
-void debug(const vector<T>& vec)
-{
-    vec.for_each([](const T& element){
-        std::cout << element << std::endl;
-    });
-}
 
 TEST(VectorTest, InsertBack)
 {
@@ -1373,6 +1371,320 @@ TEST(VectorTest, DistinctCustomType)
     });
 
     EXPECT_EQ(expected, unique_persons);
+}
+
+TEST(VectorTest, LazyMapFilterGet)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value * 2;
+        })
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 4;
+        });
+
+    EXPECT_EQ(0, map_call_count);
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto materialized_vector = lazy_vector.get();
+    EXPECT_EQ(vector<int>({6, 8}), materialized_vector);
+    EXPECT_EQ(vector<int>({1, 2, 3, 4}), vector_under_test);
+    EXPECT_EQ(4, map_call_count);
+    EXPECT_EQ(4, filter_call_count);
+}
+
+TEST(VectorTest, LazyFiltered)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4});
+    const auto filtered_vector = vector_under_test
+        .lazy()
+        .filtered([](const int& value) {
+            return value % 2 == 0;
+        })
+        .get();
+
+    EXPECT_EQ(vector<int>({2, 4}), filtered_vector);
+    EXPECT_EQ(vector<int>({1, 2, 3, 4}), vector_under_test);
+}
+
+TEST(VectorTest, LazyReduce)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    int map_call_count = 0;
+    int filter_call_count = 0;
+
+    const auto result = vector_under_test
+        .lazy()
+        .map<int>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return value * 3;
+        })
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 5;
+        })
+        .reduce(0, [](const int& partial_sum, const int& value) {
+            return partial_sum + value;
+        });
+
+    EXPECT_EQ(162, result);
+    EXPECT_EQ(10, map_call_count);
+    EXPECT_EQ(10, filter_call_count);
+}
+
+TEST(VectorTest, LazySourceCanOutliveFunctionalVector)
+{
+    lazy_vector<int> lazy_numbers;
+    {
+        const vector<int> vector_under_test({1, 2, 3, 4});
+        lazy_numbers = vector_under_test
+            .lazy()
+            .filter([](const int& value) {
+                return value > 2;
+            });
+    }
+
+    EXPECT_EQ(vector<int>({3, 4}), lazy_numbers.get());
+}
+
+TEST(VectorTest, LazySourceCanStartFromTemporaryFunctionalVector)
+{
+    const auto lazy_numbers = vector<int>({1, 2, 3, 4})
+        .lazy()
+        .map<int>([](const int& value) {
+            return value * 2;
+        });
+
+    EXPECT_EQ(vector<int>({2, 4, 6, 8}), lazy_numbers.get());
+}
+
+TEST(VectorTest, LazySort)
+{
+    const vector<person> vector_under_test({
+        person(45, "Jake"), person(34, "Bob"), person(52, "Manfred"), person(8, "Alice")
+    });
+
+    const auto sorted_vector = vector_under_test
+        .lazy()
+        .sort([](const person& person1, const person& person2) {
+            return person1.name < person2.name;
+        })
+        .get();
+
+    EXPECT_EQ(4, vector_under_test.size());
+    EXPECT_EQ("Jake", vector_under_test[0].name);
+    EXPECT_EQ("Bob", vector_under_test[1].name);
+    EXPECT_EQ("Manfred", vector_under_test[2].name);
+    EXPECT_EQ("Alice", vector_under_test[3].name);
+
+    EXPECT_EQ(4, sorted_vector.size());
+    EXPECT_EQ("Alice", sorted_vector[0].name);
+    EXPECT_EQ(8, sorted_vector[0].age);
+    EXPECT_EQ("Bob", sorted_vector[1].name);
+    EXPECT_EQ(34, sorted_vector[1].age);
+    EXPECT_EQ("Jake", sorted_vector[2].name);
+    EXPECT_EQ(45, sorted_vector[2].age);
+    EXPECT_EQ("Manfred", sorted_vector[3].name);
+    EXPECT_EQ(52, sorted_vector[3].age);
+}
+
+TEST(VectorTest, LazySortAscending)
+{
+    const vector<int> vector_under_test({3, 1, 9, -4});
+
+    const auto sorted_vector = vector_under_test
+        .lazy()
+        .sort_ascending()
+        .get();
+
+    EXPECT_EQ(vector<int>({3, 1, 9, -4}), vector_under_test);
+    EXPECT_EQ(vector<int>({-4, 1, 3, 9}), sorted_vector);
+}
+
+TEST(VectorTest, LazySortDescending)
+{
+    const vector<int> vector_under_test({3, 1, 9, -4});
+
+    const auto sorted_vector = vector_under_test
+        .lazy()
+        .sort_descending()
+        .get();
+
+    EXPECT_EQ(vector<int>({3, 1, 9, -4}), vector_under_test);
+    EXPECT_EQ(vector<int>({9, 3, 1, -4}), sorted_vector);
+}
+
+TEST(VectorTest, LazyFilterSortMap)
+{
+    const vector<int> vector_under_test({5, 1, 4, 2, 3});
+    int filter_call_count = 0;
+    int map_call_count = 0;
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 2;
+        })
+        .sort_ascending()
+        .map<std::string>([&map_call_count](const int& value) {
+            ++map_call_count;
+            return std::to_string(value);
+        });
+
+    EXPECT_EQ(0, filter_call_count);
+    EXPECT_EQ(0, map_call_count);
+
+    const auto materialized_vector = lazy_vector.get();
+
+    EXPECT_EQ(vector<std::string>({"3", "4", "5"}), materialized_vector);
+    EXPECT_EQ(5, filter_call_count);
+    EXPECT_EQ(3, map_call_count);
+}
+
+TEST(VectorTest, LazyZipWithFunctionalVector)
+{
+    const vector<int> vector_under_test({1, 2, 3, 4});
+    const vector<std::string> names({"three", "four"});
+    int filter_call_count = 0;
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .filter([&filter_call_count](const int& value) {
+            ++filter_call_count;
+            return value > 2;
+        })
+        .zip(names);
+
+    EXPECT_EQ(0, filter_call_count);
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(2, zipped_vector.size());
+    EXPECT_EQ(3, zipped_vector[0].first);
+    EXPECT_EQ("three", zipped_vector[0].second);
+    EXPECT_EQ(4, zipped_vector[1].first);
+    EXPECT_EQ("four", zipped_vector[1].second);
+    EXPECT_EQ(4, filter_call_count);
+}
+
+TEST(VectorTest, LazyZipWithStdVector)
+{
+    const vector<int> vector_under_test({1, 2, 3});
+    const std::vector<std::string> names({"one", "two", "three"});
+
+    const auto zipped_vector = vector_under_test
+        .lazy()
+        .zip(names)
+        .get();
+
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(1, zipped_vector[0].first);
+    EXPECT_EQ("one", zipped_vector[0].second);
+    EXPECT_EQ(2, zipped_vector[1].first);
+    EXPECT_EQ("two", zipped_vector[1].second);
+    EXPECT_EQ(3, zipped_vector[2].first);
+    EXPECT_EQ("three", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithTemporaryFunctionalVector)
+{
+    const vector<int> vector_under_test({1, 2, 3});
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .zip(vector<std::string>({"one", "two", "three"}));
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(1, zipped_vector[0].first);
+    EXPECT_EQ("one", zipped_vector[0].second);
+    EXPECT_EQ(2, zipped_vector[1].first);
+    EXPECT_EQ("two", zipped_vector[1].second);
+    EXPECT_EQ(3, zipped_vector[2].first);
+    EXPECT_EQ("three", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithTemporaryStdVector)
+{
+    const vector<int> vector_under_test({1, 2, 3});
+
+    const auto lazy_vector = vector_under_test
+        .lazy()
+        .zip(std::vector<std::string>({"one", "two", "three"}));
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(1, zipped_vector[0].first);
+    EXPECT_EQ("one", zipped_vector[0].second);
+    EXPECT_EQ(2, zipped_vector[1].first);
+    EXPECT_EQ("two", zipped_vector[1].second);
+    EXPECT_EQ(3, zipped_vector[2].first);
+    EXPECT_EQ("three", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithLazyVector)
+{
+    const vector<int> ages({32, 45, 37});
+    const vector<std::string> names({"Jake", "Anna", "Kate"});
+    int map_call_count = 0;
+
+    const auto lazy_names = names
+        .lazy()
+        .map<std::string>([&map_call_count](const std::string& name) {
+            ++map_call_count;
+            return name + "!";
+        });
+
+    const auto lazy_vector = ages
+        .lazy()
+        .zip(lazy_names);
+
+    EXPECT_EQ(0, map_call_count);
+
+    const auto zipped_vector = lazy_vector.get();
+
+    EXPECT_EQ(3, map_call_count);
+    EXPECT_EQ(3, zipped_vector.size());
+    EXPECT_EQ(32, zipped_vector[0].first);
+    EXPECT_EQ("Jake!", zipped_vector[0].second);
+    EXPECT_EQ(45, zipped_vector[1].first);
+    EXPECT_EQ("Anna!", zipped_vector[1].second);
+    EXPECT_EQ(37, zipped_vector[2].first);
+    EXPECT_EQ("Kate!", zipped_vector[2].second);
+}
+
+TEST(VectorTest, LazyZipWithDifferentSizesThrows)
+{
+    const vector<int> vector_under_test({1, 2});
+    const std::vector<std::string> names({"one"});
+
+    EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
+}
+
+TEST(VectorTest, LazyZipWithFunctionalVectorDifferentSizesThrows)
+{
+    const vector<int> vector_under_test({1, 2});
+    const vector<std::string> names({"one"});
+
+    EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
+}
+
+TEST(VectorTest, LazyZipWithLazyVectorDifferentSizesThrows)
+{
+    const vector<int> vector_under_test({1, 2});
+    const auto names = vector<std::string>({"one"}).lazy();
+
+    EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
 }
 
 #pragma warning( pop )

@@ -21,20 +21,383 @@
 // SOFTWARE.
 
 #pragma once
+#include "compatibility.h"
+
 #include <algorithm>
 #include <cassert>
-#include <type_traits>
-#include <vector>
-#include <iterator>
-#include "index_range.h"
-#include "optional.h"
+#include <cstddef>
+#include <cstdlib>
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
 #include <execution>
 #endif
+#include <functional>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#include "index_range.h"
+#include "optional.h"
 
 namespace fcpp {
     template <class T, class Compare>
     class set;
+
+    template <typename T>
+    class vector;
+
+    // A lightweight wrapper representing a deferred vector pipeline, enabling fluent and functional
+    // programming while avoiding intermediate vector materialization.
+    //
+    // Member functions are non-mutating and keep extending the pipeline. Terminal functions such as
+    // `get` and `reduce` execute the stored operations.
+    template <typename T>
+    class lazy_vector
+    {
+    public:
+        lazy_vector()
+            : m_operation([](const std::function<void(const T&)>&) {})
+            , m_capacity_hint(0)
+        {
+        }
+
+        // Creates a lazy vector by copying the provided std::vector as an owned source.
+        explicit lazy_vector(const std::vector<T>& vector)
+            : m_capacity_hint(vector.size())
+        {
+            auto source = std::make_shared<std::vector<T>>(vector);
+            m_operation = [source](const std::function<void(const T&)>& consumer) {
+                std::for_each(source->begin(), source->end(), consumer);
+            };
+        }
+
+        // Creates a lazy vector by moving the provided std::vector as an owned source.
+        explicit lazy_vector(std::vector<T>&& vector)
+            : m_capacity_hint(vector.size())
+        {
+            auto source = std::make_shared<std::vector<T>>(std::move(vector));
+            m_operation = [source](const std::function<void(const T&)>& consumer) {
+                std::for_each(source->begin(), source->end(), consumer);
+            };
+        }
+
+        // Creates a lazy vector by directly providing the deferred operation.
+        // This constructor is mostly useful for composing lazy_vector instances.
+        lazy_vector(std::function<void(const std::function<void(const T&)>&)> operation, size_t capacity_hint)
+            : m_operation(std::move(operation))
+            , m_capacity_hint(capacity_hint)
+        {
+        }
+
+        // Performs the functional `map` algorithm lazily. The transform is not applied until
+        // a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> input_vector({ 1, 3, -5 });
+        //      const auto output_vector = input_vector
+        //          .lazy()
+        //          .map<std::string>([](const auto& element) {
+        //              return std::to_string(element);
+        //          })
+        //          .get();
+        //
+        // outcome:
+        //      output_vector -> fcpp::vector<std::string>({ "1", "3", "-5" })
+#ifdef CPP17_AVAILABLE
+        template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
+#else
+        template <typename U, typename Transform>
+#endif
+        [[nodiscard]] lazy_vector<U> map(Transform&& transform) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            typename std::decay<Transform>::type transform_copy(std::forward<Transform>(transform));
+            return lazy_vector<U>(
+                [previous, transform_copy](const std::function<void(const U&)>& consumer) mutable {
+                    previous([&consumer, &transform_copy](const T& element) {
+                        consumer(transform_copy(element));
+                    });
+                },
+                capacity_hint);
+        }
+
+        // Performs the functional `map` algorithm lazily.
+        // See also `map` for more documentation.
+#ifdef CPP17_AVAILABLE
+        template <typename U, typename Transform, typename = std::enable_if_t<std::is_invocable_r_v<U, Transform, T>>>
+#else
+        template <typename U, typename Transform>
+#endif
+        [[nodiscard]] lazy_vector<U> mapped(Transform&& transform) const
+        {
+            return map<U>(std::forward<Transform>(transform));
+        }
+
+        // Performs the functional `filter` algorithm lazily, in which all elements which match
+        // the given predicate are kept. The predicate is not applied until a terminal operation,
+        // such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+        //      const auto filtered_numbers = numbers
+        //          .lazy()
+        //          .filter([](const auto& element) {
+        //              return element >= 1.5;
+        //          })
+        //          .get();
+        //
+        // outcome:
+        //      filtered_numbers -> fcpp::vector<int>({ 3, 2, 9 })
+#ifdef CPP17_AVAILABLE
+        template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
+#else
+        template <typename Filter>
+#endif
+        [[nodiscard]] lazy_vector filter(Filter&& predicate_to_keep) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            typename std::decay<Filter>::type predicate_copy(std::forward<Filter>(predicate_to_keep));
+            return lazy_vector(
+                [previous, predicate_copy](const std::function<void(const T&)>& consumer) mutable {
+                    previous([&consumer, &predicate_copy](const T& element) {
+                        if (predicate_copy(element)) {
+                            consumer(element);
+                        }
+                    });
+                },
+                capacity_hint);
+        }
+
+        // Performs the functional `filter` algorithm lazily.
+        // See also `filter` for more documentation.
+#ifdef CPP17_AVAILABLE
+        template <typename Filter, typename = std::enable_if_t<std::is_invocable_r_v<bool, Filter, T>>>
+#else
+        template <typename Filter>
+#endif
+        [[nodiscard]] lazy_vector filtered(Filter&& predicate_to_keep) const
+        {
+            return filter(std::forward<Filter>(predicate_to_keep));
+        }
+
+        // Performs the functional `zip` algorithm lazily, in which every element of the resulting
+        // lazy vector is a tuple of this instance's element (first) and the second vector's element
+        // (second) at the same index. The sizes of the two vectors must be equal.
+        //
+        // example:
+        //      const fcpp::vector<int> ages_vector({ 32, 25, 53 });
+        //      const fcpp::vector<std::string> names_vector({ "Jake", "Mary", "John" });
+        //      const auto zipped_vector = ages_vector
+        //          .lazy()
+        //          .zip(names_vector)
+        //          .get();
+        //
+        // outcome:
+        //      zipped_vector -> fcpp::vector<std::pair<int, std::string>>({
+        //                          (32, "Jake"),
+        //                          (25, "Mary"),
+        //                          (53, "John"),
+        //                       })
+        template <typename U>
+        [[nodiscard]] lazy_vector<std::pair<T, U>> zip(const vector<U>& vector) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            const auto vector_copy = vector;
+            return lazy_vector<std::pair<T, U>>(
+                [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                    size_t index = 0;
+                    previous([&vector_copy, &consumer, &index](const T& element) {
+                        if (index >= vector_copy.size()) {
+                            assert(false);
+                            std::abort();
+                        }
+                        consumer({element, vector_copy[index]});
+                        ++index;
+                    });
+                    if (index != vector_copy.size()) {
+                        assert(false);
+                        std::abort();
+                    }
+                },
+                capacity_hint);
+        }
+
+        // Performs the functional `zip` algorithm lazily, in which every element of the resulting
+        // lazy vector is a tuple of this instance's element (first) and the std::vector's element
+        // (second) at the same index. The sizes of the two vectors must be equal.
+        template <typename U>
+        [[nodiscard]] lazy_vector<std::pair<T, U>> zip(const std::vector<U>& vector) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            const auto vector_copy = vector;
+            return lazy_vector<std::pair<T, U>>(
+                [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                    size_t index = 0;
+                    previous([&vector_copy, &consumer, &index](const T& element) {
+                        if (index >= vector_copy.size()) {
+                            assert(false);
+                            std::abort();
+                        }
+                        consumer({element, vector_copy[index]});
+                        ++index;
+                    });
+                    if (index != vector_copy.size()) {
+                        assert(false);
+                        std::abort();
+                    }
+                },
+                capacity_hint);
+        }
+
+        // Performs the functional `zip` algorithm lazily, in which every element of the resulting
+        // lazy vector is a tuple of this instance's element (first) and the second lazy vector's
+        // element (second) at the same index. The sizes of the two lazy vectors must be equal.
+        // The right-hand lazy vector is materialized internally when a terminal operation is called.
+        template <typename U>
+        [[nodiscard]] lazy_vector<std::pair<T, U>> zip(const lazy_vector<U>& vector) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            return lazy_vector<std::pair<T, U>>(
+                [previous, vector](const std::function<void(const std::pair<T, U>&)>& consumer) {
+                    const auto materialized_vector = vector.get();
+                    size_t index = 0;
+                    previous([&materialized_vector, &consumer, &index](const T& element) {
+                        if (index >= materialized_vector.size()) {
+                            assert(false);
+                            std::abort();
+                        }
+                        consumer({element, materialized_vector[index]});
+                        ++index;
+                    });
+                    if (index != materialized_vector.size()) {
+                        assert(false);
+                        std::abort();
+                    }
+                },
+                capacity_hint);
+        }
+
+        // Sorts the lazy vector. The comparison predicate takes two elements
+        // `v1` and `v2` and returns true if the first element `v1` should appear before `v2`.
+        // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 3, 1, 9, -4 });
+        //      const auto sorted_numbers = numbers
+        //          .lazy()
+        //          .sort([](const auto& number1, const auto& number2) {
+        //              return number1 < number2;
+        //          })
+        //          .get();
+        //
+        // outcome:
+        //      sorted_numbers -> fcpp::vector<int>({ -4, 1, 3, 9 })
+#ifdef CPP17_AVAILABLE
+        template <typename Sortable, typename = std::enable_if_t<std::is_invocable_r_v<bool, Sortable, T, T>>>
+#else
+        template <typename Sortable>
+#endif
+        [[nodiscard]] lazy_vector sort(Sortable&& comparison_predicate) const
+        {
+            const auto previous = m_operation;
+            const auto capacity_hint = m_capacity_hint;
+            typename std::decay<Sortable>::type comparison_copy(std::forward<Sortable>(comparison_predicate));
+            return lazy_vector(
+                [previous, capacity_hint, comparison_copy](const std::function<void(const T&)>& consumer) mutable {
+                    std::vector<T> sorted_vector;
+                    sorted_vector.reserve(capacity_hint);
+                    previous([&sorted_vector](const T& element) {
+                        sorted_vector.push_back(element);
+                    });
+
+                    std::sort(sorted_vector.begin(),
+                              sorted_vector.end(),
+                              comparison_copy);
+                    std::for_each(sorted_vector.begin(),
+                                  sorted_vector.end(),
+                                  consumer);
+                },
+                capacity_hint);
+        }
+
+        // Sorts the lazy vector in ascending order, when its elements support comparison by std::less [<].
+        // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 3, 1, 9, -4 });
+        //      const auto sorted_numbers = numbers
+        //          .lazy()
+        //          .sort_ascending()
+        //          .get();
+        //
+        // outcome:
+        //      sorted_numbers -> fcpp::vector<int>({ -4, 1, 3, 9 })
+        [[nodiscard]] lazy_vector sort_ascending() const
+        {
+            return sort(std::less<T>());
+        }
+
+        // Sorts the lazy vector in descending order, when its elements support comparison by std::greater [>].
+        // Sorting is deferred until a terminal operation, such as `get` or `reduce`, is called.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 3, 1, 9, -4 });
+        //      const auto sorted_numbers = numbers
+        //          .lazy()
+        //          .sort_descending()
+        //          .get();
+        //
+        // outcome:
+        //      sorted_numbers -> fcpp::vector<int>({ 9, 3, 1, -4 })
+        [[nodiscard]] lazy_vector sort_descending() const
+        {
+            return sort(std::greater<T>());
+        }
+
+        // Performs the functional `reduce` (fold/accumulate) algorithm, by returning the result of
+        // accumulating all the values in this lazy vector to an initial value.
+        //
+        // example:
+        //      const fcpp::vector<int> numbers({ 1, 3, -5, 2, -1, 9, -4 });
+        //      const auto sum = numbers
+        //          .lazy()
+        //          .filter([](const auto& element) {
+        //              return element > 0;
+        //          })
+        //          .reduce(0, [](const int& partial_sum, const int& number) {
+        //              return partial_sum + number;
+        //          });
+        //
+        // outcome:
+        //      sum -> 15
+#ifdef CPP17_AVAILABLE
+        template <typename U, typename Reduce, typename = std::enable_if_t<std::is_invocable_r_v<U, Reduce, U, T>>>
+#else
+        template <typename U, typename Reduce>
+#endif
+        U reduce(const U& initial, Reduce&& reduction) const
+        {
+            auto result = initial;
+            m_operation([&result, &reduction](const T& element) {
+                result = reduction(result, element);
+            });
+            return result;
+        }
+
+        // Materializes this lazy vector to a functional vector, executing all stored operations.
+        [[nodiscard]] vector<T> get() const;
+
+    private:
+        std::function<void(const std::function<void(const T&)>&)> m_operation;
+        size_t m_capacity_hint;
+    };
 
     // A lightweight wrapper around std::vector, enabling fluent and functional
     // programming on the vector itself, rather than using the more procedural style
@@ -1429,6 +1792,13 @@ namespace fcpp {
             return *this;
         }
 
+        // Starts a lazy pipeline. The returned lazy vector defers following map/filter
+        // transformations until a terminal operation, such as get() or reduce(), is called.
+        [[nodiscard]] lazy_vector<T> lazy() const
+        {
+            return lazy_vector<T>(m_vector);
+        }
+
         // Returns the begin iterator, useful for other standard library algorithms
         [[nodiscard]] typename std::vector<T>::iterator begin()
         {
@@ -1685,4 +2055,15 @@ namespace fcpp {
             assert(index <= size());
         }
     };
+
+    template <typename T>
+    [[nodiscard]] vector<T> lazy_vector<T>::get() const
+    {
+        std::vector<T> materialized;
+        materialized.reserve(m_capacity_hint);
+        m_operation([&materialized](const T& element) {
+            materialized.push_back(element);
+        });
+        return vector<T>(std::move(materialized));
+    }
 }

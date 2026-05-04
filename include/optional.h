@@ -24,15 +24,19 @@
 #pragma once
 #include "compatibility.h"
 
-namespace fcpp {
 #ifdef CPP17_AVAILABLE
 #include <optional>
+#else
+#include <cassert>
+#include <cstddef>
+#include <utility>
+#endif
+
+namespace fcpp {
+#ifdef CPP17_AVAILABLE
 template<typename T>
 using optional_t = std::optional<T>;
 #else
-#include <cstddef>
-#include <utility>
-
     // A replacement for std::optional when C++17 is not available
     template <typename T>
     class optional

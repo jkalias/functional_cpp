@@ -21,7 +21,10 @@
 // SOFTWARE.
 
 #pragma once
+#include <cstddef>
+#include <functional>
 #include <string>
+#include <utility>
 
 struct child
 {
@@ -39,12 +42,6 @@ struct child
     
     bool operator< (const child& other) const {
         return age < other.age;
-    }
-};
-
-struct child_comparator {
-    bool operator() (const child& a, const child& b) const {
-        return a < b;
     }
 };
 
