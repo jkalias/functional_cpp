@@ -61,12 +61,19 @@ struct stateful_descending_int_compare
     bool descending;
 };
 
+std::set<int, stateful_descending_int_compare> make_stateful_ordered_set(
+    const std::initializer_list<int>& values,
+    bool descending)
+{
+    std::set<int, stateful_descending_int_compare> result{stateful_descending_int_compare(descending)};
+    result.insert(values.begin(), values.end());
+    return result;
+}
+
 std::set<int, stateful_descending_int_compare> make_stateful_descending_set(
     const std::initializer_list<int>& values)
 {
-    std::set<int, stateful_descending_int_compare> result(stateful_descending_int_compare(true));
-    result.insert(values.begin(), values.end());
-    return result;
+    return make_stateful_ordered_set(values, true);
 }
 
 TEST(SetTest, EmptyConstructor)
@@ -960,6 +967,21 @@ TEST(SetTest, LazyDifferenceWithLazySet)
     EXPECT_EQ(6, map_call_count);
 }
 
+TEST(SetTest, LazyDifferenceWithLazySetNormalizesRightHandComparatorState)
+{
+    const set<int, stateful_descending_int_compare> set1(make_stateful_ordered_set({1, 2, 3, 4}, true));
+    const set<int, stateful_descending_int_compare> set2(make_stateful_ordered_set({2, 4, 6}, false));
+
+    const auto diff = set1
+        .lazy()
+        .difference_with(set2.lazy())
+        .get();
+
+    EXPECT_EQ(2, diff.size());
+    EXPECT_EQ(3, diff[0]);
+    EXPECT_EQ(1, diff[1]);
+}
+
 TEST(SetTest, LazyDifferenceWithTemporaryFunctionalSet)
 {
     const set<int> set1({1, 2, 3, 5, 7, 8, 10});
@@ -1044,6 +1066,24 @@ TEST(SetTest, LazyUnionWithLazySet)
 
     EXPECT_EQ(set<int>({1, 2, 3, 4, 5, 7, 8, 9, 10}), combined);
     EXPECT_EQ(6, map_call_count);
+}
+
+TEST(SetTest, LazyUnionWithLazySetNormalizesRightHandComparatorState)
+{
+    const set<int, stateful_descending_int_compare> set1(make_stateful_ordered_set({1, 2, 3, 4}, true));
+    const set<int, stateful_descending_int_compare> set2(make_stateful_ordered_set({2, 4, 6}, false));
+
+    const auto combined = set1
+        .lazy()
+        .union_with(set2.lazy())
+        .get();
+
+    EXPECT_EQ(5, combined.size());
+    EXPECT_EQ(6, combined[0]);
+    EXPECT_EQ(4, combined[1]);
+    EXPECT_EQ(3, combined[2]);
+    EXPECT_EQ(2, combined[3]);
+    EXPECT_EQ(1, combined[4]);
 }
 
 TEST(SetTest, LazyUnionWithTemporaryFunctionalSet)
@@ -1133,6 +1173,21 @@ TEST(SetTest, LazyIntersectionWithLazySet)
 
     EXPECT_EQ(set<int>({3, 5, 7, 10}), intersection);
     EXPECT_EQ(6, map_call_count);
+}
+
+TEST(SetTest, LazyIntersectionWithLazySetNormalizesRightHandComparatorState)
+{
+    const set<int, stateful_descending_int_compare> set1(make_stateful_ordered_set({1, 2, 3, 4}, true));
+    const set<int, stateful_descending_int_compare> set2(make_stateful_ordered_set({2, 4, 6}, false));
+
+    const auto intersection = set1
+        .lazy()
+        .intersect_with(set2.lazy())
+        .get();
+
+    EXPECT_EQ(2, intersection.size());
+    EXPECT_EQ(4, intersection[0]);
+    EXPECT_EQ(2, intersection[1]);
 }
 
 TEST(SetTest, LazyIntersectionWithTemporaryFunctionalSet)

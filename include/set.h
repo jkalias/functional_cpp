@@ -219,7 +219,7 @@ namespace fcpp {
                         current.insert(key);
                     });
 
-                    const auto materialized_other = other.get();
+                    const auto materialized_other = materialize_with_compare(other, compare);
                     std::set<TKey, TCompare> diff(compare);
                     std::set_difference(current.begin(),
                                         current.end(),
@@ -272,7 +272,7 @@ namespace fcpp {
                         current.insert(key);
                     });
 
-                    const auto materialized_other = other.get();
+                    const auto materialized_other = materialize_with_compare(other, compare);
                     std::set<TKey, TCompare> combined(compare);
                     std::set_union(current.begin(),
                                    current.end(),
@@ -325,7 +325,7 @@ namespace fcpp {
                         current.insert(key);
                     });
 
-                    const auto materialized_other = other.get();
+                    const auto materialized_other = materialize_with_compare(other, compare);
                     std::set<TKey, TCompare> intersection(compare);
                     std::set_intersection(current.begin(),
                                           current.end(),
@@ -457,6 +457,15 @@ namespace fcpp {
         [[nodiscard]] set<TKey, TCompare> get() const;
 
     private:
+        [[nodiscard]] static std::set<TKey, TCompare> materialize_with_compare(const lazy_set& other,
+                                                                               const TCompare& compare)
+        {
+            const auto materialized_other = other.get();
+            return std::set<TKey, TCompare>(materialized_other.begin(),
+                                            materialized_other.end(),
+                                            compare);
+        }
+
         TCompare m_compare;
         std::function<void(const std::function<void(const TKey&)>&)> m_operation;
     };
