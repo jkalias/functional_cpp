@@ -868,6 +868,22 @@ TEST(SetTest, LazyZipWithLazyVector)
     EXPECT_EQ(4, map_call_count);
 }
 
+TEST(SetTest, LazyZipWithLazyVectorFewerDistinctValuesThrows)
+{
+    const set<int> ages({25, 45});
+    const vector<std::string> persons({"Jake"});
+
+    EXPECT_DEATH({ const auto zipped = ages.lazy().zip(persons.lazy()).get(); }, "");
+}
+
+TEST(SetTest, LazyZipWithLazyVectorMoreDistinctValuesThrows)
+{
+    const set<int> ages({25});
+    const vector<std::string> persons({"Jake", "Bob"});
+
+    EXPECT_DEATH({ const auto zipped = ages.lazy().zip(persons.lazy()).get(); }, "");
+}
+
 TEST(SetTest, LazyZipWithLazySet)
 {
     const set<int> ages({25, 45, 30, 63});

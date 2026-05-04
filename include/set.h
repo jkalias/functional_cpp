@@ -388,11 +388,17 @@ namespace fcpp {
                     std::set<UKey> distinct_values(materialized_vector.begin(), materialized_vector.end());
                     auto it = distinct_values.begin();
                     previous([&distinct_values, &it, &consumer](const TKey& key) {
-                        assert(it != distinct_values.end());
+                        if (it == distinct_values.end()) {
+                            assert(false);
+                            std::abort();
+                        }
                         consumer({key, *it});
                         ++it;
                     });
-                    assert(it == distinct_values.end());
+                    if (it != distinct_values.end()) {
+                        assert(false);
+                        std::abort();
+                    }
                 });
         }
 
