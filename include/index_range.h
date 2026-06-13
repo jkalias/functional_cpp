@@ -27,7 +27,7 @@
 struct FunctionalCppExport index_range
 {
     // Used for returning values of invalid operations
-    static index_range invalid;
+    static const index_range invalid;
     
     // Create with start index and element count (end index is calculated)
     static index_range start_count(int start, int count);

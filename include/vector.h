@@ -212,17 +212,11 @@ namespace fcpp {
                 [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
                     size_t index = 0;
                     previous([&vector_copy, &consumer, &index](const T& element) {
-                        if (index >= vector_copy.size()) {
-                            assert(false);
-                            std::abort();
-                        }
+                        FCPP_PRECONDITION(index < vector_copy.size());
                         consumer({element, vector_copy[index]});
                         ++index;
                     });
-                    if (index != vector_copy.size()) {
-                        assert(false);
-                        std::abort();
-                    }
+                    FCPP_PRECONDITION(index == vector_copy.size());
                 },
                 capacity_hint);
         }
@@ -240,17 +234,11 @@ namespace fcpp {
                 [previous, vector_copy](const std::function<void(const std::pair<T, U>&)>& consumer) {
                     size_t index = 0;
                     previous([&vector_copy, &consumer, &index](const T& element) {
-                        if (index >= vector_copy.size()) {
-                            assert(false);
-                            std::abort();
-                        }
+                        FCPP_PRECONDITION(index < vector_copy.size());
                         consumer({element, vector_copy[index]});
                         ++index;
                     });
-                    if (index != vector_copy.size()) {
-                        assert(false);
-                        std::abort();
-                    }
+                    FCPP_PRECONDITION(index == vector_copy.size());
                 },
                 capacity_hint);
         }
@@ -269,17 +257,11 @@ namespace fcpp {
                     const auto materialized_vector = vector.get();
                     size_t index = 0;
                     previous([&materialized_vector, &consumer, &index](const T& element) {
-                        if (index >= materialized_vector.size()) {
-                            assert(false);
-                            std::abort();
-                        }
+                        FCPP_PRECONDITION(index < materialized_vector.size());
                         consumer({element, materialized_vector[index]});
                         ++index;
                     });
-                    if (index != materialized_vector.size()) {
-                        assert(false);
-                        std::abort();
-                    }
+                    FCPP_PRECONDITION(index == materialized_vector.size());
                 },
                 capacity_hint);
         }
@@ -1284,7 +1266,10 @@ namespace fcpp {
         //        numbers -> fcpp::vector<int>({ 1, 4, 2, 7, 1 })
         vector& remove_range(index_range range)
         {
-            if (!range.is_valid || size() < range.end + 1) {
+            // A valid range guarantees range.end >= 0, so the cast is safe. Comparing
+            // against range.end directly (rather than range.end + 1) avoids signed
+            // integer overflow and the signed/unsigned mismatch with size().
+            if (!range.is_valid || size() <= static_cast<size_t>(range.end)) {
                 return *this;
             }
             m_vector.erase(begin() + range.start,
@@ -1302,7 +1287,8 @@ namespace fcpp {
         //        shorter_vector -> fcpp::vector<int>({ 1, 4, 3, 1, 7, 1 })
         [[nodiscard]] vector removing_range(index_range range) const
         {
-            if (!range.is_valid || size() < range.end + 1) {
+            // See remove_range for why the comparison is written this way.
+            if (!range.is_valid || size() <= static_cast<size_t>(range.end)) {
                 return *this;
             }
             auto shorter_vector(m_vector);
@@ -1958,7 +1944,7 @@ namespace fcpp {
         {
 #endif
             const auto vec_size = std::distance(vec_begin, vec_end);
-            assert(m_vector.size() == vec_size);
+            FCPP_PRECONDITION(m_vector.size() == static_cast<size_t>(vec_size));
             std::vector<std::pair<T, U>> combined_vector;
             combined_vector.reserve(vec_size);
             for (size_t i = 0; i < vec_size; ++i) {
@@ -2019,7 +2005,8 @@ namespace fcpp {
                                      const Iterator& vec_end)
         {
             const auto vec_size = std::distance(vec_begin, vec_end);
-            assert(index + vec_size >= vec_size && index + vec_size <= size());
+            FCPP_PRECONDITION(static_cast<size_t>(vec_size) <= size()
+                              && index <= size() - static_cast<size_t>(vec_size));
             std::copy(vec_begin,
                       vec_end,
                       m_vector.begin() + index);
@@ -2037,7 +2024,8 @@ namespace fcpp {
                                                     const Iterator& vec_end) const
         {
             const auto vec_size = std::distance(vec_begin, vec_end);
-            assert(index + vec_size >= vec_size && index + vec_size <= size());
+            FCPP_PRECONDITION(static_cast<size_t>(vec_size) <= size()
+                              && index <= size() - static_cast<size_t>(vec_size));
             auto replaced_vector(m_vector);
             std::copy(vec_begin,
                       vec_end,
@@ -2047,12 +2035,12 @@ namespace fcpp {
 
         void assert_smaller_size(size_t index) const
         {
-            assert(index < size());
+            FCPP_PRECONDITION(index < size());
         }
 
         void assert_smaller_or_equal_size(size_t index) const
         {
-            assert(index <= size());
+            FCPP_PRECONDITION(index <= size());
         }
     };
 

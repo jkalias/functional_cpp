@@ -656,7 +656,7 @@ public:
     const TValue& operator[](const TKey& key) const
     {
         const auto it = m_map.find(key);
-        assert(it != end());
+        FCPP_PRECONDITION(it != end());
         return (*it).second;
     }
 

@@ -95,6 +95,12 @@ TEST(MapTest, AccessOperator)
     EXPECT_EQ(0, persons["john"]);
 }
 
+TEST(MapTest, AccessConstOperatorMissingKeyDeath)
+{
+    const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});
+    EXPECT_DEATH(persons["john"], "");
+}
+
 TEST(MapTest, MapTo)
 {
     const map<std::string, int> persons({{"jake", 32}, {"mary", 26}, {"david", 40}});

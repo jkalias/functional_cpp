@@ -19,6 +19,7 @@ The primary focus of this library is
   * [macOS (Makefiles/g++)](#macos-makefilesg)
   * [Linux (Makefiles)](#linux-makefiles)
   * [Windows (Visual Studio)](#windows-visual-studio)
+* [Error handling](#error-handling)
 * [Functional vector usage (fcpp::vector)](#functional-vector-usage-fcppvector)
   * [extract unique (distinct) elements in a set](#extract-unique-distinct-elements-in-a-set)
   * [zip, map, filter, sort, reduce](#zip-map-filter-sort-reduce)
@@ -90,6 +91,17 @@ cd functional_cpp
 cmake -S . -B build
 ```
 Then open the generated ```functional_cpp.sln``` in the ```build``` folder.
+
+## Error handling
+Operations with a precondition (for example subscripting with ```operator[]```, ```replace_range_at```, or ```zip``` on containers of unequal size) validate that precondition at runtime. If it is violated, the program is terminated immediately via ```std::abort()```.
+
+Unlike the standard library's ```assert```, these checks are **always active and behave identically in debug and release builds** (they are not disabled by ```NDEBUG```), so an out-of-bounds access fails fast in production instead of becoming silent undefined behavior.
+
+If you have a performance-critical section whose inputs are already known to be valid, you can compile the checks out by defining ```FCPP_NO_PRECONDITION_CHECKS```:
+```console
+cmake -S . -B build -DCMAKE_CXX_FLAGS="-DFCPP_NO_PRECONDITION_CHECKS"
+```
+With the checks disabled, violating a precondition is undefined behavior, exactly like the underlying ```std::vector```/```std::set```/```std::map```.
 
 ## Functional vector usage (fcpp::vector)
 ### extract unique (distinct) elements in a set

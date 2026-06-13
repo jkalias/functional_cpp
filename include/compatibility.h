@@ -22,10 +22,30 @@
 
 #pragma once
 
+#include <cstdlib>
+
 #if __cplusplus >= 201703L
 #define CPP17_AVAILABLE
 #endif
 
 #if defined(CPP17_AVAILABLE) && !defined(__clang__)
 #define PARALLEL_ALGORITHM_AVAILABLE
+#endif
+
+// Runtime precondition check that behaves identically in debug and release builds.
+// Unlike assert (which is disabled when NDEBUG is defined), this always evaluates
+// the condition and calls std::abort() on failure, keeping the library's fatal
+// error model consistent across build types.
+//
+// Define FCPP_NO_PRECONDITION_CHECKS to compile the checks out (e.g. for hot paths
+// whose inputs have already been validated).
+#ifdef FCPP_NO_PRECONDITION_CHECKS
+#define FCPP_PRECONDITION(condition) ((void)0)
+#else
+#define FCPP_PRECONDITION(condition) \
+    do {                             \
+        if (!(condition)) {          \
+            std::abort();            \
+        }                            \
+    } while (false)
 #endif
