@@ -606,11 +606,13 @@ namespace fcpp {
         //      minimum.value() -> 1
         [[nodiscard]] fcpp::optional_t<TKey> min() const
         {
-            const auto& it = std::min_element(begin(), end());
-            if (it != end()) {
-                return *it;
+            if (m_set.empty()) {
+                return fcpp::optional_t<TKey>();
             }
-            return fcpp::optional_t<TKey>();
+            // The set is already ordered by TCompare, so the minimum is the first
+            // element (O(1)). Using std::min_element would re-rank by operator<,
+            // ignoring the custom comparator and costing O(n).
+            return *begin();
         }
 
         // Returns the maximum key in the set, if it's not empty.
@@ -627,11 +629,13 @@ namespace fcpp {
         //      maximum.value() -> 8
         [[nodiscard]] fcpp::optional_t<TKey> max() const
         {
-            const auto& it = std::max_element(begin(), end());
-            if (it != end()) {
-                return *it;
+            if (m_set.empty()) {
+                return fcpp::optional_t<TKey>();
             }
-            return fcpp::optional_t<TKey>();
+            // The set is already ordered by TCompare, so the maximum is the last
+            // element (O(1)). Using std::max_element would re-rank by operator<,
+            // ignoring the custom comparator and costing O(n).
+            return *std::prev(end());
         }
 
         // Performs the functional `map` algorithm, in which every element of the resulting set is the
@@ -1102,17 +1106,9 @@ namespace fcpp {
         TKey operator[](size_t index)
         {
             assert_smaller_size(index);
-#ifdef CPP17_AVAILABLE
-            auto it = std::advance(begin(), index);
-            return *it;
-#else
-            auto count = 0;
             auto it = begin();
-            while (count++ < index) {
-                ++it;
-            }
+            std::advance(it, index);
             return *it;
-#endif
         }
 
         // Returns a copy of the key at the given sorted position.
