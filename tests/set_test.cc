@@ -332,6 +332,35 @@ TEST(SetTest, MaxEmptySet)
     EXPECT_FALSE(maximum.has_value());
 }
 
+// min()/max() must respect the set's own comparator, not operator<.
+// The descending comparator orders ints opposite to operator<, so the
+// comparator-smallest element is the largest int, and vice versa.
+TEST(SetTest, MinRespectsCustomComparator)
+{
+    const set<int, stateful_descending_int_compare> numbers(
+        make_stateful_descending_set({1, 4, 2, 5, 8, 3}));
+    const auto minimum = numbers.min();
+    EXPECT_TRUE(minimum.has_value());
+    EXPECT_EQ(8, minimum.value());
+}
+
+TEST(SetTest, MaxRespectsCustomComparator)
+{
+    const set<int, stateful_descending_int_compare> numbers(
+        make_stateful_descending_set({1, 4, 2, 5, 8, 3}));
+    const auto maximum = numbers.max();
+    EXPECT_TRUE(maximum.has_value());
+    EXPECT_EQ(1, maximum.value());
+}
+
+TEST(SetTest, NonConstSubscripting)
+{
+    set<int> set_under_test(std::set<int>({1, 5, 3, 3}));
+    EXPECT_EQ(1, set_under_test[0]);
+    EXPECT_EQ(3, set_under_test[1]);
+    EXPECT_EQ(5, set_under_test[2]);
+}
+
 TEST(SetTest, Map)
 {
     const set<int> numbers({4, 1, 3});
