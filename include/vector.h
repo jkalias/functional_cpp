@@ -1284,7 +1284,10 @@ namespace fcpp {
         //        numbers -> fcpp::vector<int>({ 1, 4, 2, 7, 1 })
         vector& remove_range(index_range range)
         {
-            if (!range.is_valid || size() < range.end + 1) {
+            // A valid range guarantees range.end >= 0, so the cast is safe. Comparing
+            // against range.end directly (rather than range.end + 1) avoids signed
+            // integer overflow and the signed/unsigned mismatch with size().
+            if (!range.is_valid || size() <= static_cast<size_t>(range.end)) {
                 return *this;
             }
             m_vector.erase(begin() + range.start,
@@ -1302,7 +1305,8 @@ namespace fcpp {
         //        shorter_vector -> fcpp::vector<int>({ 1, 4, 3, 1, 7, 1 })
         [[nodiscard]] vector removing_range(index_range range) const
         {
-            if (!range.is_valid || size() < range.end + 1) {
+            // See remove_range for why the comparison is written this way.
+            if (!range.is_valid || size() <= static_cast<size_t>(range.end)) {
                 return *this;
             }
             auto shorter_vector(m_vector);
