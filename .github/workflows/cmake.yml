@@ -22,7 +22,7 @@ jobs:
         config: 
         - {
             name: "Windows Latest MSVC (C++11)",
-            os: windows-latest,
+            os: windows-2022,
             build_type: "Debug",
             cc: "cl",
             cxx: "cl",
@@ -31,7 +31,7 @@ jobs:
           }
         - {
             name: "Windows Latest MSVC (C++17)",
-            os: windows-latest,
+            os: windows-2022,
             build_type: "Debug",
             cc: "cl",
             cxx: "cl",
