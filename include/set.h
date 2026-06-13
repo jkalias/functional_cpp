@@ -388,17 +388,11 @@ namespace fcpp {
                     std::set<UKey> distinct_values(materialized_vector.begin(), materialized_vector.end());
                     auto it = distinct_values.begin();
                     previous([&distinct_values, &it, &consumer](const TKey& key) {
-                        if (it == distinct_values.end()) {
-                            assert(false);
-                            std::abort();
-                        }
+                        FCPP_PRECONDITION(it != distinct_values.end());
                         consumer({key, *it});
                         ++it;
                     });
-                    if (it != distinct_values.end()) {
-                        assert(false);
-                        std::abort();
-                    }
+                    FCPP_PRECONDITION(it == distinct_values.end());
                 });
         }
 
@@ -415,17 +409,11 @@ namespace fcpp {
                     const auto materialized_set = set.get();
                     size_t index = 0;
                     previous([&materialized_set, &consumer, &index](const TKey& key) {
-                        if (index >= materialized_set.size()) {
-                            assert(false);
-                            std::abort();
-                        }
+                        FCPP_PRECONDITION(index < materialized_set.size());
                         consumer({key, materialized_set[index]});
                         ++index;
                     });
-                    if (index != materialized_set.size()) {
-                        assert(false);
-                        std::abort();
-                    }
+                    FCPP_PRECONDITION(index == materialized_set.size());
                 });
         }
 
@@ -1169,7 +1157,7 @@ namespace fcpp {
 
         void assert_smaller_size(const size_t index) const
         {
-            assert(index < size());
+            FCPP_PRECONDITION(index < size());
         }
 
 #ifdef CPP17_AVAILABLE
@@ -1185,7 +1173,7 @@ namespace fcpp {
         {
 #endif
             const auto vec_size = std::distance(set_begin, set_end);
-            assert(size() == vec_size);
+            FCPP_PRECONDITION(size() == static_cast<size_t>(vec_size));
             std::set<std::pair<TKey, UKey>> combined_set;
             auto it1 = begin();
             auto it2 = set_begin;
