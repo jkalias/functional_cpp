@@ -518,7 +518,7 @@ namespace fcpp {
                                 other.begin(),
                                 other.end(),
                                 std::inserter(diff, diff.begin()));
-            return set(diff);
+            return set(std::move(diff));
         }
 
         [[nodiscard]] set difference_with(const std::set<TKey, TCompare>& other) const
@@ -545,7 +545,7 @@ namespace fcpp {
                            other.begin(),
                            other.end(),
                            std::inserter(combined, combined.begin()));
-            return set(combined);
+            return set(std::move(combined));
         }
 
         [[nodiscard]] set union_with(const std::set<TKey, TCompare>& other) const
@@ -572,7 +572,7 @@ namespace fcpp {
                                   other.begin(),
                                   other.end(),
                                   std::inserter(intersection, intersection.begin()));
-            return set(intersection);
+            return set(std::move(intersection));
         }
 
         [[nodiscard]] set intersect_with(const std::set<TKey, TCompare>& other) const
@@ -656,7 +656,7 @@ namespace fcpp {
             for (const auto& key : m_set) {
                 transformed_set.insert(transform(key));
             }
-            return set<UKey, UCompare>(transformed_set);
+            return set<UKey, UCompare>(std::move(transformed_set));
         }
 
         // Returns true if all keys match the predicate (return true)
@@ -830,7 +830,7 @@ namespace fcpp {
                     copy.insert(*it);
                 }
             }
-            return set(copy);
+            return set(std::move(copy));
         }
 
 #ifdef CPP17_AVAILABLE
@@ -928,7 +928,7 @@ namespace fcpp {
             for_each([&vec](const TKey& key){
                 vec.insert_back(key);
             });
-            return std::move(vec);
+            return vec;
         }
 
         // Removes an element from the set, if it exists, potentially changing the set's contents (mutating)
@@ -958,7 +958,7 @@ namespace fcpp {
         {
             auto copy(m_set);
             copy.erase(element);
-            return set(copy);
+            return set(std::move(copy));
         }
 
         // Inserts an element in the set, if it does not already exist, potentially changing the set's contents (mutating)
@@ -988,7 +988,7 @@ namespace fcpp {
         {
             auto copy(m_set);
             copy.insert(element);
-            return set(copy);
+            return set(std::move(copy));
         }
 
         // Removes all keys from the set (mutating)
@@ -1089,7 +1089,8 @@ namespace fcpp {
         }
 
         // Returns a copy of the key at the given sorted position.
-        // Bounds checking (assert) is enabled for debug builds.
+        // Bounds checking is always enabled (in both debug and release builds): an out-of-bounds
+        // index calls std::abort(). Define FCPP_NO_PRECONDITION_CHECKS to disable the check.
         // Performance is O(n), so be careful for performance critical code sections.
         TKey operator[](size_t index)
         {
@@ -1100,7 +1101,8 @@ namespace fcpp {
         }
 
         // Returns a copy of the key at the given sorted position.
-        // Bounds checking (assert) is enabled for debug builds.
+        // Bounds checking is always enabled (in both debug and release builds): an out-of-bounds
+        // index calls std::abort(). Define FCPP_NO_PRECONDITION_CHECKS to disable the check.
         // Performance is O(n), so be careful for performance critical code sections.
         TKey operator[](size_t index) const
         {
@@ -1180,7 +1182,7 @@ namespace fcpp {
             for (; it1 != end() && it2 != set_end; ++it1, ++it2) {
                 combined_set.insert({*it1, *it2});
             }
-            return set<std::pair<TKey, UKey>>(combined_set);
+            return set<std::pair<TKey, UKey>>(std::move(combined_set));
         }
     };
 

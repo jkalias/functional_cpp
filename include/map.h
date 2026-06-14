@@ -452,7 +452,7 @@ public:
                 ++it;
             }
         }
-        return map(copy);
+        return map(std::move(copy));
     }
 
     // Executes the given operation for each key/value pair in the map. The operation must not
@@ -543,7 +543,7 @@ public:
     {
         auto copy(m_map);
         copy.erase(key);
-        return map(copy);
+        return map(std::move(copy));
     }
 
     // Inserts a key/value pair in place (mutating). If an equivalent key already exists, the
@@ -583,7 +583,7 @@ public:
     {
         auto copy(m_map);
         copy.insert(std::make_pair(key, value));
-        return map(copy);
+        return map(std::move(copy));
     }
 
     // Returns a copy of this instance with the key/value pair inserted (non-mutating). If an
@@ -592,7 +592,7 @@ public:
     {
         auto copy(m_map);
         copy.insert(element);
-        return map(copy);
+        return map(std::move(copy));
     }
 
     // Removes all key/value pairs from the map (mutating)
@@ -651,8 +651,9 @@ public:
         return m_map.end();
     }
 
-    // Returns a reference to the value that is mapped to a key,
-    // assuming that such key already exists.
+    // Returns a reference to the value that is mapped to a key, which must already exist.
+    // If the key is not present the program calls std::abort() (in both debug and release
+    // builds). Define FCPP_NO_PRECONDITION_CHECKS to disable the check.
     const TValue& operator[](const TKey& key) const
     {
         const auto it = m_map.find(key);

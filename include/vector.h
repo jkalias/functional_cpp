@@ -454,7 +454,7 @@ namespace fcpp {
                            m_vector.end(),
                            std::back_inserter(transformed_vector),
                            std::forward<Transform>(transform));
-            return vector<U>(transformed_vector);
+            return vector<U>(std::move(transformed_vector));
         }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
@@ -470,7 +470,7 @@ namespace fcpp {
                            m_vector.cend(),
                            transformed_vector.begin(),
                            std::forward<Transform>(transform));
-            return vector<U>(transformed_vector);
+            return vector<U>(std::move(transformed_vector));
         }
 #endif
 
@@ -704,7 +704,7 @@ namespace fcpp {
                          m_vector.end(),
                          std::back_inserter(filtered_vector),
                          std::forward<Callable>(predicate_to_keep));
-            return vector(filtered_vector);
+            return vector(std::move(filtered_vector));
         }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
@@ -726,7 +726,7 @@ namespace fcpp {
                      m_vector.end(),
                      std::back_inserter(filtered_vector),
                      std::forward<Callable>(predicate_to_keep));
-        return vector(filtered_vector);
+        return vector(std::move(filtered_vector));
 #endif
         }
 #endif
@@ -999,7 +999,7 @@ namespace fcpp {
             std::sort(sorted_vector.begin(),
                       sorted_vector.end(),
                       std::forward<Sortable>(comparison_predicate));
-            return vector(sorted_vector);
+            return vector(std::move(sorted_vector));
         }
 
 #ifdef PARALLEL_ALGORITHM_AVAILABLE
@@ -1013,7 +1013,7 @@ namespace fcpp {
                       sorted_vector.begin(),
                       sorted_vector.end(),
                       std::forward<Sortable>(comparison_predicate));
-            return fcpp::vector(sorted_vector);
+            return fcpp::vector(std::move(sorted_vector));
         }
 #endif
 
@@ -1192,7 +1192,7 @@ namespace fcpp {
             assert_smaller_size(index);
             auto copy(m_vector);
             copy.erase(copy.begin() + index);
-            return vector(copy);
+            return vector(std::move(copy));
         }
 
         // Removes the last element, if present (mutating)
@@ -1221,7 +1221,7 @@ namespace fcpp {
         {
             auto copy(m_vector);
             copy.pop_back();
-            return vector(copy);
+            return vector(std::move(copy));
         }
 
         // Removes the first element, if present (mutating)
@@ -1294,7 +1294,7 @@ namespace fcpp {
             auto shorter_vector(m_vector);
             shorter_vector.erase(shorter_vector.begin() + range.start,
                                  shorter_vector.begin() + range.start + range.count);
-            return vector(shorter_vector);
+            return vector(std::move(shorter_vector));
         }
 
         // Inserts an element at the given index, therefore changing the vector's contents (mutating)
@@ -1325,7 +1325,7 @@ namespace fcpp {
             assert_smaller_or_equal_size(index);
             auto copy(m_vector);
             copy.insert(copy.begin() + index, element);
-            return vector(copy);
+            return vector(std::move(copy));
         }
 
         // Inserts a range of elements starting at the given index, therefore changing the vector's contents (mutating)
@@ -1422,7 +1422,7 @@ namespace fcpp {
         //      numbers -> fcpp::vector({1, 4, 2, 5, 8, 3, 1, 7, 1, 18});
         vector& insert_back(T value)
         {
-            m_vector.push_back(value);
+            m_vector.push_back(std::move(value));
             return *this;
         }
 
@@ -1450,8 +1450,8 @@ namespace fcpp {
         [[nodiscard]] vector inserting_back(T value) const
         {
             auto augmented_vector(m_vector);
-            augmented_vector.push_back(value);
-            return vector(augmented_vector);
+            augmented_vector.push_back(std::move(value));
+            return vector(std::move(augmented_vector));
         }
 
         // Makes a copy of the vector, inserts value at the beginning of the copy and returns the copy (non-mutating)
@@ -1824,7 +1824,8 @@ namespace fcpp {
         }
 
         // Returns a reference to the element in the given index, allowing subscripting and value editing.
-        // Bounds checking (assert) is enabled for debug builds.
+        // Bounds checking is always enabled (in both debug and release builds): an out-of-bounds
+        // index calls std::abort(). Define FCPP_NO_PRECONDITION_CHECKS to disable the check.
         T& operator[](size_t index)
         {
             assert_smaller_size(index);
@@ -1832,7 +1833,8 @@ namespace fcpp {
         }
 
         // Returns a constant reference to the element in the given index, allowing subscripting.
-        // Bounds checking (assert) is enabled for debug builds.
+        // Bounds checking is always enabled (in both debug and release builds): an out-of-bounds
+        // index calls std::abort(). Define FCPP_NO_PRECONDITION_CHECKS to disable the check.
         const T& operator[](size_t index) const
         {
             assert_smaller_size(index);
@@ -1912,7 +1914,7 @@ namespace fcpp {
             augmented_vector.insert(augmented_vector.end(),
                                     vec_begin,
                                     vec_end);
-            return vector(augmented_vector);
+            return vector(std::move(augmented_vector));
         }
 
 #ifdef CPP17_AVAILABLE
@@ -1928,7 +1930,7 @@ namespace fcpp {
             augmented_vector.insert(augmented_vector.begin(),
                                     vec_begin,
                                     vec_end);
-            return vector(augmented_vector);
+            return vector(std::move(augmented_vector));
         }
 
 #ifdef CPP17_AVAILABLE
@@ -2030,7 +2032,7 @@ namespace fcpp {
             std::copy(vec_begin,
                       vec_end,
                       replaced_vector.begin() + index);
-            return vector(replaced_vector);
+            return vector(std::move(replaced_vector));
         }
 
         void assert_smaller_size(size_t index) const
