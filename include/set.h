@@ -1065,25 +1065,25 @@ namespace fcpp {
         }
 
         // Returns the begin iterator, useful for other standard library algorithms
-        [[nodiscard]] typename std::set<TKey>::iterator begin()
+        [[nodiscard]] typename std::set<TKey, TCompare>::iterator begin()
         {
             return m_set.begin();
         }
 
         // Returns the const begin iterator, useful for other standard library algorithms
-        [[nodiscard]] typename std::set<TKey>::const_iterator begin() const
+        [[nodiscard]] typename std::set<TKey, TCompare>::const_iterator begin() const
         {
             return m_set.begin();
         }
 
         // Returns the end iterator, useful for other standard library algorithms
-        [[nodiscard]] typename std::set<TKey>::iterator end()
+        [[nodiscard]] typename std::set<TKey, TCompare>::iterator end()
         {
             return m_set.end();
         }
 
         // Returns the const end iterator, useful for other standard library algorithms
-        [[nodiscard]] typename std::set<TKey>::const_iterator end() const
+        [[nodiscard]] typename std::set<TKey, TCompare>::const_iterator end() const
         {
             return m_set.end();
         }

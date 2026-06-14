@@ -54,7 +54,10 @@ using optional_t = std::optional<T>;
 
         optional& operator=(optional const& other)
         {
-            _value = nullptr;
+            if (this == &other) {
+                return *this;
+            }
+            reset();
             if (other.has_value()) {
                 _value = new T{other.value()};
             }
