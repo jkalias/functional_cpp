@@ -108,3 +108,14 @@ TEST(OptionalTest, CopyConstructorNullTest)
     const optional_t<int> v1(v2);
     EXPECT_FALSE(v1.has_value());
 }
+
+TEST(OptionalTest, SelfAssignmentTest)
+{
+    optional_t<int> v(5);
+    // Assign through an alias so the self-assignment is not diagnosed by the
+    // compiler but still exercises operator=(optional const&) with this == &other.
+    const optional_t<int>& alias = v;
+    v = alias;
+    EXPECT_TRUE(v.has_value());
+    EXPECT_EQ(5, v.value());
+}
