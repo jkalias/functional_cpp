@@ -1687,4 +1687,29 @@ TEST(VectorTest, LazyZipWithLazyVectorDifferentSizesThrows)
     EXPECT_DEATH({ const auto zipped_vector = vector_under_test.lazy().zip(names).get(); }, "");
 }
 
+TEST(VectorTest, NonMutatingReturnMovesInsteadOfCopies)
+{
+    const vector<counted> vector_under_test({counted(3), counted(1), counted(4), counted(2)});
+    counted::reset();
+    const auto shorter = vector_under_test.removing_back();
+    // The single unavoidable copy is the working copy of the underlying std::vector
+    // (4 elements). The returned wrapper must move that copy, not copy it again.
+    // Before the fix this was 2 * 4 - 1 = 7.
+    EXPECT_EQ(4, counted::copy_count());
+    EXPECT_EQ(3u, shorter.size());
+}
+
+TEST(VectorTest, InsertBackMovesElementInsteadOfCopyingTwice)
+{
+    vector<counted> vector_under_test;
+    vector_under_test.reserve(10);
+    const counted element(5);
+    counted::reset();
+    vector_under_test.insert_back(element);
+    // The lvalue is copied once into the by-value parameter, then moved into storage.
+    // Before the fix the parameter was copied a second time (2 copies, 0 moves).
+    EXPECT_EQ(1, counted::copy_count());
+    EXPECT_EQ(1, counted::move_count());
+}
+
 #pragma warning( pop )

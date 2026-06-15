@@ -1260,3 +1260,15 @@ TEST(SetTest, LazyIntersectionWithFunctionalSetPreservesComparatorState)
     EXPECT_EQ(4, intersection[0]);
     EXPECT_EQ(2, intersection[1]);
 }
+
+TEST(SetTest, NonMutatingReturnMovesInsteadOfCopies)
+{
+    const set<counted> set_under_test(std::vector<counted>({counted(3), counted(1), counted(2)}));
+    counted::reset();
+    const auto unchanged = set_under_test.removing(counted(999));
+    // The single unavoidable copy is the working copy of the underlying std::set
+    // (3 elements). The returned wrapper must move that copy, not copy it again.
+    // Before the fix this was 2 * 3 = 6.
+    EXPECT_EQ(3, counted::copy_count());
+    EXPECT_EQ(3u, unchanged.size());
+}

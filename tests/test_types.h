@@ -80,3 +80,28 @@ struct person_comparator {
         return a < b;
     }
 };
+
+// A type that counts how many times it is copy- vs move-constructed, used to verify
+// that non-mutating operations move their internal containers instead of copying them.
+// The counters are function-local statics so the type stays header-only across all
+// test translation units (no separate .cc and no C++17 inline-variable requirement).
+struct counted
+{
+    static int& copy_count() { static int count = 0; return count; }
+    static int& move_count() { static int count = 0; return count; }
+    static void reset() { copy_count() = 0; move_count() = 0; }
+
+    counted() : value(0) {}
+    counted(int value) : value(value) {}
+
+    counted(const counted& other) : value(other.value) { ++copy_count(); }
+    counted(counted&& other) noexcept : value(other.value) { ++move_count(); }
+
+    counted& operator=(const counted& other) { value = other.value; return *this; }
+    counted& operator=(counted&& other) noexcept { value = other.value; return *this; }
+
+    int value;
+
+    bool operator==(const counted& other) const { return value == other.value; }
+    bool operator<(const counted& other) const { return value < other.value; }
+};
